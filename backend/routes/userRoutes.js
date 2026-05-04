@@ -4,6 +4,8 @@ const db = require('../config/db');
 
 const jwt = require('jsonwebtoken');
 
+const authMiddleware = require('../middlewares/authMiddleware');
+
 router.post('/users', (req, res) => {
     const {username, password, tipo} = req.body;
 
@@ -51,6 +53,13 @@ router.get('/users', (req, res) => {
             return res.status(500).json(err);
         }
         res.json(result);
+    });
+});
+
+router.get('/perfil', authMiddleware, (req, res) => {
+    res.json({
+        message: "Voce está logado!",
+        user: req.user
     });
 });
 
