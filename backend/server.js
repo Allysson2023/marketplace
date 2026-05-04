@@ -15,6 +15,9 @@ app.use('/api', storeRoutes);
 const productRoutes = require('./routes/productRoutes');
 app.use('/api', productRoutes);
 
+const cartRoutes = require('./routes/cartRoutes');
+app.use('/api', cartRoutes);
+
 app.get('/', (req, res) => {
     res.send("Servidor funcionando!");
 });
