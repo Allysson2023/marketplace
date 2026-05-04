@@ -16,6 +16,23 @@ router.post('/users', (req, res) => {
     });
 });
 
+router.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    const sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+
+    db.query(sql, [username, password], (err, result) => {
+        if (err) {
+            return res.status(500).json(err);
+        }
+        if(result.length > 0) {
+            res.json({ message: "Login feito com sucesso!" });
+        } else {
+            res.status(401).json({ message: "Usuário ou senha inválidos" });
+        }
+    });
+});
+
 router.get('/users', (req, res) => {
     db.query("SELECT * FROM users", (err, result) => {
         if (err) {
