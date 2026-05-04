@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
+const jwt = require('jsonwebtoken');
+
 router.post('/users', (req, res) => {
     const {username, password, tipo} = req.body;
 
@@ -26,9 +28,19 @@ router.post('/login', (req, res) => {
             return res.status(500).json(err);
         }
         if(result.length > 0) {
-            res.json({ message: "Login feito com sucesso!" });
+            const user = result[0];
+
+            const token = jwt.sign(
+                { id: user.id, username: user.username },
+                "segredo_super",
+                { expiresIn: "1h"}
+            );
+            res.json({
+                message: "Login feito com sucesso!",
+                token: token
+            });
         } else {
-            res.status(401).json({ message: "Usuário ou senha inválidos" });
+            res.status(401).json({ message: "Usuário ou senha inválidos "});
         }
     });
 });
