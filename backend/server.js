@@ -4,6 +4,12 @@ const app = express();
 
 require('./config/db');
 
+app.use(express.json());
+
+const userRoutes = require('./routes/userRoutes');
+app.use('/api', userRoutes);
+
+
 app.get('/', (req, res) => {
     res.send("Servidor funcionando!");
 });
