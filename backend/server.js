@@ -12,6 +12,9 @@ app.use('/api', userRoutes);
 const storeRoutes = require('./routes/storeRoutes');
 app.use('/api', storeRoutes);
 
+const productRoutes = require('./routes/productRoutes');
+app.use('/api', productRoutes);
+
 app.get('/', (req, res) => {
     res.send("Servidor funcionando!");
 });
