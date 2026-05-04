@@ -9,6 +9,8 @@ app.use(express.json());
 const userRoutes = require('./routes/userRoutes');
 app.use('/api', userRoutes);
 
+const storeRoutes = require('./routes/storeRoutes');
+app.use('/api', storeRoutes);
 
 app.get('/', (req, res) => {
     res.send("Servidor funcionando!");
