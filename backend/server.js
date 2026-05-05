@@ -4,6 +4,8 @@ const app = express();
 
 require('./config/db');
 
+const cors = require('cors');
+app.use(cors());
 app.use(express.json());
 
 const userRoutes = require('./routes/userRoutes');
@@ -17,6 +19,7 @@ app.use('/api', productRoutes);
 
 const cartRoutes = require('./routes/cartRoutes');
 app.use('/api', cartRoutes);
+
 
 app.get('/', (req, res) => {
     res.send("Servidor funcionando!");
