@@ -1,13 +1,22 @@
 import { useEffect, useState } from "react";
+import Login from "./pages/Login";
 
-const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJhbGx5c3NvbiIsImlhdCI6MTc3ODAyNDM5OCwiZXhwIjoxNzc4MTk3MTk4fQ.qLOsDfOywULqRbpKgRTI_rpV1lVUtLIDlIH97U01qWQ";
+const token = localStorage.getItem("token");
 
 function App() {
   const [carrinho, setCarrinho] = useState([]);
   const [produtos, setProdutos] = useState([]);
+  
+  const token = localStorage.getItem("token");
+    
+    if (!token) {
+      return <Login/>;
+    }
 
   function adicionarCarrinho(id) {
+
+    const token = localStorage.getItem("token");
+
     fetch("http://localhost:3000/api/cart", {
       method: "POST",
       headers: {
@@ -27,6 +36,8 @@ function App() {
   }
 
   function carregarCarrinho() {
+    const token = localStorage.getItem("token");
+
     fetch("http://localhost:3000/api/cart", {
       headers: {
         "Authorization": "Bearer " + token
@@ -53,9 +64,10 @@ function App() {
   }
 
   useEffect(() => {
+
     fetch("http://localhost:3000/api/products")
       .then(res => res.json())
-      .then(data => setProdutos(data));
+      .then(data => setProdutos(data))
 
     carregarCarrinho();
   }, []);
