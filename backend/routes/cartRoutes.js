@@ -41,7 +41,7 @@ router.get('/cart', authMiddleware, (req, res) =>{
         SELECT products.nome, products.preco, cart_items.quantidade
         FROM cart_items
         JOIN cart ON cart.id = cart_items.cart_id
-        JOIN products ON products.id = cart_items.product_is
+        JOIN products ON products.id = cart_items.product_id
         WHERE cart.user_id = ?
     `;
     
