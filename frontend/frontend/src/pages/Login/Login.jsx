@@ -32,6 +32,8 @@ function Login() {
   }
 
   return (
+    <div className="container-geral">
+
     <div className="login-container">
       <h2>Login</h2>
 
@@ -53,6 +55,7 @@ function Login() {
       </form>
 
       <p>{mensagem}</p>
+    </div>
     </div>
   );
 }
