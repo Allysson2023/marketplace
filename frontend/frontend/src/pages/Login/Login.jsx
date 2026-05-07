@@ -7,29 +7,67 @@ function Login() {
   const [mensagem, setMensagem] = useState("");
 
   async function handleLogin(e) {
-    e.preventDefault();
 
-    try {
-      const resposta = await fetch("http://localhost:3000/api/login", {
-        method: "POST",
+  e.preventDefault();
+
+  try {
+
+    const resposta = await fetch("http://localhost:3000/api/login", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        username,
+        password
+      })
+
+    });
+
+    const dados = await resposta.json();
+
+    if (resposta.ok) {
+
+      localStorage.setItem("token", dados.token);
+
+      fetch("http://localhost:3000/api/minha-loja", {
+
         headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ username, password })
+          Authorization: `Bearer ${dados.token}`
+        }
+
+      })
+      .then(res => res.json())
+      .then(loja => {
+
+        if(loja.existe){
+
+          window.location.href = "/";
+
+        } else {
+
+          window.location.href = "/cadastrar-loja";
+
+        }
+
       });
 
-      const dados = await resposta.json();
+    } else {
 
-      if (resposta.ok) {
-        localStorage.setItem("token", dados.token);
-        window.location.href = "/";
-      } else {
-        setMensagem(dados.error);
-      }
-    } catch (err) {
-      setMensagem("Erro no servidor");
+      setMensagem(dados.error);
+
     }
+
+  } catch (err) {
+
+    setMensagem("Erro no servidor");
+
   }
+
+}
 
   return (
     <div className="container-geral">
