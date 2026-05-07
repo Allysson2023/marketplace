@@ -125,6 +125,7 @@ body{
 }
 
 .menu-dropdown{
+    text-align: center;
     background: white;
 
     padding: 15px;

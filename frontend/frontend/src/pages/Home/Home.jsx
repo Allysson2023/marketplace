@@ -60,7 +60,7 @@ function Home() {
           </a>
 
           <a href="/perfil">
-            Atualizar
+            Atualizar Perfil
           </a>
 
         </div>
