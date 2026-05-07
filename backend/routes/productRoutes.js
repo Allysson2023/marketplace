@@ -4,18 +4,52 @@ const db = require('../config/db');
 const authMiddleware = require('../middlewares/authMiddleware');
 const { route } = require('./userRoutes');
 
-router.post('/products', authMiddleware,  (req, res) => {
-    const { nome, preco, store_id, categoria } = req.body;
+router.post('/products', authMiddleware, (req, res) => {
 
-    const sql = "INSERT INTO products (nome, preco, store_id, categoria) VALUES (?, ?, ?, ?)";
+    const { nome, preco, categoria } = req.body;
 
-    db.query(sql, [nome, preco, store_id, categoria], (err, result) => {
+    const userId = req.user.id;
+
+    const buscarLoja = "SELECT id FROM stores WHERE user_id = ?";
+
+    db.query(buscarLoja, [userId], (err, lojaResult) => {
+
         if (err) {
             return res.status(500).json(err);
         }
 
-        res.json({message: "Produto criado com sucesso!" });
+        if (lojaResult.length === 0) {
+            return res.status(404).json({
+                message: "Loja não encontrada"
+            });
+        }
+
+        const store_id = lojaResult[0].id;
+
+        const sql = `
+            INSERT INTO products
+            (nome, preco, store_id, categoria)
+            VALUES (?, ?, ?, ?)
+        `;
+
+        db.query(
+            sql,
+            [nome, preco, store_id, categoria],
+            (err, result) => {
+
+                if (err) {
+                    return res.status(500).json(err);
+                }
+
+                res.json({
+                    message: "Produto criado com sucesso!"
+                });
+
+            }
+        );
+
     });
+
 });
 
 router.get('/products', (req, res) => {

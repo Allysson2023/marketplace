@@ -24,8 +24,7 @@ function CadastrarProduto() {
       body: JSON.stringify({
         nome,
         preco,
-        categoria,
-        store_id: 1
+        categoria
       })
     })
     .then(res => res.json())
