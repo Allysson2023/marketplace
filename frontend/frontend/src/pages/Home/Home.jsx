@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import "./Home.css";
 
+function sair(){
+  localStorage.removeItem("token");
+  window.location.href = "/login";
+}
 
 function Home() {
   const [lojas, setLojas] = useState([]);
@@ -32,10 +36,17 @@ function Home() {
       <header className="topo">
         <h2>Economica</h2>
         
+      <div className="acoes-topo">
+
         <input 
           type="text" 
           placeholder="Buscar lojas..." 
-        />
+          />
+
+        <button onClick={sair} className="btn-sair" >Sair</button>
+        <button  className="btn-sair" > + </button>
+     
+      </div>
       </header>
 
       {/* 🧭 MENU */}
@@ -62,7 +73,7 @@ function Home() {
         ))}
       </div>
 
-        <h2 className="produto-titulo">Estoque</h2>
+        <h2 className="produto-titulo">Promoção</h2>
 
         <div className="produto-grid">
           {produtos.map(produto => (

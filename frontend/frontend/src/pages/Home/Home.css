@@ -59,12 +59,17 @@ body{
     flex-shrink: 0;
 }
 
-.topo input{
+.acoes-topo{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    flex: 1;
+}
+.acoes-topo input{
     flex: 1;
 
     width: 100%;
-    max-width: 100%;
-    min-width: 0;
 
     padding: 12px;
 
@@ -76,8 +81,26 @@ body{
     font-size: 15px;
 }
 
+.btn-sair{
+    background: #e53935;
+    color: white;
 
-/* ===== MENU ===== */
+    border: none;
+
+    padding: 12px 18px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+    transition: 0.3s;
+}
+
+.btn-sair:hover{
+    background: #c62828;
+}
 
 .menu{
     width: 100%;
@@ -269,9 +292,13 @@ body{
         font-size: 24px;
     }
 
-    .topo input{
-        width: 100%;
-    }
+    .acoes-topo{
+    width: 100%;
+}
+
+.acoes-topo input{
+    width: 100%;
+}
 
     .produto-grid{
         grid-template-columns: repeat(2, 1fr);
