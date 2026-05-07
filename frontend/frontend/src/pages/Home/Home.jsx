@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import "./Home.css";
 
+
 function Home() {
+  const [lojas, setLojas] = useState([]);
   const [produtos, setProdutos] = useState([]);
 
   const token = localStorage.getItem("token");
@@ -12,39 +14,69 @@ function Home() {
   }
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/products")
+    fetch("http://localhost:3000/api/stores")
       .then(res => res.json())
-      .then(data => setProdutos(data));
+      .then(data => setLojas(data));
   }, []);
 
-  function adicionarCarrinho(id) {
-    fetch("http://localhost:3000/api/cart", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      },
-      body: JSON.stringify({
-        product_id: id,
-        quantidade: 1
-      })
-    });
-  }
+  useEffect(() => {
+    fetch("http://localhost:3000/api/products")
+    .then(res => res.json())
+    .then(data => setProdutos(data));
+  }, []);
 
   return (
-    <div>
-      <h1>Produtos</h1>
+    <div className="home">
 
-      {produtos.map(p => (
-        <div key={p.id}>
-          <h3>{p.nome}</h3>
-          <p>R$ {p.preco}</p>
+      {/* 🔝 TOPO */}
+      <header className="topo">
+        <h2>Economica</h2>
+        
+        <input 
+          type="text" 
+          placeholder="Buscar lojas..." 
+        />
+      </header>
 
-          <button onClick={() => adicionarCarrinho(p.id)}>
-            Adicionar
-          </button>
+      {/* 🧭 MENU */}
+      <div className="menu">
+        <span>Roupas</span>
+        <span>Eletrônicos</span>
+        <span>Calçados</span>
+        <span>Promoções</span>
+      </div>
+
+      {/* 🏬 CARROSSEL DE LOJAS */}
+      <h3 className="titulo-secao">Nossas Lojas</h3>
+
+      <div className="carrossel" >
+        {lojas.map(loja => (
+          <div key={loja.id} className="card-loja">
+
+            <img 
+              src={loja.imagem || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl55ZXLSARGsTv4qgCQBC_UD8wwSrV-3I-qg&s"} 
+              alt={loja.nome}
+            />
+            <p>{loja.nome}</p>
+          </div>
+        ))}
+      </div>
+
+        <h2 className="produto-titulo">Estoque</h2>
+
+        <div className="produto-grid">
+          {produtos.map(produto => (
+            <div key={produto.id} className="card-produto">
+
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfRIKWWU4HDicibTE5El0JVkVIdtjTt0FYYg&s" alt="img" />
+
+              <p>{produto.nome}</p>
+
+            </div>
+          ))}
         </div>
-      ))}
+
+
     </div>
   );
 }
