@@ -10,6 +10,7 @@ function Home() {
   const [lojas, setLojas] = useState([]);
   const [produtos, setProdutos] = useState([]);
   const [menuAberto, setMenuAberto] = useState(false);
+  const [modalSair, setModalSair] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -44,8 +45,9 @@ function Home() {
           placeholder="Buscar lojas..." 
           />
 
-        <button onClick={sair} className="btn-sair" >Sair</button>
+        <button onClick={()=> setModalSair(true)} className="btn-sair" >Sair</button>
         <button 
+
         onClick={() => setMenuAberto(!menuAberto)}
         className="btn-mais" > + </button>
      
@@ -101,7 +103,37 @@ function Home() {
             </div>
           ))}
         </div>
+{modalSair && (
+  <div className="modal-overlay">
 
+    <div className="modal-sair">
+
+      <h3>Deseja sair?</h3>
+
+      <p>Você realmente deseja encerrar a sessão?</p>
+
+      <div className="modal-botoes">
+
+        <button
+          className="btn-cancelar"
+          onClick={() => setModalSair(false)}
+        >
+          Cancelar
+        </button>
+
+        <button
+          className="btn-confirmar"
+          onClick={sair}
+        >
+          Sair
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
 
     </div>
   );
