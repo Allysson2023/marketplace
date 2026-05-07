@@ -35,7 +35,7 @@ function Login() {
     <div className="container-geral">
 
     <div className="login-container">
-      <h2>Login</h2>
+      <h2>Economica</h2>
 
       <form onSubmit={handleLogin}>
         <input
