@@ -5,11 +5,11 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const { route } = require('./userRoutes');
 
 router.post('/products', authMiddleware,  (req, res) => {
-    const { nome, preco, store_id } = req.body;
+    const { nome, preco, store_id, categoria } = req.body;
 
-    const sql = "INSERT INTO products (nome, preco, store_id) VALUES (?, ?, ?)";
+    const sql = "INSERT INTO products (nome, preco, store_id, categoria) VALUES (?, ?, ?, ?)";
 
-    db.query(sql, [nome, preco, store_id], (err, result) => {
+    db.query(sql, [nome, preco, store_id, categoria], (err, result) => {
         if (err) {
             return res.status(500).json(err);
         }
