@@ -74,3 +74,17 @@
 .btn-voltar:hover{
     background: #616161 !important;
 }
+
+.mensagem-sucesso{
+    background: #c8e6c9;
+
+    color: #2e7d32;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    text-align: center;
+
+    font-weight: bold;
+}

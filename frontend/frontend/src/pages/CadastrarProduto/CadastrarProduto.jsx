@@ -8,6 +8,7 @@ function CadastrarProduto() {
   const [nome, setNome] = useState("");
   const [preco, setPreco] = useState("");
   const [categoria, setCategoria] = useState("");
+  const [mensagem, setMensagem] = useState("");
 
   function cadastrarProduto(e){
     e.preventDefault();
@@ -29,7 +30,7 @@ function CadastrarProduto() {
     })
     .then(res => res.json())
     .then(data => {
-      alert("Produto cadastrado!");
+      setMensagem("Produto cadastrado com sucesso!");
 
       setNome("");
       setPreco("");
@@ -43,7 +44,11 @@ function CadastrarProduto() {
       <form onSubmit={cadastrarProduto} className="form-produto">
 
         <h2>Cadastrar Produto</h2>
-
+        {mensagem && (
+            <div className="mensagem-sucesso">
+                {mensagem}
+            </div>  
+        )}
         <input
           type="text"
           placeholder="Nome do produto"
