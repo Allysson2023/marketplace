@@ -9,6 +9,7 @@ function sair(){
 function Home() {
   const [lojas, setLojas] = useState([]);
   const [produtos, setProdutos] = useState([]);
+  const [menuAberto, setMenuAberto] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -44,10 +45,24 @@ function Home() {
           />
 
         <button onClick={sair} className="btn-sair" >Sair</button>
-        <button  className="btn-sair" > + </button>
+        <button 
+        onClick={() => setMenuAberto(!menuAberto)}
+        className="btn-mais" > + </button>
      
       </div>
       </header>
+      {menuAberto && (
+        <div className="menu-dropdown">
+          <a href="/cadastrar-produto">
+            Cadastrar Produto
+          </a>
+
+          <a href="/perfil">
+            Atualizar Perfil
+          </a>
+
+        </div>
+      )}
 
       {/* 🧭 MENU */}
       <div className="menu">
