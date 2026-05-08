@@ -29,13 +29,36 @@ useEffect(() => {
     .then(res => res.json())
     .then(data => setCategorias(data));
 
-}, []);
+}, [token]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/stores")
-      .then(res => res.json())
-      .then(data => setLojas(data));
-  }, []);
+    fetch("http://localhost:3000/api/stores", {
+    headers: {
+        Authorization: `Bearer ${token}`
+    }
+})
+.then(res => {
+
+    if(res.status === 401){
+
+        localStorage.removeItem("token");
+
+        window.location.href = "/login";
+
+        return;
+    }
+
+    return res.json();
+
+})
+.then(data => {
+
+    if(data){
+        setLojas(data);
+    }
+
+});
+}, [token]);
 
   useEffect(() => {
 
@@ -45,9 +68,32 @@ useEffect(() => {
         url += `?categoria=${categoriaSelecionada}`;
     }
 
-    fetch(url)
-    .then(res => res.json())
-    .then(data => setProdutos(data));
+    fetch(url, {
+    headers: {
+        Authorization: `Bearer ${token}`
+    }
+})
+.then(res => {
+
+    if(res.status === 401){
+
+        localStorage.removeItem("token");
+
+        window.location.href = "/login";
+
+        return;
+    }
+
+    return res.json();
+
+})
+.then(data => {
+
+    if(data){
+        setProdutos(data);
+    }
+
+});
 
 }, [categoriaSelecionada]);
 
