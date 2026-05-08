@@ -291,3 +291,41 @@
     }
 
 }
+
+.btn-back{
+    position: fixed;
+
+    top: 20px;
+    left: 20px;
+
+    z-index: 999;
+
+    border: none;
+
+    background: rgba(255,255,255,0.2);
+
+    backdrop-filter: blur(12px);
+
+    color: white;
+
+    padding: 12px 20px;
+
+    border-radius: 14px;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.2);
+}
+
+.btn-back:hover{
+    transform: scale(1.05);
+
+    background: rgba(255,255,255,0.3);
+}

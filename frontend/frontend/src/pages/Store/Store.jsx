@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "./Store.css";
 
 function Store(){
 
     const { id } = useParams();
-
+    const navigate = useNavigate();
     const [produtos, setProdutos] = useState([]);
 
     useEffect(() => {
@@ -21,6 +21,11 @@ function Store(){
         <div className="store-page">
 
             {/* PERFIL DA LOJA */}
+            <button
+                className="btn-back"
+                onClick={() => navigate("/")}>
+                ← Voltar
+            </button>
             <div className="store-header">
 
                 <img
