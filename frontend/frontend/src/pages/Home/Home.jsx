@@ -11,6 +11,7 @@ function Home() {
   const [produtos, setProdutos] = useState([]);
   const [menuAberto, setMenuAberto] = useState(false);
   const [modalSair, setModalSair] = useState(false);
+  const [categorias, setCategorias] = useState([]);
 
   const token = localStorage.getItem("token");
 
@@ -18,6 +19,14 @@ function Home() {
     window.location.href = "/login";
     return null;
   }
+
+useEffect(() => {
+
+    fetch("http://localhost:3000/api/categories")
+    .then(res => res.json())
+    .then(data => setCategorias(data));
+
+}, []);
 
   useEffect(() => {
     fetch("http://localhost:3000/api/stores")
@@ -66,13 +75,17 @@ function Home() {
         </div>
       )}
 
-      {/* 🧭 MENU */}
       <div className="menu">
-        <span>Roupas</span>
-        <span>Eletrônicos</span>
-        <span>Calçados</span>
-        <span>Promoções</span>
-      </div>
+
+    {categorias.map(categoria => (
+
+        <span key={categoria.id}>
+            {categoria.nome}
+        </span>
+
+    ))}
+
+</div>
 
       {/* 🏬 CARROSSEL DE LOJAS */}
       <h3 className="titulo-secao">Nossas Lojas</h3>

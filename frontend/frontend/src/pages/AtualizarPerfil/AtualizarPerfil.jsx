@@ -7,6 +7,7 @@ function AtualizarPerfil(){
     const [nomeLoja, setNomeLoja] = useState("");
     const [categoria, setCategoria] = useState("");
     const [mensagem, setMensagem] = useState("");
+    const [categorias, setCategorias] = useState([]);
     const token = localStorage.getItem("token");
 
 useEffect(() => {
@@ -21,6 +22,14 @@ useEffect(() => {
         setNomeLoja(data.nomeLoja || "");
         setCategoria(data.categoria || "");
     });
+}, []);
+
+useEffect(() => {
+
+    fetch("http://localhost:3000/api/categories")
+    .then(res => res.json())
+    .then(data => setCategorias(data));
+
 }, []);
 
     async function atualizarPerfil(e){
@@ -101,12 +110,27 @@ useEffect(() => {
                     value={nomeLoja}
                     onChange={(e) => setNomeLoja(e.target.value)}
                 />
-                <input
-                    type="text"
-                    placeholder="Categoria da loja"
-                    value={categoria}
-                    onChange={(e) => setCategoria(e.target.value)}
-                />
+                <select
+    value={categoria}
+    onChange={(e) => setCategoria(e.target.value)}
+>
+
+    <option value="">
+        Escolha uma categoria
+    </option>
+
+    {categorias.map(cat => (
+
+        <option
+            key={cat.id}
+            value={cat.nome}
+        >
+            {cat.nome}
+        </option>
+
+    ))}
+
+</select>
                 <div className="botoes">
 
     <button type="submit">

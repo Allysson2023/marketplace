@@ -66,3 +66,17 @@
 .btn-voltar{
     background: #555 !important;
 }
+
+select{
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 10px;
+
+    outline: none;
+
+    font-size: 15px;
+}

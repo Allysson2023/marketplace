@@ -20,6 +20,8 @@ app.use('/api', productRoutes);
 const cartRoutes = require('./routes/cartRoutes');
 app.use('/api', cartRoutes);
 
+const categoryRoutes = require('./routes/categoryRoutes');
+app.use('/api', categoryRoutes);
 
 app.get('/', (req, res) => {
     res.send("Servidor funcionando!");
