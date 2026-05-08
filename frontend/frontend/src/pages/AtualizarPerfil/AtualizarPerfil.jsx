@@ -8,6 +8,7 @@ function AtualizarPerfil(){
     const [categoria, setCategoria] = useState("");
     const [mensagem, setMensagem] = useState("");
     const [categorias, setCategorias] = useState([]);
+    const [imagem, setImagem] = useState(null);
     const token = localStorage.getItem("token");
 
 useEffect(() => {
@@ -46,6 +47,16 @@ useEffect(() => {
 
     try{
 
+        const formData = new FormData();
+
+        formData.append("username", username);
+        formData.append("nomeLoja", nomeLoja);
+        formData.append("categoria", categoria);
+
+        if(imagem){
+            formData.append("imagem", imagem);
+        }
+
         const resposta = await fetch(
             "http://localhost:3000/api/update-profile",
             {
@@ -53,15 +64,10 @@ useEffect(() => {
                 method: "PUT",
 
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
                 },
 
-                body: JSON.stringify({
-                    username,
-                    nomeLoja,
-                    categoria
-                })
+                body: formData
 
             }
         );
@@ -70,7 +76,7 @@ useEffect(() => {
 
         if(resposta.ok){
 
-            alert("Perfil atualizado com sucesso!");
+            alert("Perfil Atualizado com sucesso!")
 
             localStorage.removeItem("token");
 
@@ -98,6 +104,10 @@ useEffect(() => {
                 onSubmit={atualizarPerfil}
             >
                 <h2>Atualizar Perfil</h2>
+
+                <input type="file"
+                    onChange={(e) => setImagem(e.target.files[0])}/>
+
                 <input
                     type="text"
                     placeholder="Novo usuário"
@@ -110,40 +120,37 @@ useEffect(() => {
                     value={nomeLoja}
                     onChange={(e) => setNomeLoja(e.target.value)}
                 />
-                <select
-    value={categoria}
-    onChange={(e) => setCategoria(e.target.value)}
->
+                <select value={categoria}
+                    onChange={(e) => setCategoria(e.target.value)}>
 
-    <option value="">
-        Escolha uma categoria
-    </option>
+                <option value="">
+                        Escolha uma categoria
+                </option>
 
-    {categorias.map(cat => (
+                {categorias.map(cat => (
 
-        <option
-            key={cat.id}
-            value={cat.nome}
-        >
-            {cat.nome}
-        </option>
-
+                <option
+                    key={cat.id}
+                    value={cat.nome}
+                >
+                {cat.nome}
+                </option>
     ))}
 
-</select>
+        </select>
                 <div className="botoes">
 
-    <button type="submit">
-        Atualizar
-    </button>
+        <button
+            type="button"
+            className="btn-voltar"
+            onClick={() => window.location.href = "/"} >
+            Voltar
+        </button>
 
-    <button
-        type="button"
-        className="btn-voltar"
-        onClick={() => window.location.href = "/"}
-    >
-        Voltar
-    </button>
+        <button type="submit">
+            Atualizar
+        </button>
+
 
 </div>
                 <p>{mensagem}</p>

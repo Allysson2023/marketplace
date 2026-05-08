@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 
 const authMiddleware = require('../middlewares/authMiddleware');
 
+const upload = require('../middlewares/uploadLojas');
+
 router.post('/users', (req, res) => {
     const {username, password, tipo} = req.body;
 
@@ -63,49 +65,58 @@ router.get('/perfil', authMiddleware, (req, res) => {
     });
 });
 
-router.put('/update-profile', authMiddleware, (req, res) => {
-
-    const {
-        username,
-        nomeLoja,
-        categoria
-    } = req.body;
+router.put('/update-profile', authMiddleware, upload.single('imagem'),
+  (req, res) => {
 
     const userId = req.user.id;
+    const { username, nomeLoja, categoria} = req.body;
 
-    const sql = `
-        UPDATE users
-        SET username = ?
-        WHERE id = ?
+    const imagem = req.file ? req.file.filename : null;
+
+    const sqlUser = `
+      UPDATE users SET username = ? WHERE id = ?
     `;
 
-    db.query(
-        sql,
-        [username, userId],
-        (err, result) => {
-
-            if(err){
-                return res.status(500).json(err);
-            }
-
-            const sqlLoja = `
-                UPDATE stores
-                SET nome = ?, categoria = ?
-                WHERE user_id = ?
-            `;
-
-            db.query(
-                sqlLoja,
-                [nomeLoja, categoria, userId]
-            );
-
-            res.json({
-                message: "Perfil atualizado!"
-            });
-
+    db.query( sqlUser, [username, userId], (err, result) => {
+        if(err){
+          return res.status(500).json(err);
         }
-    );
+        let sqlStore = `
+             UPDATE stores SET nome = ?, categoria = ?
+        `;
 
+        let valores = [ nomeLoja, categoria];
+
+        if(imagem){
+          sqlStore = `
+            UPDATE stores SET nome = ?, categoria = ?, imagem = ?
+            WHERE user_id = ?
+          `;
+
+          valores = [
+            nomeLoja, categoria, imagem, userId ];
+
+        }else{
+          sqlStore = `
+            UPDATE stores SET nome = ?, categoria = ?
+            WHERE user_id = ?
+          `;
+
+          valores = [ nomeLoja, categoria, userId ];
+        }
+
+        db.query( sqlStore, valores,
+          (err, result) => {
+            if(err){
+              return res.status(500).json(err);
+            }
+            res.json({
+              message: "Perfil atualizado com sucesso"
+            });
+          }
+        );
+      }
+    );
 });
 
 router.get('/profile', authMiddleware, (req, res) => {

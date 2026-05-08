@@ -4,6 +4,26 @@ const db = require('../config/db');
 const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadLojas');
 
+router.put( '/stores/imagem', authMiddleware, upload.single('imagem'),
+  (req, res) => {
+
+    const userId = req.user.id;
+    const imagem = req.file ? req.file.filename : null;
+
+    const sql = `
+      UPDATE stores SET imagem = ? WHERE user_id = ?
+    `;
+    db.query(sql,[imagem, userId],(err, result) => {
+        if(err){
+          return res.status(500).json(err);
+        }
+        res.json({
+          message: "Imagem atualizada com sucesso"
+        });
+      }
+    );
+});
+
 router.post('/stores', authMiddleware, upload.single('imagem'),(req, res) => {
 
     const { nome, categoria } = req.body;
