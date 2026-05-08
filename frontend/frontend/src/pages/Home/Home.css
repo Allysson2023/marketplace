@@ -403,6 +403,24 @@ body{
     color: white;
 }
 
+.categoria-item{
+    padding: 8px 14px;
+    margin-right: 8px;
+    cursor: pointer;
+    border-radius: 20px;
+    background: #eee;
+    transition: 0.3s;
+}
+
+.categoria-item:hover{
+    background: #ddd;
+}
+
+.categoria-ativa{
+    background: #2575fc;
+    color: white;
+}
+
 @keyframes aparecer{
     from{
         opacity: 0;

@@ -109,15 +109,22 @@ useEffect(() => {
       </div>
       <div className="menu">
 
+    <span
+        className="categoria-item"
+        onClick={() => setCategoriaSelecionada("")}
+    >
+        Todos
+    </span>
+
     {categorias.map(categoria => (
 
         <span
-        key={categoria.id}
-        onClick={() => setCategoriaSelecionada(categoria.nome)}
-        className="categoria-item"
-    >
-        {categoria.nome}
-    </span>
+            key={categoria.id}
+            className="categoria-item"
+            onClick={() => setCategoriaSelecionada(categoria.nome)}
+        >
+            {categoria.nome}
+        </span>
 
     ))}
 
