@@ -5,7 +5,7 @@ import Home from "./pages/Home/Home";
 import Carrinho from "./pages/Carrinho/Carrinho";
 import CadastrarProduto from "./pages/CadastrarProduto/CadastrarProduto";
 import CadastrarLoja from "./pages/CadastrarLoja/CadastrarLoja";
-
+import AtualizarPerfil from "./pages/AtualizarPerfil/AtualizarPerfil";
 
 function App() {
   return (
@@ -16,6 +16,7 @@ function App() {
         <Route path="/carrinho" element={<Carrinho />} />
         <Route path="/cadastrar-produto" element={<CadastrarProduto/>} />
         <Route path="/cadastrar-loja" element={<CadastrarLoja/>} />
+        <Route path="/atualizar-perfil" element={<AtualizarPerfil />} />
 
       </Routes>
     </BrowserRouter>

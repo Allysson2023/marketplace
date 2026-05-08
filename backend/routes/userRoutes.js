@@ -63,4 +63,76 @@ router.get('/perfil', authMiddleware, (req, res) => {
     });
 });
 
+router.put('/update-profile', authMiddleware, (req, res) => {
+
+    const {
+        username,
+        nomeLoja,
+        categoria
+    } = req.body;
+
+    const userId = req.user.id;
+
+    const sql = `
+        UPDATE users
+        SET username = ?
+        WHERE id = ?
+    `;
+
+    db.query(
+        sql,
+        [username, userId],
+        (err, result) => {
+
+            if(err){
+                return res.status(500).json(err);
+            }
+
+            const sqlLoja = `
+                UPDATE stores
+                SET nome = ?, categoria = ?
+                WHERE user_id = ?
+            `;
+
+            db.query(
+                sqlLoja,
+                [nomeLoja, categoria, userId]
+            );
+
+            res.json({
+                message: "Perfil atualizado!"
+            });
+
+        }
+    );
+
+});
+
+router.get('/profile', authMiddleware, (req, res) => {
+
+    const userId = req.user.id;
+
+    const sql = `
+        SELECT
+            users.username,
+            stores.nome AS nomeLoja,
+            stores.categoria
+        FROM users
+        LEFT JOIN stores
+        ON users.id = stores.user_id
+        WHERE users.id = ?
+    `;
+
+    db.query(sql, [userId], (err, result) => {
+
+        if(err){
+            return res.status(500).json(err);
+        }
+
+        res.json(result[0]);
+
+    });
+
+});
+
 module.exports = router

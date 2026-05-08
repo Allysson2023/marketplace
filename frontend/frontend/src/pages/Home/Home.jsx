@@ -59,7 +59,7 @@ function Home() {
             Cadastrar Produto
           </a>
 
-          <a href="/perfil">
+          <a href="/atualizar-perfil">
             Atualizar Perfil
           </a>
 
