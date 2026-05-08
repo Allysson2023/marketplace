@@ -66,11 +66,19 @@ router.get('/minha-loja', authMiddleware, (req, res) => {
 });
 
 router.get('/stores', (req, res) => {
-    db.query("SELECT * FROM stores", (err, result) => {
-        if (err) {
+    const { busca } = req.query;
+    let sql = "SELECT * FROM stores";
+    let values = [];
+
+    if(busca){
+        sql += " WHERE nome LIKE ?";
+        values.push(`%${busca}%`);
+    }
+    sql += " ORDER BY id DESC";
+    db.query(sql, values, (err, result) => {
+        if(err){
             return res.status(500).json(err);
         }
-
         res.json(result);
     });
 });

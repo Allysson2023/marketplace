@@ -41,17 +41,24 @@ router.post('/products', authMiddleware, (req, res) => {
 });
 
 router.get('/products', (req, res) => {
+    const { categoria, busca } = req.query;
 
-    const { categoria } = req.query;
-
-    let sql = "SELECT * FROM products";
+    let sql = `
+        SELECT * FROM products
+        WHERE 1=1
+    `;
     let values = [];
-
     if(categoria){
-        sql += " WHERE categoria = ?";
+        sql += " AND categoria = ?";
         values.push(categoria);
     }
-
+    if(busca){
+        sql += `
+            AND ( nome LIKE ? OR categoria LIKE ? )
+        `;
+        values.push(`%${busca}%`);
+        values.push(`%${busca}%`);
+    }
     sql += " ORDER BY id DESC";
 
     db.query(sql, values, (err, result) => {
@@ -59,11 +66,8 @@ router.get('/products', (req, res) => {
         if(err){
             return res.status(500).json(err);
         }
-
         res.json(result);
-
     });
-
 });
 
 router.get('/stores/:id/products', (req, res) => {

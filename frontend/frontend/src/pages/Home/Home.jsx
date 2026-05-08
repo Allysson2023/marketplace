@@ -15,6 +15,7 @@ function Home() {
   const [categorias, setCategorias] = useState([]);
   const navigate = useNavigate();
   const [categoriaSelecionada, setCategoriaSelecionada] = useState("");
+  const [busca, setBusca] = useState("");
 
   const token = localStorage.getItem("token");
 
@@ -31,71 +32,73 @@ useEffect(() => {
 
 }, [token]);
 
+ useEffect(() => {
+
+    fetch(`http://localhost:3000/api/stores?busca=${busca}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    .then(res => {
+
+        if(res.status === 401){
+
+            localStorage.removeItem("token");
+
+            window.location.href = "/login";
+
+            return;
+        }
+
+        return res.json();
+
+    })
+    .then(data => {
+
+        if(data){
+            setLojas(data);
+        }
+
+    });
+
+}, [busca, token]);
+
   useEffect(() => {
-    fetch("http://localhost:3000/api/stores", {
-    headers: {
-        Authorization: `Bearer ${token}`
-    }
-})
-.then(res => {
 
-    if(res.status === 401){
-
-        localStorage.removeItem("token");
-
-        window.location.href = "/login";
-
-        return;
-    }
-
-    return res.json();
-
-})
-.then(data => {
-
-    if(data){
-        setLojas(data);
-    }
-
-});
-}, [token]);
-
-  useEffect(() => {
-
-    let url = "http://localhost:3000/api/products";
+    let url = `http://localhost:3000/api/products?busca=${busca}`;
 
     if(categoriaSelecionada){
-        url += `?categoria=${categoriaSelecionada}`;
+        url += `&categoria=${categoriaSelecionada}`;
     }
 
     fetch(url, {
-    headers: {
-        Authorization: `Bearer ${token}`
-    }
-})
-.then(res => {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    .then(res => {
 
-    if(res.status === 401){
+        if(res.status === 401){
 
-        localStorage.removeItem("token");
+            localStorage.removeItem("token");
 
-        window.location.href = "/login";
+            window.location.href = "/login";
 
-        return;
-    }
+            return;
+        }
 
-    return res.json();
+        return res.json();
 
-})
-.then(data => {
+    })
+    .then(data => {
 
-    if(data){
-        setProdutos(data);
-    }
+        if(data){
+            setProdutos(data);
+        }
 
-});
+    });
 
-}, [categoriaSelecionada]);
+}, [categoriaSelecionada, busca, token]);
 
   return (
     <div className="home">
@@ -106,10 +109,12 @@ useEffect(() => {
         
       <div className="acoes-topo">
 
-        <input 
-          type="text" 
-          placeholder="Buscar lojas..." 
-          />
+        <input
+    type="text"
+    placeholder="Buscar lojas ou produtos..."
+    value={busca}
+    onChange={(e) => setBusca(e.target.value)}
+/>
 
         <button onClick={()=> setModalSair(true)} className="btn-sair" >Sair</button>
         <button 
