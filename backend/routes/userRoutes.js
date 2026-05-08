@@ -37,7 +37,7 @@ router.post('/login', (req, res) => {
             const token = jwt.sign(
                 { id: user.id, username: user.username },
                 "segredo_super",
-                { expiresIn: "30d"}
+                { expiresIn: "1h"}
             );
             res.json({
                 message: "Login feito com sucesso!",
