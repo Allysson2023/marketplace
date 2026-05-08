@@ -1,14 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./CadastrarProduto.css";
 import { useNavigate } from "react-router-dom";
 
 function CadastrarProduto() {
-    const navigate = useNavigate();
+
+  const navigate = useNavigate();
 
   const [nome, setNome] = useState("");
   const [preco, setPreco] = useState("");
   const [categoria, setCategoria] = useState("");
+  const [categorias, setCategorias] = useState([]);
   const [mensagem, setMensagem] = useState("");
+
+  useEffect(() => {
+
+    fetch("http://localhost:3000/api/categories")
+    .then(res => res.json())
+    .then(data => setCategorias(data));
+
+  }, []);
 
   function cadastrarProduto(e){
     e.preventDefault();
@@ -29,11 +39,13 @@ function CadastrarProduto() {
     })
     .then(res => res.json())
     .then(data => {
+
       setMensagem("Produto cadastrado com sucesso!");
 
       setNome("");
       setPreco("");
       setCategoria("");
+
     });
   }
 
@@ -43,11 +55,13 @@ function CadastrarProduto() {
       <form onSubmit={cadastrarProduto} className="form-produto">
 
         <h2>Cadastrar Produto</h2>
+
         {mensagem && (
-            <div className="mensagem-sucesso">
-                {mensagem}
-            </div>  
+          <div className="mensagem-sucesso">
+            {mensagem}
+          </div>
         )}
+
         <input
           type="text"
           placeholder="Nome do produto"
@@ -62,28 +76,44 @@ function CadastrarProduto() {
           onChange={(e) => setPreco(e.target.value)}
         />
 
-        <input
-          type="text"
-          placeholder="Categoria"
+        <select
           value={categoria}
           onChange={(e) => setCategoria(e.target.value)}
-        />
+        >
+
+          <option value="">
+            Escolha uma categoria
+          </option>
+
+          {categorias.map(cat => (
+
+            <option
+              key={cat.id}
+              value={cat.nome}
+            >
+              {cat.nome}
+            </option>
+
+          ))}
+
+        </select>
 
         <div className="botoes-form">
 
-  <button
-    type="button"
-    className="btn-voltar"
-    onClick={() => navigate("/")}
-  >
-    Voltar
-  </button>
+          <button
+            type="button"
+            className="btn-voltar"
+            onClick={() => navigate("/")}
+          >
+            Voltar
+          </button>
 
-  <button type="submit">
-    Cadastrar
-  </button>
+          <button type="submit">
+            Cadastrar
+          </button>
 
-</div>
+        </div>
+
       </form>
 
     </div>
