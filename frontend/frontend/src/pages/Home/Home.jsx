@@ -95,9 +95,13 @@ useEffect(() => {
           <div key={loja.id} className="card-loja">
 
             <img 
-              src={loja.imagem || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl55ZXLSARGsTv4qgCQBC_UD8wwSrV-3I-qg&s"} 
-              alt={loja.nome}
-            />
+  src={
+    loja.imagem
+      ? `http://localhost:3000/uploads/lojas/${loja.imagem}`
+      : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl55ZXLSARGsTv4qgCQBC_UD8wwSrV-3I-qg&s"
+  }
+  alt={loja.nome}
+/>
             <p>{loja.nome}</p>
           </div>
         ))}

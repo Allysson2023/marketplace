@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CadastrarLoja.css";
 
@@ -7,6 +7,7 @@ function CadastrarLoja() {
   const [nome, setNome] = useState("");
   const [categoria, setCategoria] = useState("");
   const [categorias, setCategorias] = useState([]);
+  const [imagem, setImagem] = useState(null);
 
   const navigate = useNavigate();
 
@@ -19,30 +20,31 @@ function CadastrarLoja() {
 }, []);
 
   function cadastrarLoja(e){
-    e.preventDefault();
+  e.preventDefault();
 
-    fetch("http://localhost:3000/api/stores", {
-      method: "POST",
+  const formData = new FormData();
 
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      },
+  formData.append("nome", nome);
+  formData.append("categoria", categoria);
+  formData.append("imagem", imagem);
 
-      body: JSON.stringify({
-        nome,
-        categoria
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
+  fetch("http://localhost:3000/api/stores", {
+    method: "POST",
 
-      alert("Loja criada com sucesso!");
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
 
-      navigate("/");
-    });
-  }
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
 
+    alert("Loja criada com sucesso!");
+
+    navigate("/");
+  });
+}
   return (
     <div className="cadastro-loja">
 
@@ -81,6 +83,10 @@ function CadastrarLoja() {
     ))}
 
 </select>
+<input
+  type="file"
+  onChange={(e) => setImagem(e.target.files[0])}
+/>
 
         <button type="submit">
           Criar Loja

@@ -2,28 +2,27 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const authMiddleware = require('../middlewares/authMiddleware');
+const upload = require('../middlewares/uploadLojas');
 
-router.post('/stores', authMiddleware, (req, res) => {
+router.post('/stores', authMiddleware, upload.single('imagem'),(req, res) => {
+
     const { nome, categoria } = req.body;
-    const userId = req.user.id;
-
+    const imagem = req.file ? req.file.filename : null;
     const sql = `
-        INSERT INTO stores
-        (nome, user_id, categoria)
-        VALUES (?, ?, ?)
+      INSERT INTO stores (nome, categoria, imagem, user_id)
+      VALUES (?, ?, ?, ?)
     `;
-
     db.query(
-        sql,
-        [nome, userId, categoria],
-        (err, result) => {
-            if (err) {
-                return res.status(500).json(err);
-            }
-            res.json({
-                message: "Loja criada com sucesso!"
-            });
+      sql,
+      [nome, categoria, imagem, req.user.id],
+      (err, result) => {
+        if(err){
+          return res.status(500).json(err);
         }
+        res.json({
+          message: 'Loja criada com sucesso'
+        });
+      }
     );
 });
 
