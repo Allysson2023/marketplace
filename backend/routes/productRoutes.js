@@ -42,21 +42,20 @@ router.post('/products', authMiddleware, (req, res) => {
 
 router.get('/products', (req, res) => {
 
-    const sql = `
-        SELECT * FROM products
-        ORDER BY id DESC
-    `;
+    const categoria = req.query.categoria;
+    let sql = "SELECT * FROM products";
+    let params = [];
 
-    db.query(sql, (err, result) => {
-
-        if (err) {
+    if(categoria){
+        sql += " WHERE categoria = ?";
+        params.push(categoria);
+    }
+    db.query(sql, params, (err, result) => {
+        if(err){
             return res.status(500).json(err);
         }
-
         res.json(result);
-
     });
-
 });
 
 router.get('/stores/:id/products', (req, res) => {

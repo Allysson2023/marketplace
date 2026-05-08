@@ -14,6 +14,7 @@ function Home() {
   const [modalSair, setModalSair] = useState(false);
   const [categorias, setCategorias] = useState([]);
   const navigate = useNavigate();
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState("");
 
   const token = localStorage.getItem("token");
 
@@ -37,10 +38,18 @@ useEffect(() => {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/products")
+
+    let url = "http://localhost:3000/api/products";
+
+    if(categoriaSelecionada){
+        url += `?categoria=${categoriaSelecionada}`;
+    }
+
+    fetch(url)
     .then(res => res.json())
     .then(data => setProdutos(data));
-  }, []);
+
+}, [categoriaSelecionada]);
 
   return (
     <div className="home">
@@ -81,9 +90,13 @@ useEffect(() => {
 
     {categorias.map(categoria => (
 
-        <span key={categoria.id}>
-            {categoria.nome}
-        </span>
+        <span
+        key={categoria.id}
+        onClick={() => setCategoriaSelecionada(categoria.nome)}
+        className="categoria-item"
+    >
+        {categoria.nome}
+    </span>
 
     ))}
 
