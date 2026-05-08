@@ -86,21 +86,6 @@ useEffect(() => {
         </div>
       )}
 
-      <div className="menu">
-
-    {categorias.map(categoria => (
-
-        <span
-        key={categoria.id}
-        onClick={() => setCategoriaSelecionada(categoria.nome)}
-        className="categoria-item"
-    >
-        {categoria.nome}
-    </span>
-
-    ))}
-
-</div>
 
       {/* 🏬 CARROSSEL DE LOJAS */}
       <h3 className="titulo-secao">Nossas Lojas</h3>
@@ -122,6 +107,21 @@ useEffect(() => {
           </div>
         ))}
       </div>
+      <div className="menu">
+
+    {categorias.map(categoria => (
+
+        <span
+        key={categoria.id}
+        onClick={() => setCategoriaSelecionada(categoria.nome)}
+        className="categoria-item"
+    >
+        {categoria.nome}
+    </span>
+
+    ))}
+
+</div>
 
         <h2 className="produto-titulo">Promoção</h2>
 
