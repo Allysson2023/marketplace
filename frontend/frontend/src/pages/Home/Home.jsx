@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./Home.css";
+import { useNavigate } from "react-router-dom";
 
 function sair(){
   localStorage.removeItem("token");
@@ -12,6 +13,7 @@ function Home() {
   const [menuAberto, setMenuAberto] = useState(false);
   const [modalSair, setModalSair] = useState(false);
   const [categorias, setCategorias] = useState([]);
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
 
@@ -92,7 +94,8 @@ useEffect(() => {
 
       <div className="carrossel" >
         {lojas.map(loja => (
-          <div key={loja.id} className="card-loja">
+          <div key={loja.id} className="card-loja"
+          onClick={() => navigate(`/store/${loja.id}`)}>
 
             <img 
   src={

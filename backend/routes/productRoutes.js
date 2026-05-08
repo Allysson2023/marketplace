@@ -59,4 +59,25 @@ router.get('/products', (req, res) => {
 
 });
 
+router.get('/stores/:id/products', (req, res) => {
+
+    const storeId = req.params.id;
+
+    const sql = `
+        SELECT * FROM products
+        WHERE store_id = ?
+    `;
+
+    db.query(sql, [storeId], (err, result) => {
+
+        if(err){
+            return res.status(500).json(err);
+        }
+
+        res.json(result);
+
+    });
+
+});
+
 module.exports = router;

@@ -6,6 +6,7 @@ import Carrinho from "./pages/Carrinho/Carrinho";
 import CadastrarProduto from "./pages/CadastrarProduto/CadastrarProduto";
 import CadastrarLoja from "./pages/CadastrarLoja/CadastrarLoja";
 import AtualizarPerfil from "./pages/AtualizarPerfil/AtualizarPerfil";
+import Store from "./pages/Store/Store";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/cadastrar-produto" element={<CadastrarProduto/>} />
         <Route path="/cadastrar-loja" element={<CadastrarLoja/>} />
         <Route path="/atualizar-perfil" element={<AtualizarPerfil />} />
+        <Route path="/store/:id" element={<Store />} />
 
       </Routes>
     </BrowserRouter>
