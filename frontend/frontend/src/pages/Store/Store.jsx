@@ -3,10 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./Store.css";
 
 function Store(){
-
+    
     const { id } = useParams();
     const navigate = useNavigate();
     const [produtos, setProdutos] = useState([]);
+    const [store, setStore] = useState(null);
 
     useEffect(() => {
 
@@ -14,6 +15,10 @@ function Store(){
         .then(res => res.json())
         .then(data => setProdutos(data));
 
+        fetch(`http://localhost:3000/api/stores/${id}`)
+        .then(res => res.json())
+        .then(data => setStore(data));
+        
     }, [id]);
 
     return(
@@ -29,24 +34,32 @@ function Store(){
             <div className="store-header">
 
                 <img
-                    className="store-banner"
-                    src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200"
-                    alt="banner"
-                />
+    className="store-banner"
+    src={
+        store?.imagem
+        ? `http://localhost:3000/uploads/lojas/${store.imagem}`
+        : "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200"
+    }
+    alt="banner"
+/>
 
                 <div className="store-overlay"></div>
 
                 <div className="store-profile">
 
                     <img
-                        className="store-logo"
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl55ZXLSARGsTv4qgCQBC_UD8wwSrV-3I-qg&s"
-                        alt="logo"
-                    />
+    className="store-logo"
+    src={
+        store?.imagem
+        ? `http://localhost:3000/uploads/lojas/${store.imagem}`
+        : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl55ZXLSARGsTv4qgCQBC_UD8wwSrV-3I-qg&s"
+    }
+    alt="logo"
+/>
 
                     <div className="store-info">
 
-                        <h1>Minha Loja</h1>
+                        <h1>{store?.nome}</h1>
 
                         <p>
                             Produtos incríveis com os melhores preços.

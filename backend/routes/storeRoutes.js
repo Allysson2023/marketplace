@@ -75,4 +75,25 @@ router.get('/stores', (req, res) => {
     });
 });
 
+router.get('/stores/:id', (req, res) => {
+
+    const storeId = req.params.id;
+
+    const sql = `
+        SELECT * FROM stores
+        WHERE id = ?
+    `;
+
+    db.query(sql, [storeId], (err, result) => {
+
+        if(err){
+            return res.status(500).json(err);
+        }
+
+        res.json(result[0]);
+
+    });
+
+});
+
 module.exports = router;
