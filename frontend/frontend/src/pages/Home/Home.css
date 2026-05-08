@@ -417,8 +417,9 @@ body{
 }
 
 .categoria-ativa{
-    background: #2575fc;
-    color: white;
+    background: #202130;
+    color: rgb(255, 2, 2);
+    border: 1px solid rgb(255, 0, 0);
 }
 
 @keyframes aparecer{

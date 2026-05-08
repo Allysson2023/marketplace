@@ -107,10 +107,11 @@ useEffect(() => {
           </div>
         ))}
       </div>
+      
       <div className="menu">
 
     <span
-        className="categoria-item"
+        className={`categoria-item ${categoriaSelecionada === "" ? "categoria-ativa" : ""}`}
         onClick={() => setCategoriaSelecionada("")}
     >
         Todos
@@ -120,7 +121,7 @@ useEffect(() => {
 
         <span
             key={categoria.id}
-            className="categoria-item"
+            className={`categoria-item ${categoriaSelecionada === categoria.nome ? "categoria-ativa" : ""}`}
             onClick={() => setCategoriaSelecionada(categoria.nome)}
         >
             {categoria.nome}
