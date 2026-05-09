@@ -2,38 +2,50 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const authMiddleware = require('../middlewares/authMiddleware');
+const upload = require('../middlewares/uploadProdutos');
 const { route } = require('./userRoutes');
 
-router.post('/products', authMiddleware, (req, res) => {
-    const { nome, preco, categoria } = req.body;
-    const userId = req.user.id;
-    const buscarLoja = "SELECT id FROM stores WHERE user_id = ?";
+router.post('/products', authMiddleware, upload.single('imagem'),
+    (req, res) => {
 
-    db.query(buscarLoja, [userId], (err, lojaResult) => {
-        if (err) {
+    const userId = req.user.id;
+    const {nome, descricao, preco, preco_antigo, estoque, categoria
+    } = req.body;
+    const imagem = req.file ? req.file.filename : null;
+
+    const sqlStore = `
+        SELECT id FROM stores
+        WHERE user_id = ?
+    `;
+    db.query(sqlStore, [userId], (err, storeResult) => {
+        if(err){
             return res.status(500).json(err);
         }
-        if (lojaResult.length === 0) {
+        if(storeResult.length === 0){
             return res.status(404).json({
-                message: "Loja não encontrada"
+                error: "Loja não encontrada"
             });
         }
-
-        const store_id = lojaResult[0].id;
+        const store_id = storeResult[0].id;
         const sql = `
             INSERT INTO products
-            (nome, preco, store_id, categoria)
-            VALUES (?, ?, ?, ?)
+            (
+                nome, descricao, preco, preco_antigo, estoque,
+                imagem, categoria, store_id
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
         db.query(
             sql,
-            [nome, preco, store_id, categoria],
+            [nome, descricao, preco, preco_antigo, estoque,
+             imagem, categoria, store_id
+            ],
             (err, result) => {
-                if (err) {
+                if(err){
                     return res.status(500).json(err);
                 }
                 res.json({
-                    message: "Produto criado com sucesso!"
+                    message: "Produto cadastrado!"
                 });
             }
         );

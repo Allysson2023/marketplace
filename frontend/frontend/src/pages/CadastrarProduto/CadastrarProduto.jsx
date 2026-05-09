@@ -10,7 +10,11 @@ function CadastrarProduto() {
   const [preco, setPreco] = useState("");
   const [categoria, setCategoria] = useState("");
   const [categorias, setCategorias] = useState([]);
-  const [mensagem, setMensagem] = useState("");
+  const [mensagem, setMensagem] = useState("")
+  const [descricao, setDescricao] = useState("");
+  const [precoAntigo, setPrecoAntigo] = useState("");
+  const [estoque, setEstoque] = useState("");
+  const [imagem, setImagem] = useState(null);
 
   useEffect(() => {
 
@@ -20,34 +24,49 @@ function CadastrarProduto() {
 
   }, []);
 
-  function cadastrarProduto(e){
+async function cadastrarProduto(e){
+
     e.preventDefault();
 
-    fetch("http://localhost:3000/api/products", {
-      method: "POST",
+    const formData = new FormData();
 
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      },
+    formData.append("nome", nome);
+    formData.append("descricao", descricao);
+    formData.append("preco", preco);
+    formData.append("preco_antigo", precoAntigo);
+    formData.append("estoque", estoque);
+    formData.append("categoria", categoria);
 
-      body: JSON.stringify({
-        nome,
-        preco,
-        categoria
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
+    if(imagem){
+        formData.append("imagem", imagem);
+    }
 
-      setMensagem("Produto cadastrado com sucesso!");
+    const resposta = await fetch(
+        "http://localhost:3000/api/products",
+        {
+            method: "POST",
 
-      setNome("");
-      setPreco("");
-      setCategoria("");
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            },
 
-    });
-  }
+            body: formData
+        }
+    );
+
+    const data = await resposta.json();
+
+    setMensagem(data.message);
+
+    setNome("");
+    setDescricao("");
+    setPreco("");
+    setPrecoAntigo("");
+    setEstoque("");
+    setCategoria("");
+    setImagem(null);
+
+}
 
   return (
     <div className="cadastro-produto">
@@ -62,6 +81,12 @@ function CadastrarProduto() {
           </div>
         )}
 
+
+        <input
+    type="file"
+    onChange={(e) => setImagem(e.target.files[0])}
+/>
+
         <input
           type="text"
           placeholder="Nome do produto"
@@ -69,12 +94,32 @@ function CadastrarProduto() {
           onChange={(e) => setNome(e.target.value)}
         />
 
+        <textarea
+    placeholder="Descrição do produto"
+    value={descricao}
+    onChange={(e) => setDescricao(e.target.value)}
+/>
+
+<input
+    type="number"
+    placeholder="Preço antigo"
+    value={precoAntigo}
+    onChange={(e) => setPrecoAntigo(e.target.value)}
+/>
+
         <input
           type="number"
           placeholder="Preço"
           value={preco}
           onChange={(e) => setPreco(e.target.value)}
         />
+
+<input
+    type="number"
+    placeholder="Quantidade em estoque"
+    value={estoque}
+    onChange={(e) => setEstoque(e.target.value)}
+/>
 
         <select
           value={categoria}
