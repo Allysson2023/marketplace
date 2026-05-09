@@ -7,12 +7,14 @@ import CadastrarProduto from "./pages/CadastrarProduto/CadastrarProduto";
 import CadastrarLoja from "./pages/CadastrarLoja/CadastrarLoja";
 import AtualizarPerfil from "./pages/AtualizarPerfil/AtualizarPerfil";
 import Store from "./pages/Store/Store";
+import ProductDetalhes from "./pages/ProductDetalhes/ProductDetalhes";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/produto/:id" element={<ProductDetalhes />} />
         <Route path="/login" element={<Login />} />
         <Route path="/carrinho" element={<Carrinho />} />
         <Route path="/cadastrar-produto" element={<CadastrarProduto/>} />

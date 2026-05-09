@@ -15,6 +15,8 @@ function CadastrarProduto() {
   const [precoAntigo, setPrecoAntigo] = useState("");
   const [estoque, setEstoque] = useState("");
   const [imagem, setImagem] = useState(null);
+  const [imagem2, setImagem2] = useState(null);
+const [imagem3, setImagem3] = useState(null);
 
   useEffect(() => {
 
@@ -38,8 +40,16 @@ async function cadastrarProduto(e){
     formData.append("categoria", categoria);
 
     if(imagem){
-        formData.append("imagem", imagem);
-    }
+    formData.append("imagem", imagem);
+}
+
+if(imagem2){
+    formData.append("imagem2", imagem2);
+}
+
+if(imagem3){
+    formData.append("imagem3", imagem3);
+}
 
     const resposta = await fetch(
         "http://localhost:3000/api/products",
@@ -82,9 +92,25 @@ async function cadastrarProduto(e){
         )}
 
 
-        <input
+      <p>Imagem principal do produto</p>
+
+<input
     type="file"
     onChange={(e) => setImagem(e.target.files[0])}
+/>
+
+<p>Imagem extra 1 (detalhes)</p>
+
+<input
+    type="file"
+    onChange={(e) => setImagem2(e.target.files[0])}
+/>
+
+<p>Imagem extra 2 (detalhes)</p>
+
+<input
+    type="file"
+    onChange={(e) => setImagem3(e.target.files[0])}
 />
 
         <input

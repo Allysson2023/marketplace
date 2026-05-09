@@ -148,8 +148,9 @@ useEffect(() => {
                     value={cat.nome}
                 >
                 {cat.nome}
-                </option>
+                </option>         
     ))}
+    
 
         </select>
                 <div className="botoes">

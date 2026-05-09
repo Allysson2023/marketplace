@@ -5,13 +5,27 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadProdutos');
 const { route } = require('./userRoutes');
 
-router.post('/products', authMiddleware, upload.single('imagem'),
+router.post('/products', authMiddleware, upload.fields([
+    { name: "imagem", maxCount: 1 },
+    { name: "imagem2", maxCount: 1 },
+    { name: "imagem3", maxCount: 1 }
+]),
     (req, res) => {
 
     const userId = req.user.id;
     const {nome, descricao, preco, preco_antigo, estoque, categoria
     } = req.body;
-    const imagem = req.file ? req.file.filename : null;
+    const imagem = req.files?.imagem
+    ? req.files.imagem[0].filename
+    : null;
+
+const imagem2 = req.files?.imagem2
+    ? req.files.imagem2[0].filename
+    : null;
+
+const imagem3 = req.files?.imagem3
+    ? req.files.imagem3[0].filename
+    : null;
 
     const sqlStore = `
         SELECT id FROM stores
@@ -30,16 +44,33 @@ router.post('/products', authMiddleware, upload.single('imagem'),
         const sql = `
             INSERT INTO products
             (
-                nome, descricao, preco, preco_antigo, estoque,
-                imagem, categoria, store_id
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    nome,
+    descricao,
+    preco,
+    preco_antigo,
+    estoque,
+    imagem,
+    imagem2,
+    imagem3,
+    categoria,
+    store_id
+)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         db.query(
             sql,
-            [nome, descricao, preco, preco_antigo, estoque,
-             imagem, categoria, store_id
-            ],
+            [
+ nome,
+ descricao,
+ preco,
+ preco_antigo,
+ estoque,
+ imagem,
+ imagem2,
+ imagem3,
+ categoria,
+ store_id
+],
             (err, result) => {
                 if(err){
                     return res.status(500).json(err);
@@ -111,6 +142,38 @@ db.query(sql, values, (err, result) => {
     res.json(result);
 
 });
+
+});
+
+router.get('/products/:id', (req, res) => {
+
+    const productId = req.params.id;
+
+    const sql = `
+        SELECT
+            products.*,
+            stores.nome AS nomeLoja
+        FROM products
+        JOIN stores
+        ON products.store_id = stores.id
+        WHERE products.id = ?
+    `;
+
+    db.query(sql, [productId], (err, result) => {
+
+        if(err){
+            return res.status(500).json(err);
+        }
+
+        if(result.length === 0){
+            return res.status(404).json({
+                error: "Produto não encontrado"
+            });
+        }
+
+        res.json(result[0]);
+
+    });
 
 });
 

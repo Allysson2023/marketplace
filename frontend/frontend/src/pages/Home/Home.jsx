@@ -220,14 +220,18 @@ useEffect(() => {
 
 </div>
 
-        <h2 className="produto-titulo">Promoção</h2>
+        <h2 className="produto-titulo">Produtos</h2>
 
 
         <div className="produto-grid">
 
   {produtos.map(produto => (
 
-    <div key={produto.id} className="card-produto">
+   <div
+  key={produto.id}
+  className="card-produto"
+  onClick={() => navigate(`/produto/${produto.id}`)}
+>
 
       <img
         src={
