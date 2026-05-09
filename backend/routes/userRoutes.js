@@ -127,7 +127,8 @@ router.get('/profile', authMiddleware, (req, res) => {
         SELECT
             users.username,
             stores.nome AS nomeLoja,
-            stores.categoria
+            stores.categoria,
+            stores.imagem
         FROM users
         LEFT JOIN stores
         ON users.id = stores.user_id

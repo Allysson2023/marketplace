@@ -9,6 +9,7 @@ function AtualizarPerfil(){
     const [mensagem, setMensagem] = useState("");
     const [categorias, setCategorias] = useState([]);
     const [imagem, setImagem] = useState(null);
+    const [imagemAtual, setImagemAtual] = useState("");
     const token = localStorage.getItem("token");
 
 useEffect(() => {
@@ -22,6 +23,7 @@ useEffect(() => {
         setUsername(data.username || "");
         setNomeLoja(data.nomeLoja || "");
         setCategoria(data.categoria || "");
+        setImagemAtual(data.imagem || "");
     });
 }, []);
 
@@ -105,8 +107,20 @@ useEffect(() => {
             >
                 <h2>Atualizar Perfil</h2>
 
-                <input type="file"
-                    onChange={(e) => setImagem(e.target.files[0])}/>
+                {imagemAtual && (
+
+    <img
+        className="preview-perfil"
+        src={`http://localhost:3000/uploads/lojas/${imagemAtual}`}
+        alt="Perfil"
+    />
+
+)}
+
+                <input
+                    type="file"
+                    onChange={(e) => setImagem(e.target.files[0])}
+                />
 
                 <input
                     type="text"
