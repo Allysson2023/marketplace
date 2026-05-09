@@ -92,17 +92,25 @@ router.get('/products', (req, res) => {
 
     }
 
-    sql += " ORDER BY products.id DESC";
+    const pagina = parseInt(req.query.pagina) || 1;
 
-    db.query(sql, values, (err, result) => {
+const limite = 30;
 
-        if(err){
-            return res.status(500).json(err);
-        }
+const offset = (pagina - 1) * limite;
 
-        res.json(result);
+sql += " ORDER BY products.id DESC LIMIT ? OFFSET ?";
 
-    });
+values.push(limite, offset);
+
+db.query(sql, values, (err, result) => {
+
+    if(err){
+        return res.status(500).json(err);
+    }
+
+    res.json(result);
+
+});
 
 });
 

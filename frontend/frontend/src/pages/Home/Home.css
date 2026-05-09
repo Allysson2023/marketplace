@@ -460,6 +460,39 @@ body{
     margin-top: 4px;
 }
 
+.paginacao{
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    margin-top: 30px;
+}
+
+.btn-carregar{
+    background: #2e7d32;
+    color: white;
+
+    border: none;
+
+    padding: 14px 30px;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    transition: 0.3s;
+}
+
+.btn-carregar:hover{
+    background: #1b5e20;
+}
+
 @keyframes aparecer{
     from{
         opacity: 0;

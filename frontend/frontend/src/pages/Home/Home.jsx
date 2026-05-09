@@ -16,7 +16,8 @@ function Home() {
   const navigate = useNavigate();
   const [categoriaSelecionada, setCategoriaSelecionada] = useState("");
   const [busca, setBusca] = useState("");
-
+  const [pagina, setPagina] = useState(1);
+  const [temMaisProdutos, setTemMaisProdutos] = useState(true);
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -88,7 +89,7 @@ useEffect(() => {
 
   useEffect(() => {
 
-    let url = `http://localhost:3000/api/products?busca=${busca}`;
+    let url = `http://localhost:3000/api/products?busca=${busca}&pagina=${pagina}`;
 
     if(categoriaSelecionada){
         url += `&categoria=${categoriaSelecionada}`;
@@ -116,12 +117,16 @@ useEffect(() => {
     .then(data => {
 
         if(data){
-            setProdutos(data);
-        }
+
+    setProdutos(data);
+
+    setTemMaisProdutos(data.length === 30);
+
+}
 
     });
 
-}, [categoriaSelecionada, busca, token]);
+}, [categoriaSelecionada, busca, pagina, token]);
 
   return (
     <div className="home">
@@ -136,7 +141,10 @@ useEffect(() => {
     type="text"
     placeholder="Buscar lojas ou produtos..."
     value={busca}
-    onChange={(e) => setBusca(e.target.value)}
+    onChange={(e) => {
+    setBusca(e.target.value);
+    setPagina(1);
+}}
 />
 
         <button onClick={()=> setModalSair(true)} className="btn-sair" >Sair</button>
@@ -200,7 +208,10 @@ useEffect(() => {
                 ? "categoria-ativa"
                 : ""
             }`}
-            onClick={() => setCategoriaSelecionada(categoria.nome)}
+            onClick={() => {
+    setCategoriaSelecionada(categoria.nome);
+    setPagina(1);
+}}
         >
             {categoria.nome}
         </span>
@@ -250,6 +261,29 @@ useEffect(() => {
     </div>
 
   ))}
+
+
+</div>
+
+<div className="paginacao">
+
+  {pagina > 1 && (
+    <button
+      className="btn-carregar"
+      onClick={() => setPagina(pagina - 1)}
+    >
+      Voltar
+    </button>
+  )}
+
+  {temMaisProdutos && (
+    <button
+      className="btn-carregar"
+      onClick={() => setPagina(pagina + 1)}
+    >
+      Próxima
+    </button>
+  )}
 
 </div>
 
