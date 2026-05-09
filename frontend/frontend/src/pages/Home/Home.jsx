@@ -20,9 +20,32 @@ function Home() {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    window.location.href = "/login";
-    return null;
-  }
+  window.location.href = "/login";
+  return null;
+}
+
+useEffect(() => {
+
+    if(token){
+
+        const payload = JSON.parse(
+            atob(token.split(".")[1])
+        );
+
+        const expiracao = payload.exp * 1000;
+
+        const agora = Date.now();
+
+        if(agora >= expiracao){
+
+            localStorage.removeItem("token");
+
+            window.location.href = "/login";
+        }
+
+    }
+
+}, [token]);
 
 useEffect(() => {
 

@@ -35,10 +35,10 @@ router.post('/login', (req, res) => {
             const user = result[0];
 
             const token = jwt.sign(
-                { id: user.id, username: user.username },
-                "segredo_super",
-                { expiresIn: "1h"}
-            );
+    { id: user.id },
+    "segredo_super",
+    { expiresIn: "1h" }
+);
             res.json({
                 message: "Login feito com sucesso!",
                 token: token
