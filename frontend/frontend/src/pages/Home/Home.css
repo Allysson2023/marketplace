@@ -419,6 +419,47 @@ body{
         0 5px 15px rgba(37,117,252,0.3);
 }
 
+.precos{
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+
+    margin-top: 10px;
+}
+
+.preco-antigo{
+    color: #999;
+
+    text-decoration: line-through;
+
+    font-size: 14px;
+}
+
+.preco-atual{
+    color: #2e7d32;
+
+    font-size: 20px;
+
+    font-weight: bold;
+}
+
+.card-produto h3{
+    font-size: 16px;
+
+    margin-top: 8px;
+
+    color: #222;
+}
+
+.nome-loja{
+    color: #777;
+
+    font-size: 14px;
+
+    margin-top: 4px;
+}
+
 @keyframes aparecer{
     from{
         opacity: 0;

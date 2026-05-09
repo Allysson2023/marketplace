@@ -188,17 +188,49 @@ useEffect(() => {
 
         <h2 className="produto-titulo">Promoção</h2>
 
+
         <div className="produto-grid">
-          {produtos.map(produto => (
-            <div key={produto.id} className="card-produto">
 
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfRIKWWU4HDicibTE5El0JVkVIdtjTt0FYYg&s" alt="img" />
+  {produtos.map(produto => (
 
-              <p>{produto.nome}</p>
+    <div key={produto.id} className="card-produto">
 
-            </div>
-          ))}
-        </div>
+      <img
+        src={
+          produto.imagem
+            ? `http://localhost:3000/uploads/produtos/${produto.imagem}`
+            : "https://via.placeholder.com/300"
+        }
+        alt={produto.nome}
+      />
+
+      <h3>{produto.nome}</h3>
+
+      <p className="nome-loja">
+  {produto.nomeLoja}
+</p>
+
+      <div className="precos">
+
+        {produto.preco_antigo && (
+          <span className="preco-antigo">
+            R$ {produto.preco_antigo}
+          </span>
+        )}
+
+        <span className="preco-atual">
+          R$ {produto.preco}
+        </span>
+
+      </div>
+
+    </div>
+
+  ))}
+
+</div>
+
+
 {modalSair && (
   <div className="modal-overlay">
 

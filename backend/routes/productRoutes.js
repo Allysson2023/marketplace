@@ -53,33 +53,57 @@ router.post('/products', authMiddleware, upload.single('imagem'),
 });
 
 router.get('/products', (req, res) => {
+
     const { categoria, busca } = req.query;
 
     let sql = `
-        SELECT * FROM products
+        SELECT 
+            products.*,
+            stores.nome AS nomeLoja
+        FROM products
+        JOIN stores
+        ON products.store_id = stores.id
         WHERE 1=1
     `;
+
     let values = [];
+
     if(categoria){
-        sql += " AND categoria = ?";
+
+        sql += " AND products.categoria = ?";
+
         values.push(categoria);
+
     }
+
     if(busca){
+
         sql += `
-            AND ( nome LIKE ? OR categoria LIKE ? )
+            AND (
+                products.nome LIKE ?
+                OR products.categoria LIKE ?
+                OR stores.nome LIKE ?
+            )
         `;
+
         values.push(`%${busca}%`);
         values.push(`%${busca}%`);
+        values.push(`%${busca}%`);
+
     }
-    sql += " ORDER BY id DESC";
+
+    sql += " ORDER BY products.id DESC";
 
     db.query(sql, values, (err, result) => {
 
         if(err){
             return res.status(500).json(err);
         }
+
         res.json(result);
+
     });
+
 });
 
 router.get('/stores/:id/products', (req, res) => {
