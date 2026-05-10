@@ -44,7 +44,7 @@ router.post('/login', (req, res) => {
                 token: token
             });
         } else {
-            res.status(401).json({ message: "Usuário ou senha inválidos "});
+            res.status(401).json({ error: "Usuário ou senha inválidos "});
         }
     });
 });

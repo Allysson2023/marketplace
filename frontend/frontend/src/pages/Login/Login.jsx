@@ -4,7 +4,7 @@ import "./Login.css";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [mensagem, setMensagem] = useState("");
+  const [mensagemErro, setMensagemErro] = useState("");
 
   async function handleLogin(e) {
 
@@ -57,13 +57,13 @@ function Login() {
 
     } else {
 
-      setMensagem(dados.error);
+      setMensagemErro(dados.error);
 
     }
 
   } catch (err) {
 
-    setMensagem("Erro no servidor");
+    setMensagemErro("Erro no servidor");
 
   }
 
@@ -88,11 +88,14 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-
+{mensagemErro && (
+  <div className="mensagem-erro">
+    {mensagemErro}
+  </div>
+)}
         <button>Entrar</button>
       </form>
 
-      <p>{mensagem}</p>
     </div>
     </div>
   );
