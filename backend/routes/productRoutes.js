@@ -3,92 +3,114 @@ const router = express.Router();
 const db = require('../config/db');
 const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadProdutos');
-const { route } = require('./userRoutes');
 
-router.post('/products', authMiddleware, upload.fields([
-    { name: "imagem", maxCount: 1 },
-    { name: "imagem2", maxCount: 1 },
-    { name: "imagem3", maxCount: 1 }
-]),
+router.post(
+    '/products',
+    authMiddleware,
+    upload.fields([
+        { name: "imagem", maxCount: 1 },
+        { name: "imagem2", maxCount: 1 },
+        { name: "imagem3", maxCount: 1 }
+    ]),
     (req, res) => {
 
-    const userId = req.user.id;
-    const {nome, descricao, preco, preco_antigo, estoque, categoria
-    } = req.body;
-    const imagem = req.files?.imagem
-    ? req.files.imagem[0].filename
-    : null;
+        const userId = req.user.id;
 
-const imagem2 = req.files?.imagem2
-    ? req.files.imagem2[0].filename
-    : null;
+        const {
+            nome,
+            descricao,
+            preco,
+            preco_antigo,
+            estoque,
+            categoria
+        } = req.body;
 
-const imagem3 = req.files?.imagem3
-    ? req.files.imagem3[0].filename
-    : null;
+        const imagem = req.files?.imagem
+            ? req.files.imagem[0].filename
+            : null;
 
-    const sqlStore = `
-        SELECT id FROM stores
-        WHERE user_id = ?
-    `;
-    db.query(sqlStore, [userId], (err, storeResult) => {
-        if(err){
-            return res.status(500).json(err);
-        }
-        if(storeResult.length === 0){
-            return res.status(404).json({
-                error: "Loja não encontrada"
-            });
-        }
-        const store_id = storeResult[0].id;
-        const sql = `
-            INSERT INTO products
-            (
-    nome,
-    descricao,
-    preco,
-    preco_antigo,
-    estoque,
-    imagem,
-    imagem2,
-    imagem3,
-    categoria,
-    store_id
-)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        const imagem2 = req.files?.imagem2
+            ? req.files.imagem2[0].filename
+            : null;
+
+        const imagem3 = req.files?.imagem3
+            ? req.files.imagem3[0].filename
+            : null;
+
+        const sqlStore = `
+            SELECT id FROM stores
+            WHERE user_id = ?
         `;
-        db.query(
-            sql,
-            [
- nome,
- descricao,
- preco,
- preco_antigo,
- estoque,
- imagem,
- imagem2,
- imagem3,
- categoria,
- store_id
-],
-            (err, result) => {
-                if(err){
-                    return res.status(500).json(err);
-                }
-                res.json({
-                    message: "Produto cadastrado!"
+
+        db.query(sqlStore, [userId], (err, storeResult) => {
+
+            if(err){
+                return res.status(500).json(err);
+            }
+
+            if(storeResult.length === 0){
+                return res.status(404).json({
+                    error: "Loja não encontrada"
                 });
             }
-        );
-    });
-});
+
+            const store_id = storeResult[0].id;
+
+            const sql = `
+                INSERT INTO products
+                (
+                    nome,
+                    descricao,
+                    preco,
+                    preco_antigo,
+                    estoque,
+                    imagem,
+                    imagem2,
+                    imagem3,
+                    categoria,
+                    store_id
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+
+            db.query(
+                sql,
+                [
+                    nome,
+                    descricao,
+                    preco,
+                    preco_antigo,
+                    estoque,
+                    imagem,
+                    imagem2,
+                    imagem3,
+                    categoria,
+                    store_id
+                ],
+                (err, result) => {
+
+                    if(err){
+                        return res.status(500).json(err);
+                    }
+
+                    res.json({
+                        message: "Produto cadastrado!"
+                    });
+
+                }
+            );
+
+        });
+
+    }
+);
 
 router.get('/products', (req, res) => {
 
     const { categoria, busca } = req.query;
 
     let sql = `
-        SELECT 
+        SELECT
             products.*,
             stores.nome AS nomeLoja
         FROM products
@@ -125,23 +147,23 @@ router.get('/products', (req, res) => {
 
     const pagina = parseInt(req.query.pagina) || 1;
 
-const limite = 30;
+    const limite = 30;
 
-const offset = (pagina - 1) * limite;
+    const offset = (pagina - 1) * limite;
 
-sql += " ORDER BY products.id DESC LIMIT ? OFFSET ?";
+    sql += " ORDER BY products.id DESC LIMIT ? OFFSET ?";
 
-values.push(limite, offset);
+    values.push(limite, offset);
 
-db.query(sql, values, (err, result) => {
+    db.query(sql, values, (err, result) => {
 
-    if(err){
-        return res.status(500).json(err);
-    }
+        if(err){
+            return res.status(500).json(err);
+        }
 
-    res.json(result);
+        res.json(result);
 
-});
+    });
 
 });
 
