@@ -95,6 +95,7 @@ function Store(){
                         <div
                             key={produto.id}
                             className="product-card"
+                            onClick={() => navigate(`/product/${produto.id}`)}
                         >
 
                             <img
