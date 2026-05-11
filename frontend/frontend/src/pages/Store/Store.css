@@ -1,146 +1,328 @@
 .store-page{
-    min-height: 40vh;
-    background: #f5f7fb;
-    padding-bottom: 40px;
+    min-height: 100vh;
+
+    background:
+        radial-gradient(circle at top, #1f2937 0%, #0f172a 35%, #020617 100%);
+
+    padding-bottom: 50px;
+
     font-family: Arial, Helvetica, sans-serif;
+
+    overflow-x: hidden;
 }
+
+/* =========================
+   HEADER
+========================= */
 
 .store-header{
     position: relative;
+
     width: 100%;
-    height: clamp(420px, 50vh, 700px);
-    min-height: 420px;
-    max-height: 700px;
+
+    height: clamp(450px, 55vh, 750px);
+
+    min-height: 450px;
+
     overflow: hidden;
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,0.35);
+
+    display: flex;
+    justify-content: center;
 }
+
+/* =========================
+   BANNER
+========================= */
 
 .store-banner{
     position: absolute;
+
     inset: 0;
+
     width: 100%;
     height: 100%;
+
     object-fit: cover;
-    filter: brightness(0.65);
+
+    filter:
+        brightness(0.5)
+        saturate(1.1);
+
+    transform: scale(1.03);
 }
 
 .store-overlay{
     position: absolute;
+
     inset: 0;
-    background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0.2),
-        rgba(0,0,0,0.7)
-    );
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,0.15),
+            rgba(0,0,0,0.75)
+        );
 }
 
 /* =========================
-   CARD PERFIL 3D
+   PERFIL
 ========================= */
 
 .store-profile{
     position: absolute;
-    bottom: 50px;
-    min-height: 180px;
-    left: 50%;
+
+    bottom: 5px;
+
+    
     transform: translateX(-50%);
+
     width: 92%;
-    max-width: 950px;
+    max-width: 1100px;
 
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(15px);
-
-    border: 1px solid rgba(255,255,255,0.2);
-
-    border-radius: 30px;
-
-    padding: 25px;
+    min-height: 220px;
 
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 30px;
+
+    padding: 30px;
+
+    border-radius: 35px;
+
+    background: rgba(255,255,255,0.10);
+
+    backdrop-filter: blur(8px);
+
+    border: 1px solid rgba(255,255,255,0.08);
 
     box-shadow:
-        0 10px 40px rgba(0,0,0,0.25),
-        inset 0 1px 1px rgba(255,255,255,0.2);
+        0 10px 30px rgba(0,0,0,0.25);
 
-    transform-style: preserve-3d;
+    z-index: 10;
+
+    overflow: hidden;
+}
+
+/* brilho animado */
+
+.store-profile::before{
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: -120px;
+
+    width: 60px;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            to right,
+            transparent,
+            rgba(255,255,255,0.18),
+            transparent
+        );
+
+    transform: skewX(-20deg);
+
+    animation: brilhoCard 5s linear infinite;
+}
+
+@keyframes brilhoCard{
+    100%{
+        left: 120%;
+    }
 }
 
 /* =========================
-   FOTO DA LOJA
+   LOGO COM ANIMAÇÃO
 ========================= */
 
 .store-logo{
-    width: 130px;
-    height: 130px;
+    width: 150px;
+    height: 150px;
+
     border-radius: 50%;
+
     object-fit: cover;
 
-    border: 5px solid #fff;
+    border: 5px solid rgba(255,255,255,0.9);
 
     box-shadow:
-        0 10px 25px rgba(0,0,0,0.3),
-        0 0 20px rgba(255,255,255,0.4);
+        0 10px 25px rgba(0,0,0,0.35),
+        0 0 25px rgba(255,255,255,0.15);
 
-    transition: 0.4s;
+    transition: 0.3s;
+
+    animation: flutuar 3s ease-in-out infinite;
+}
+
+/* animação flutuando */
+
+@keyframes flutuar{
+
+    0%{
+        transform: translateY(0px);
+    }
+
+    50%{
+        transform: translateY(-10px);
+    }
+
+    100%{
+        transform: translateY(0px);
+    }
 }
 
 .store-logo:hover{
-    transform: scale(1.08) rotate(3deg);
+    transform:
+        scale(1.06)
+        rotate(2deg);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,0.45),
+        0 0 35px rgba(255,255,255,0.25);
 }
 
 /* =========================
-   INFO DA LOJA
+   INFO
 ========================= */
 
 .store-info{
     flex: 1;
-    color: #fff;
+
+    color: white;
 }
 
 .store-info h1{
-    font-size: 35px;
-    margin-bottom: 10px;
-    font-weight: bold;
+    font-size: 42px;
+
+    margin-bottom: 12px;
+
+    text-shadow:
+        0 4px 12px rgba(0,0,0,0.35);
 }
 
 .store-info p{
     font-size: 16px;
+
+    line-height: 1.6;
+
     opacity: 0.95;
-    margin-bottom: 12px;
+
+    margin-bottom: 18px;
 }
 
 .store-stats{
     display: flex;
-    gap: 20px;
+
+    gap: 15px;
+
     flex-wrap: wrap;
 }
 
 .store-stats span{
-    background: rgba(255,255,255,0.15);
-    padding: 10px 16px;
-    border-radius: 14px;
+    padding: 12px 18px;
+
+    border-radius: 16px;
+
+    background: rgba(255,255,255,0.10);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
     font-size: 14px;
-    backdrop-filter: blur(10px);
+
+    font-weight: bold;
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,0.15);
+
+    transition: 0.3s;
+}
+
+.store-stats span:hover{
+    transform: translateY(-3px);
+
+    background: rgba(255,255,255,0.16);
 }
 
 /* =========================
-   ÁREA PRODUTOS
+   PRODUTOS
 ========================= */
 
 .store-products{
-    width: 95%;
-    max-width: 1400px;
-    margin: 170px auto 0;
+    width: 94%;
+
+    max-width: 1450px;
+
+    margin: 60px auto 0;
 }
 
 .store-products h2{
-    font-size: 30px;
-    color: #222;
+    font-size: 34px;
+
+    color: white;
+
     margin-bottom: 25px;
+
+    text-shadow:
+        0 5px 10px rgba(0,0,0,0.3);
+}
+
+/* =========================
+   BUSCA
+========================= */
+
+.search-box{
+    width: 100%;
+
+    margin-bottom: 30px;
+}
+
+.search-box input{
+    width: 100%;
+
+    padding: 18px 22px;
+
+    border-radius: 18px;
+
+    border: 1px solid rgba(255,255,255,0.1);
+
+    outline: none;
+
+    font-size: 16px;
+
+    color: white;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    backdrop-filter: blur(8px);
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.15);
+
+    transition: 0.25s;
+}
+
+.search-box input::placeholder{
+    color: rgba(255,255,255,0.7);
+}
+
+.search-box input:focus{
+    border-color: #60a5fa;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 25px rgba(37,117,252,0.2);
 }
 
 /* =========================
@@ -149,8 +331,11 @@
 
 .products-grid{
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 25px;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(240px, 1fr));
+
+    gap: 28px;
 }
 
 /* =========================
@@ -158,45 +343,78 @@
 ========================= */
 
 .product-card{
-    background: #fff;
+    position: relative;
+
+    background: #ffffff;
 
     border-radius: 24px;
 
     overflow: hidden;
 
-    transition: 0.4s;
-
     cursor: pointer;
 
-    position: relative;
+    transition: 0.25s ease;
 
     box-shadow:
-        0 8px 20px rgba(0,0,0,0.08);
+        0 8px 20px rgba(0,0,0,0.12);
+
+    will-change: transform;
 }
 
 .product-card:hover{
     transform:
-        translateY(-10px)
-        rotateX(3deg);
+        translateY(-6px);
 
     box-shadow:
-        0 20px 35px rgba(0,0,0,0.18);
+        0 15px 30px rgba(0,0,0,0.18);
+}
+
+/* brilho */
+
+.product-card::before{
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: -100px;
+
+    width: 50px;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            to right,
+            transparent,
+            rgba(255,255,255,0.5),
+            transparent
+        );
+
+    transform: skewX(-20deg);
+
+    transition: 0.6s;
+}
+
+.product-card:hover::before{
+    left: 120%;
 }
 
 /* =========================
-   IMAGEM PRODUTO
+   IMAGEM
 ========================= */
 
 .product-card img{
     width: 100%;
-    height: 240px;
+
+    height: 260px;
+
     object-fit: cover;
 
-    transition: 0.4s;
+    transition: 0.3s;
 }
 
 .product-card:hover img{
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
 
 /* =========================
@@ -204,25 +422,43 @@
 ========================= */
 
 .product-info{
-    padding: 18px;
+    padding: 20px;
 }
 
 .product-info h3{
-    font-size: 18px;
-    color: #222;
-    margin-bottom: 10px;
+    font-size: 19px;
+
+    color: #111827;
+
+    margin-bottom: 12px;
+
+    min-height: 45px;
 }
 
 .product-price{
-    font-size: 22px;
-    color: #00a650;
+    font-size: 26px;
+
+    color: #16a34a;
+
     font-weight: bold;
+
+    margin-bottom: 12px;
 }
 
 .product-category{
-    margin-top: 10px;
+    display: inline-block;
+
+    padding: 8px 14px;
+
+    border-radius: 20px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
     font-size: 13px;
-    color: #777;
+
+    font-weight: bold;
 }
 
 /* =========================
@@ -230,94 +466,48 @@
 ========================= */
 
 .btn-buy{
-    margin-top: 15px;
-
     width: 100%;
+
+    margin-top: 18px;
 
     border: none;
 
-    background: linear-gradient(
-        135deg,
-        #6a11cb,
-        #2575fc
-    );
+    padding: 14px;
 
-    color: white;
-
-    padding: 13px;
-
-    border-radius: 14px;
+    border-radius: 16px;
 
     font-size: 15px;
 
     font-weight: bold;
 
+    color: white;
+
     cursor: pointer;
 
-    transition: 0.3s;
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #2563eb
+        );
+
+    box-shadow:
+        0 8px 18px rgba(37,99,235,0.25);
+
+    transition: 0.25s;
 }
 
 .btn-buy:hover{
-    transform: scale(1.03);
-    opacity: 0.92;
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 12px 22px rgba(37,99,235,0.35);
 }
 
-.search-box{
-    width: 100%;
-
-    margin-bottom: 20px;
-}
-
-.search-box input{
-    width: 100%;
-
-    padding: 14px;
-
-    border: 1px solid #ddd;
-
-    border-radius: 12px;
-
-    outline: none;
-
-    font-size: 15px;
-
-    transition: 0.3s;
-
-    background: white;
-}
-
-.search-box input:focus{
-    border-color: #2e7d32;
-
-    box-shadow: 0 0 10px rgba(46,125,50,0.2);
-}
-
-@media(max-width: 768px){
-
-    .store-profile{
-        flex-direction: column;
-        text-align: center;
-        padding-top: 40px;
-    }
-
-    .store-logo{
-        width: 110px;
-        height: 110px;
-    }
-
-    .store-info h1{
-        font-size: 28px;
-    }
-
-    .store-products{
-        margin-top: 170px;
-    }
-
-    .store-stats{
-        justify-content: center;
-    }
-
-}
+/* =========================
+   BOTÃO VOLTAR
+========================= */
 
 .btn-back{
     position: fixed;
@@ -329,30 +519,105 @@
 
     border: none;
 
-    background: rgba(255,255,255,0.2);
+    padding: 14px 22px;
 
-    backdrop-filter: blur(12px);
-
-    color: white;
-
-    padding: 12px 20px;
-
-    border-radius: 14px;
+    border-radius: 18px;
 
     font-size: 15px;
 
     font-weight: bold;
 
+    color: white;
+
     cursor: pointer;
 
-    transition: 0.3s;
+    background:
+        rgba(255,255,255,0.12);
+
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255,255,255,0.15);
 
     box-shadow:
         0 8px 20px rgba(0,0,0,0.2);
+
+    transition: 0.25s;
 }
 
 .btn-back:hover{
-    transform: scale(1.05);
+    transform: translateY(-2px);
 
-    background: rgba(255,255,255,0.3);
+    background:
+        rgba(255,255,255,0.2);
+}
+
+/* =========================
+   PERFORMANCE
+========================= */
+
+*{
+    -webkit-tap-highlight-color: transparent;
+}
+
+img{
+    user-select: none;
+}
+
+.product-card,
+.store-profile,
+.btn-buy{
+    transform: translateZ(0);
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media(max-width: 900px){
+
+    .store-profile{
+        flex-direction: column;
+
+        text-align: center;
+
+        padding-top: 45px;
+    }
+
+    .store-info h1{
+        font-size: 32px;
+    }
+
+    .store-stats{
+        justify-content: center;
+    }
+
+    .store-products{
+        margin-top: 240px;
+    }
+
+}
+
+@media(max-width: 600px){
+
+    .products-grid{
+        grid-template-columns: 1fr;
+    }
+
+    .store-header{
+        min-height: 560px;
+    }
+
+    .store-logo{
+        width: 120px;
+        height: 120px;
+    }
+
+    .store-info h1{
+        font-size: 28px;
+    }
+
+    .store-products h2{
+        font-size: 28px;
+    }
+
 }
