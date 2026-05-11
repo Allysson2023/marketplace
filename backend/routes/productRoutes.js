@@ -206,6 +206,7 @@ router.get('/stores/:id/products', (req, res) => {
     const sql = `
         SELECT * FROM products
         WHERE store_id = ?
+        ORDER BY id DESC
     `;
 
     db.query(sql, [storeId], (err, result) => {
