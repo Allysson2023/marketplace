@@ -8,7 +8,7 @@ function Store(){
     const navigate = useNavigate();
     const [produtos, setProdutos] = useState([]);
     const [store, setStore] = useState(null);
-
+    const [busca, setBusca] = useState("");
     useEffect(() => {
 
         fetch(`http://localhost:3000/api/stores/${id}/products`)
@@ -20,6 +20,10 @@ function Store(){
         .then(data => setStore(data));
         
     }, [id]);
+
+    const produtosFiltrados = produtos.filter(produto =>
+    produto.nome.toLowerCase().includes(busca.toLowerCase())
+);
 
     return(
 
@@ -86,12 +90,22 @@ function Store(){
             {/* PRODUTOS */}
             <div className="store-products">
 
+                <div className="search-box">
+
+    <input
+        type="text"
+        placeholder="Buscar produtos da loja..."
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+    />
+
+</div>
+
                 <h2>Produtos da Loja</h2>
 
                 <div className="products-grid">
 
-                    {produtos.map(produto => (
-
+                    {produtosFiltrados.map(produto => (
                         <div
                             key={produto.id}
                             className="product-card"
