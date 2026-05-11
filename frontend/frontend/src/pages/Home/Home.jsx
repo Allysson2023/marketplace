@@ -201,6 +201,8 @@ function Home() {
 
     <div className="home">
 
+      
+
       {/* TOPO */}
 
       <header className="topo">
@@ -221,6 +223,10 @@ function Home() {
 
             }}
           />
+          <button onClick={() => navigate("/cart")} className="btn-carrinho">
+  🛒 Carrinho
+   <span className="cart-badge">2</span>
+</button>
 
           <button
             onClick={() => setModalSair(true)}
