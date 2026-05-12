@@ -6,8 +6,38 @@ function ProdutoDetalhe(){
 
     const { id } = useParams();
     const navigate = useNavigate();
-
+    const [modalSucesso, setModalSucesso] = useState(false);
     const [produto, setProduto] = useState(null);
+
+    const adicionarAoCarrinho = () => {
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  const index = cart.findIndex(
+    item => item.id === produto.id
+  );
+
+  if(index !== -1){
+
+    cart[index].quantidade += 1;
+
+  }else{
+
+    cart.push({
+      id: produto.id,
+      nome: produto.nome,
+      preco: produto.preco,
+      imagem: produto.imagem,
+      quantidade: 1
+    });
+
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  // ABRIR MODAL
+  setModalSucesso(true);
+};
 
     useEffect(() => {
 
@@ -96,13 +126,41 @@ function ProdutoDetalhe(){
                     Estoque disponível: {produto.estoque}
                 </p>
 
-                <button className="btn-comprar">
-                    Comprar Agora
-                </button>
+                <button
+  className="btn-carrinho"
+  onClick={adicionarAoCarrinho}
+>
+  Adicionar ao Carrinho
+</button>
 
             </div>
 
         </div>
+
+        {modalSucesso && (
+
+  <div className="modal-overlay">
+
+    <div className="modal-sucesso">
+
+      <h3>Produto adicionado!</h3>
+
+      <p>
+        Produto adicionado ao carrinho com sucesso.
+      </p>
+
+      <button
+        className="btn-ok"
+        onClick={() => setModalSucesso(false)}
+      >
+        OK
+      </button>
+
+    </div>
+
+  </div>
+
+)}
 
     </div>
 
