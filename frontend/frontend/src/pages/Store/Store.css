@@ -569,9 +569,90 @@ img{
     transform: translateZ(0);
 }
 
-/* =========================
-   RESPONSIVO
-========================= */
+.btn-carrinho{
+    position: relative;
+
+    background: linear-gradient(135deg, #7c3aed, #2563eb);
+
+    color: white;
+
+    border: none;
+
+    padding: 12px 18px;
+
+    border-radius: 14px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    display: flex;
+    gap: 8px;
+
+    box-shadow: 0 10px 25px rgba(37,99,235,0.3);
+
+    transition: 0.3s;
+}
+
+.btn-carrinho:hover{
+    transform: translateY(-2px);
+}
+
+.cart-badge{
+    position: absolute;
+
+    top: -8px;
+    right: -8px;
+
+    background: red;
+
+    color: white;
+
+    width: 22px;
+    height: 22px;
+
+    border-radius: 50%;
+
+    font-size: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    animation: pop 0.3s ease;
+}
+
+@keyframes pop{
+    0%{ transform: scale(0); }
+    80%{ transform: scale(1.2); }
+    100%{ transform: scale(1); }
+}
+
+.btn-add-cart{
+    width: 100%;
+
+    margin-top: 10px;
+
+    border: none;
+
+    padding: 12px;
+
+    border-radius: 12px;
+
+    background: linear-gradient(135deg, #10b981, #059669);
+
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.btn-add-cart:hover{
+    transform: scale(1.03);
+}
 
 @media(max-width: 900px){
 

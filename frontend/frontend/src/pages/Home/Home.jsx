@@ -2,6 +2,34 @@ import { useEffect, useState } from "react";
 import "./Home.css";
 import { useNavigate } from "react-router-dom";
 
+function getCart() {
+  return JSON.parse(localStorage.getItem("cart")) || [];
+}
+
+function saveCart(cart) {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function adicionarAoCarrinho(produto) {
+  let cart = getCart();
+
+  const index = cart.findIndex(item => item.id === produto.id);
+
+  if (index !== -1) {
+    cart[index].quantidade += 1;
+  } else {
+    cart.push({
+      id: produto.id,
+      nome: produto.nome,
+      preco: produto.preco,
+      imagem: produto.imagem,
+      quantidade: 1
+    });
+  }
+
+  saveCart(cart);
+}
+
 function sair() {
   localStorage.removeItem("token");
   window.location.href = "/login";
