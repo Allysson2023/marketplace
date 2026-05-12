@@ -274,6 +274,7 @@
 
     text-shadow:
         0 5px 10px rgba(0,0,0,0.3);
+    text-align: center;
 }
 
 /* =========================
@@ -433,6 +434,7 @@
     margin-bottom: 12px;
 
     min-height: 45px;
+    text-align: center;
 }
 
 .product-price{
@@ -671,9 +673,13 @@ img{
     .store-stats{
         justify-content: center;
     }
+    .store-products h2{
+        font-size: 38px;
+        text-align: center;
+    }
 
     .store-products{
-        margin-top: 240px;
+        margin-top: 70px;
     }
 
 }
@@ -685,7 +691,7 @@ img{
     }
 
     .store-header{
-        min-height: 560px;
+        min-height: 160px;
     }
 
     .store-logo{
@@ -699,6 +705,7 @@ img{
 
     .store-products h2{
         font-size: 28px;
+        text-align: center;
     }
 
 }

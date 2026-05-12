@@ -126,16 +126,6 @@ function Store() {
                                     R$ {produto.preco}
                                 </p>
 
-                                <button
-                                    className="btn-buy"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        console.log("Adicionar ao carrinho:", produto.id);
-                                    }}
-                                >
-                                    Comprar
-                                </button>
-
                             </div>
 
                         </div>
