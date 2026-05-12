@@ -240,7 +240,7 @@ const abrirCarrinho = async () => {
       )}
 
       {/* LOJAS */}
-      <h3>Nossas Lojas</h3>
+      <h3 className="centraliza-titulo" >Nossas Lojas</h3>
 
       <div className="carrossel">
         {lojas.map((loja) => (
@@ -297,7 +297,7 @@ const abrirCarrinho = async () => {
 </div>
 
       {/* PRODUTOS */}
-      <h2>Produtos</h2>
+      <h2 className="centraliza-titulo" >Produtos</h2>
 
       <div className="produto-grid">
         {produtos.map((produto) => (
@@ -315,8 +315,8 @@ const abrirCarrinho = async () => {
               alt={produto.nome}
             />
 
-            <h3>{produto.nome}</h3>
-            <p>{produto.nomeLoja}</p>
+            <h3 className="centraliza-titulo" >{produto.nome}</h3>
+            <p className="centraliza-titulo" >{produto.nomeLoja}</p>
            <div className="precos">
 
                     {produto.preco_antigo && (
