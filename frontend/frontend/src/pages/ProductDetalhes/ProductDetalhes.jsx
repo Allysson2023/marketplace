@@ -9,34 +9,51 @@ function ProdutoDetalhe(){
     const [modalSucesso, setModalSucesso] = useState(false);
     const [produto, setProduto] = useState(null);
 
-    const adicionarAoCarrinho = () => {
+   const adicionarAoCarrinho = async () => {
 
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    try {
 
-  const index = cart.findIndex(
-    item => item.id === produto.id
-  );
+        const token = localStorage.getItem("token");
 
-  if(index !== -1){
+        const response = await fetch(
+            "http://localhost:3000/api/cart",
+            {
+                method: "POST",
 
-    cart[index].quantidade += 1;
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
 
-  }else{
+                body: JSON.stringify({
+                    product_id: produto.id,
+                    quantidade: 1
+                })
+            }
+        );
 
-    cart.push({
-      id: produto.id,
-      nome: produto.nome,
-      preco: produto.preco,
-      imagem: produto.imagem,
-      quantidade: 1
-    });
+        const data = await response.json();
 
-  }
+        console.log(data);
 
-  localStorage.setItem("cart", JSON.stringify(cart));
+        if(response.ok){
 
-  // ABRIR MODAL
-  setModalSucesso(true);
+            setModalSucesso(true);
+
+        }else{
+
+            alert(data.error || "Erro ao adicionar no carrinho");
+
+        }
+
+    } catch (error) {
+
+        console.log(error);
+
+        alert("Erro no servidor");
+
+    }
+
 };
 
     useEffect(() => {

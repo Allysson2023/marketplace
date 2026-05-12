@@ -14,6 +14,7 @@ function Home() {
   const [busca, setBusca] = useState("");
   const [pagina, setPagina] = useState(1);
   const [temMaisProdutos, setTemMaisProdutos] = useState(true);
+  const [quantidadeCarrinho, setQuantidadeCarrinho] = useState(0);
 
   const token = localStorage.getItem("token");
 
@@ -131,6 +132,34 @@ function Home() {
       .catch(err => console.log(err));
   }, [categoriaSelecionada, busca, pagina]);
 
+  useEffect(() => {
+
+  fetch("http://localhost:3000/api/cart", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+    .then(res => res.json())
+    .then(data => {
+
+      console.log(data);
+
+      if(Array.isArray(data)){
+
+        const total = data.reduce(
+          (acc, item) => acc + item.quantidade,
+          0
+        );
+
+        setQuantidadeCarrinho(total);
+
+      }
+
+    })
+    .catch(err => console.log(err));
+
+}, []);
+
   return (
     <div className="home">
 
@@ -152,7 +181,9 @@ function Home() {
 
           <button onClick={() => navigate("/cart")} className="btn-carrinho">
             🛒 Carrinho
-            <span className="cart-badge">2</span>
+            <span className="cart-badge">
+  {quantidadeCarrinho}
+</span>
           </button>
 
           <button
