@@ -3,6 +3,123 @@ const router = express.Router();
 const db = require('../config/db');
 const authMiddleware = require('../middlewares/authMiddleware');
 
+
+router.delete("/cart/clear", authMiddleware, (req, res) => {
+
+    const userId = req.user.id;
+
+    const sql = `
+        DELETE cart_items
+        FROM cart_items
+        JOIN cart ON cart.id = cart_items.cart_id
+        WHERE cart.user_id = ?
+    `;
+
+    db.query(sql, [userId], (err) => {
+
+        if (err) return res.status(500).json(err);
+
+        res.json({ message: "Carrinho limpo com sucesso!" });
+
+    });
+
+});
+
+router.delete("/cart/delete/:id", authMiddleware, (req,res)=>{
+
+  const userId = req.user.id;
+  const productId = req.params.id;
+
+  const sql = `
+    DELETE cart_items
+    FROM cart_items
+    JOIN cart ON cart.id = cart_items.cart_id
+    WHERE cart.user_id = ? AND cart_items.product_id = ?
+  `;
+
+  db.query(sql, [userId, productId], (err)=>{
+    if(err) return res.status(500).json(err);
+    res.json({message:"removido"});
+  });
+
+});
+
+router.put("/cart/decrease/:id", authMiddleware, (req, res) => {
+
+    const userId = req.user.id;
+    const productId = req.params.id;
+
+    const getSql = `
+        SELECT cart_items.id, cart_items.quantidade
+        FROM cart_items
+        JOIN cart ON cart.id = cart_items.cart_id
+        WHERE cart.user_id = ? AND cart_items.product_id = ?
+    `;
+
+    db.query(getSql, [userId, productId], (err, result) => {
+
+        if (err) return res.status(500).json(err);
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: "Item não encontrado" });
+        }
+
+        const item = result[0];
+
+        // 🔥 SE FOR 1, REMOVE
+        if (item.quantidade <= 1) {
+
+            const deleteSql = `
+                DELETE cart_items
+                FROM cart_items
+                JOIN cart ON cart.id = cart_items.cart_id
+                WHERE cart.user_id = ? AND cart_items.product_id = ?
+            `;
+
+            db.query(deleteSql, [userId, productId], (err) => {
+                if (err) return res.status(500).json(err);
+
+                return res.json({ message: "Item removido" });
+            });
+
+        } else {
+
+            // ➖ SE FOR MAIOR QUE 1, DIMINUI
+            const updateSql = `
+                UPDATE cart_items
+                JOIN cart ON cart.id = cart_items.cart_id
+                SET quantidade = quantidade - 1
+                WHERE cart.user_id = ? AND cart_items.product_id = ?
+            `;
+
+            db.query(updateSql, [userId, productId], (err) => {
+                if (err) return res.status(500).json(err);
+
+                return res.json({ message: "Quantidade atualizada" });
+            });
+        }
+    });
+});
+
+router.put("/cart/increase/:id", authMiddleware, (req,res)=>{
+
+  const userId = req.user.id;
+  const productId = req.params.id;
+
+  const sql = `
+    UPDATE cart_items 
+    JOIN cart ON cart.id = cart_items.cart_id
+    SET quantidade = quantidade + 1
+    WHERE cart.user_id = ? AND cart_items.product_id = ?
+  `;
+
+  db.query(sql, [userId, productId], (err)=>{
+    if(err) return res.status(500).json(err);
+    res.json({message:"ok"});
+  });
+
+});
+
 router.post('/cart', authMiddleware, (req, res) => {
     const userId = req.user.id;
     const { product_id, quantidade } = req.body;
@@ -24,13 +141,47 @@ router.post('/cart', authMiddleware, (req, res) => {
         }
 
         function adicionarItem(cartId) {
-            const sql = "INSERT INTO cart_items (cart_id, product_id, quantidade) VALUES (?, ?, ?)";
 
-            db.query(sql, [cartId, product_id, quantidade], (err) => {
+    const checkSql = `
+        SELECT * FROM cart_items 
+        WHERE cart_id = ? AND product_id = ?
+    `;
+
+    db.query(checkSql, [cartId, product_id], (err, result) => {
+
+        if (err) return res.status(500).json(err);
+
+        if (result.length > 0) {
+
+            // já existe → aumenta quantidade
+            const updateSql = `
+                UPDATE cart_items 
+                SET quantidade = quantidade + ?
+                WHERE cart_id = ? AND product_id = ?
+            `;
+
+            db.query(updateSql, [quantidade, cartId, product_id], (err) => {
                 if (err) return res.status(500).json(err);
-                res.json({ message: "Produto adicionado ao carrinho!" });
+
+                return res.json({ message: "Quantidade atualizada!" });
+            });
+
+        } else {
+
+            // não existe → cria
+            const insertSql = `
+                INSERT INTO cart_items (cart_id, product_id, quantidade)
+                VALUES (?, ?, ?)
+            `;
+
+            db.query(insertSql, [cartId, product_id, quantidade], (err) => {
+                if (err) return res.status(500).json(err);
+
+                return res.json({ message: "Produto adicionado!" });
             });
         }
+    });
+}
     });
 });
 
@@ -39,6 +190,7 @@ router.get('/cart', authMiddleware, (req, res) =>{
 
     const sql = `
     SELECT 
+        cart_items.product_id,
         products.nome,
         products.preco,
         products.imagem,

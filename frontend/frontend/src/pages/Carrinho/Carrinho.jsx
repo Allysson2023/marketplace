@@ -29,12 +29,88 @@ function Carrinho() {
       })
       .catch(err => console.log(err));
 
-  }, []);
+  }, [token]);
 
   const total = carrinho.reduce((acc, item) => {
     return acc + (Number(item.preco) * item.quantidade);
   }, 0);
-console.log(carrinho[0]);
+
+const aumentar = (id) => {
+
+  fetch(`http://localhost:3000/api/cart/increase/${id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  .then(() => {
+
+    setCarrinho(prev =>
+      prev.map(item =>
+        item.product_id === id
+          ? { ...item, quantidade: item.quantidade + 1 }
+          : item
+      )
+    );
+
+  });
+
+};
+
+const diminuir = (id) => {
+
+  fetch(`http://localhost:3000/api/cart/decrease/${id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  .then(() => {
+
+    setCarrinho(prev =>
+      prev
+        .map(item =>
+          item.product_id === id
+            ? { ...item, quantidade: item.quantidade - 1 }
+            : item
+        )
+        .filter(item => item.quantidade > 0)
+    );
+
+  });
+
+};
+
+const remover = (id) => {
+
+  fetch(`http://localhost:3000/api/cart/delete/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  .then(() => {
+
+    setCarrinho(prev =>
+      prev.filter(item => item.product_id !== id)
+    );
+
+  });
+
+};
+
+const limparCarrinho = () => {
+
+  fetch("http://localhost:3000/api/cart/clear", {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  .then(() => setCarrinho([]));
+
+};
+
   return (
 
     <div className="pagina-carrinho">
@@ -66,10 +142,17 @@ console.log(carrinho[0]);
         
           <div className="lista-carrinho">
 
+            <button
+  className="btn-limpar"
+  onClick={limparCarrinho}
+>
+  🧹 Limpar Carrinho
+</button>
+
             {carrinho.map((item) => (
 
               <div
-                key={item.id}
+                key={item.product_id}
                 className="card-carrinho"
               >
 
@@ -91,6 +174,24 @@ console.log(carrinho[0]);
                   </span>
 
                 </div>
+
+                <div className="actions">
+
+  <button className="btn-menos" onClick={() => diminuir(item.product_id)}>
+    -
+  </button>
+
+  <span>{item.quantidade}</span>
+
+  <button className="btn-mais" onClick={() => aumentar(item.product_id)}>
+    +
+  </button>
+
+  <button className="btn-delete" onClick={() => remover(item.product_id)}>
+    🗑
+  </button>
+
+</div>
 
               </div>
 
