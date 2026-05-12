@@ -224,6 +224,19 @@ function Home() {
 
             <h3>{produto.nome}</h3>
             <p>{produto.nomeLoja}</p>
+           <div className="precos">
+
+                    {produto.preco_antigo && (
+                        <span className="preco-antigo">
+                            R$ {produto.preco_antigo}
+                        </span>
+                    )}
+
+                    <span className="preco-atual">
+                        R$ {produto.preco}
+                    </span>
+
+                </div>
           </div>
         ))}
       </div>
