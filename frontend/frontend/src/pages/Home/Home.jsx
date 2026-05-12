@@ -179,7 +179,7 @@ function Home() {
             }}
           />
 
-          <button onClick={() => navigate("/cart")} className="btn-carrinho">
+          <button onClick={() => navigate("/carrinho")} className="btn-carrinho">
             🛒 Carrinho
             <span className="cart-badge">
   {quantidadeCarrinho}

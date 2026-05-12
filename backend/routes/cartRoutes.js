@@ -38,12 +38,16 @@ router.get('/cart', authMiddleware, (req, res) =>{
     const userId = req.user.id;
 
     const sql = `
-        SELECT products.nome, products.preco, cart_items.quantidade
-        FROM cart_items
-        JOIN cart ON cart.id = cart_items.cart_id
-        JOIN products ON products.id = cart_items.product_id
-        WHERE cart.user_id = ?
-    `;
+    SELECT 
+        products.nome,
+        products.preco,
+        products.imagem,
+        cart_items.quantidade
+    FROM cart_items
+    JOIN cart ON cart.id = cart_items.cart_id
+    JOIN products ON products.id = cart_items.product_id
+    WHERE cart.user_id = ?
+`;
     
     db.query(sql, [userId], (err, result) => {
         if (err) return res.status(500).json(err);
