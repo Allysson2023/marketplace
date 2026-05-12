@@ -160,6 +160,33 @@ function Home() {
 
 }, []);
 
+const [modalCarrinhoVazio, setModalCarrinhoVazio] = useState(false);
+
+const abrirCarrinho = async () => {
+
+  try {
+
+    const res = await fetch("http://localhost:3000/api/cart", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      setModalCarrinhoVazio(true);
+      return;
+    }
+
+    navigate("/carrinho");
+
+  } catch (err) {
+    console.log(err);
+  }
+
+};
+
   return (
     <div className="home">
 
@@ -179,12 +206,13 @@ function Home() {
             }}
           />
 
-          <button onClick={() => navigate("/carrinho")} className="btn-carrinho">
-            🛒 Carrinho
-            <span className="cart-badge">
-  {quantidadeCarrinho}
-</span>
-          </button>
+         <button onClick={abrirCarrinho} className="btn-carrinho">
+  🛒 Carrinho
+
+  <span className="cart-badge">
+    {quantidadeCarrinho}
+  </span>
+</button>
 
           <button
   onClick={() => setModalSair(true)}
@@ -301,6 +329,29 @@ function Home() {
         </button>
 
       </div>
+
+    </div>
+
+  </div>
+
+)}
+
+{modalCarrinhoVazio && (
+
+  <div className="modal-overlay">
+
+    <div className="modal">
+
+      <h3>Seu carrinho está vazio 🧺</h3>
+
+      <p>Adicione produtos antes de continuar.</p>
+
+      <button
+        onClick={() => setModalCarrinhoVazio(false)}
+        className="btn-ok"
+      >
+        OK
+      </button>
 
     </div>
 
