@@ -333,6 +333,33 @@ const abrirCarrinho = async () => {
           </div>
         ))}
       </div>
+        {/* PAGINAÇÃO */}
+        
+        <div className="paginacao">
+        
+          {pagina > 1 && (
+        
+            <button
+              className="btn-carregar"
+              onClick={() => setPagina(pagina - 1)}
+            >
+              Voltar
+            </button>
+        
+          )}
+        
+          {temMaisProdutos && (
+        
+            <button
+              className="btn-carregar"
+              onClick={() => setPagina(pagina + 1)}
+            >
+              Próximo
+            </button>
+        
+          )}
+        
+        </div>
 
       {modalSair && (
 
@@ -363,7 +390,6 @@ const abrirCarrinho = async () => {
         </button>
 
       </div>
-
     </div>
 
   </div>

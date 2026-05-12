@@ -626,6 +626,50 @@ PREÇOS
     text-align: center;
 }
 
+/* =========================
+PAGINAÇÃO
+========================= */
+
+.paginacao{
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 15px;
+
+    margin-top: 35px;
+    margin-bottom: 40px;
+}
+
+.btn-carregar{
+    border: none;
+
+    padding: 14px 22px;
+
+    border-radius: 12px;
+
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+
+    color: white;
+
+    font-weight: bold;
+    font-size: 15px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.btn-carregar:hover{
+    transform: translateY(-3px);
+
+    box-shadow: 0 15px 30px rgba(37,99,235,0.35);
+}
+
 @media(max-width: 768px){
 
     .topo{
