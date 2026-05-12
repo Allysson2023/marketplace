@@ -262,6 +262,40 @@ const abrirCarrinho = async () => {
         ))}
       </div>
 
+      {/* CATEGORIAS */}
+<div className="menu">
+
+  <span
+    className={`categoria-item ${
+  categoriaSelecionada === "" ? "categoria-ativa" : ""
+}`}
+    onClick={() => {
+      setCategoriaSelecionada("");
+      setPagina(1);
+    }}
+  >
+    Todos
+  </span>
+
+  {categorias.map((cat) => (
+    <span
+      key={cat.id}
+      className={`categoria-item ${
+  categoriaSelecionada === cat.nome
+    ? "categoria-ativa"
+    : ""
+}`}
+      onClick={() => {
+        setCategoriaSelecionada(cat.nome);
+        setPagina(1);
+      }}
+    >
+      {cat.nome}
+    </span>
+  ))}
+
+</div>
+
       {/* PRODUTOS */}
       <h2>Produtos</h2>
 
