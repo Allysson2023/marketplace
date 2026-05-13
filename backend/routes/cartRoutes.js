@@ -206,18 +206,59 @@ router.post('/cart', authMiddleware, (req, res) => {
 
         if (result.length > 0) {
 
-            // já existe → aumenta quantidade
-            const updateSql = `
-                UPDATE cart_items 
-                SET quantidade = quantidade + ?
-                WHERE cart_id = ? AND product_id = ?
-            `;
+            const quantidadeAtual = result[0].quantidade;
 
-            db.query(updateSql, [quantidade, cartId, product_id], (err) => {
-                if (err) return res.status(500).json(err);
+// 🔥 Buscar estoque do produto
+db.query(
+    "SELECT estoque, nome FROM products WHERE id = ?",
+    [product_id],
+    (err, estoqueResult) => {
 
-                return res.json({ message: "Quantidade atualizada!" });
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        if (estoqueResult.length === 0) {
+            return res.status(404).json({
+                message: "Produto não encontrado"
             });
+        }
+
+        const estoque = estoqueResult[0].estoque;
+        const nomeProduto = estoqueResult[0].nome;
+
+        // 🔥 Verifica limite
+        if ((quantidadeAtual + quantidade) > estoque) {
+
+            return res.status(400).json({
+                message:
+                    `Quantidade indisponível.\n\nExistem apenas ${estoque} Fale com Lojista!.`
+            });
+        }
+
+        // ✅ Pode atualizar
+        const updateSql = `
+            UPDATE cart_items 
+            SET quantidade = quantidade + ?
+            WHERE cart_id = ? AND product_id = ?
+        `;
+
+        db.query(
+            updateSql,
+            [quantidade, cartId, product_id],
+            (err) => {
+
+                if (err) {
+                    return res.status(500).json(err);
+                }
+
+                return res.json({
+                    message: "Quantidade atualizada!"
+                });
+            }
+        );
+    }
+);
 
         } else {
 

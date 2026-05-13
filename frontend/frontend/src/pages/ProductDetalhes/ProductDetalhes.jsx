@@ -12,6 +12,15 @@ function ProdutoDetalhe(){
 
    const adicionarAoCarrinho = async () => {
 
+    if(produto.estoque <= 0){
+
+        alert(
+            "Produto indisponível no momento.\n\nFale com a loja para saber quando haverá reposição."
+        );
+
+        return;
+    }
+
     try {
 
         const token = localStorage.getItem("token");
@@ -43,7 +52,7 @@ function ProdutoDetalhe(){
 
         }else{
 
-            alert(data.error || "Erro ao adicionar no carrinho");
+            alert(data.message || "Erro ao adicionar no carrinho");
 
         }
 
@@ -186,15 +195,32 @@ function ProdutoDetalhe(){
 
                 </div>
 
-                <p className="estoque">
-                    Estoque disponível: {produto.estoque}
-                </p>
+                {
+    produto.estoque <= 0 ? (
+
+        <p className="indisponivel">
+            Produto indisponível
+        </p>
+
+    ) : (
+
+        <p className="estoque">
+            Estoque disponível: {produto.estoque}
+        </p>
+
+    )
+}
 
                 <button
   className="btn-carrinho"
   onClick={adicionarAoCarrinho}
+  disabled={produto.estoque <= 0}
 >
-  Adicionar ao Carrinho
+  {
+    produto.estoque <= 0
+      ? "Produto Indisponível"
+      : "Adicionar ao Carrinho"
+  }
 </button>
 
             </div>
