@@ -8,6 +8,7 @@ function ProdutoDetalhe(){
     const navigate = useNavigate();
     const [modalSucesso, setModalSucesso] = useState(false);
     const [produto, setProduto] = useState(null);
+    const [imagemPrincipal, setImagemPrincipal] = useState("");
 
    const adicionarAoCarrinho = async () => {
 
@@ -58,11 +59,19 @@ function ProdutoDetalhe(){
 
     useEffect(() => {
 
-        fetch(`http://localhost:3000/api/products/${id}`)
-        .then(res => res.json())
-        .then(data => setProduto(data));
+    fetch(`http://localhost:3000/api/products/${id}`)
+    .then(res => res.json())
+    .then(data => {
 
-    }, [id]);
+        setProduto(data);
+
+        setImagemPrincipal(
+            `http://localhost:3000/uploads/produtos/${data.imagem}`
+        );
+
+    });
+
+}, [id]);
 
     if(!produto){
         return <p>Carregando...</p>;
@@ -85,33 +94,71 @@ function ProdutoDetalhe(){
 
         <div className="produto-detalhe">
 
-            <div className="galeria">
+    <div className="galeria">
 
-                <img
-                    className="imagem-principal"
-                    src={`http://localhost:3000/uploads/produtos/${produto.imagem}`}
-                    alt={produto.nome}
-                />
+    <img
+        className="imagem-principal"
+        src={imagemPrincipal}
+        alt={produto.nome}
+    />
 
-                <div className="miniaturas">
+    <div className="miniaturas">
 
-                    {produto.imagem2 && (
-                        <img
-                            src={`http://localhost:3000/uploads/produtos/${produto.imagem2}`}
-                            alt=""
-                        />
-                    )}
+        <img
+            className={
+                imagemPrincipal ===
+                `http://localhost:3000/uploads/produtos/${produto.imagem}`
+                ? "miniatura ativa"
+                : "miniatura"
+            }
+            src={`http://localhost:3000/uploads/produtos/${produto.imagem}`}
+            alt=""
+            onClick={() =>
+                setImagemPrincipal(
+                    `http://localhost:3000/uploads/produtos/${produto.imagem}`
+                )
+            }
+        />
 
-                    {produto.imagem3 && (
-                        <img
-                            src={`http://localhost:3000/uploads/produtos/${produto.imagem3}`}
-                            alt=""
-                        />
-                    )}
+        {produto.imagem2 && (
+            <img
+                className={
+                    imagemPrincipal ===
+                    `http://localhost:3000/uploads/produtos/${produto.imagem2}`
+                    ? "miniatura ativa"
+                    : "miniatura"
+                }
+                src={`http://localhost:3000/uploads/produtos/${produto.imagem2}`}
+                alt=""
+                onClick={() =>
+                    setImagemPrincipal(
+                        `http://localhost:3000/uploads/produtos/${produto.imagem2}`
+                    )
+                }
+            />
+        )}
 
-                </div>
+        {produto.imagem3 && (
+            <img
+                className={
+                    imagemPrincipal ===
+                    `http://localhost:3000/uploads/produtos/${produto.imagem3}`
+                    ? "miniatura ativa"
+                    : "miniatura"
+                }
+                src={`http://localhost:3000/uploads/produtos/${produto.imagem3}`}
+                alt=""
+                onClick={() =>
+                    setImagemPrincipal(
+                        `http://localhost:3000/uploads/produtos/${produto.imagem3}`
+                    )
+                }
+            />
+        )}
 
-            </div>
+    </div>
+
+</div>
 
             <div className="info-produto">
 
