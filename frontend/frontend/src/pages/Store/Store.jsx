@@ -12,6 +12,7 @@ const [pagina, setPagina] = useState(1);
 const [temMaisProdutos, setTemMaisProdutos] = useState(true);
     const [store, setStore] = useState(null);
     const [busca, setBusca] = useState("");
+const [menuConfig, setMenuConfig] = useState(false);
 
     useEffect(() => {
 
@@ -63,13 +64,49 @@ const [temMaisProdutos, setTemMaisProdutos] = useState(true);
 
         <div className="store-page">
 
-            {/* BOTÃO VOLTAR */}
-            <button
-                className="btn-back"
-                onClick={() => navigate("/")}
-            >
-                ← Voltar
-            </button>
+            <div className="store-top-bar">
+
+    <button
+        className="btn-back"
+        onClick={() => navigate("/")}
+    >
+        ← Voltar
+    </button>
+
+    <div className="top-actions">
+
+        <button
+            className="btn-config-top"
+            onClick={() => setMenuConfig(!menuConfig)}
+        >
+            ⚙️
+        </button>
+
+        {menuConfig && (
+            <div className="dropdown-config-top">
+
+                <button onClick={() => navigate(`/editar-loja/${store.id}`)}>
+                    ✏️ Editar Loja
+                </button>
+
+                <button onClick={() => navigate("/criar-produto")}>
+                    ➕ Adicionar Produto
+                </button>
+
+                <button onClick={() => navigate(`/pedidos/${store.id}`)}>
+                    📦 Pedidos
+                </button>
+
+                <button onClick={() => navigate(`/config-loja/${store.id}`)}>
+                    ⚙️ Configurações
+                </button>
+
+            </div>
+        )}
+
+    </div>
+
+</div>
 
             {/* HEADER */}
             <div className="store-header">
