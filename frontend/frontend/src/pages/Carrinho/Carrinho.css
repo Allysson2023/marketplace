@@ -167,3 +167,62 @@
 .btn-limpar:hover {
   background: #e60000;
 }
+
+
+.actions button:disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.indisponivel{
+    color: #ff0000;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.estoque{
+    color: #555;
+    font-size: 14px;
+}
+
+.actions{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.actions span{
+    font-size: 18px;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* botão desabilitado */
+.actions button:disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #999 !important;
+}
+
+/* efeito hover geral */
+.btn-mais,
+.btn-menos,
+.btn-delete,
+.btn-finalizar,
+.btn-limpar,
+.btn-voltar{
+    transition: 0.2s;
+}
+
+/* card indisponível */
+.card-carrinho.indisponivel-card{
+    opacity: 0.7;
+    border: 2px solid #ff4d4d;
+}
+
+.btn-finalizar:disabled{
+    background: #999;
+    cursor: not-allowed;
+    opacity: 0.7;
+}

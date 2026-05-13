@@ -101,22 +101,75 @@ router.put("/cart/decrease/:id", authMiddleware, (req, res) => {
     });
 });
 
-router.put("/cart/increase/:id", authMiddleware, (req,res)=>{
+router.put("/cart/increase/:id", authMiddleware, (req, res) => {
 
-  const userId = req.user.id;
-  const productId = req.params.id;
+    const userId = req.user.id;
+    const productId = req.params.id;
 
-  const sql = `
-    UPDATE cart_items 
-    JOIN cart ON cart.id = cart_items.cart_id
-    SET quantidade = quantidade + 1
-    WHERE cart.user_id = ? AND cart_items.product_id = ?
-  `;
+    // Busca item do carrinho + estoque do produto
+    const sql = `
+        SELECT 
+            cart_items.quantidade,
+            products.estoque,
+            products.nome
+        FROM cart_items
+        JOIN cart ON cart.id = cart_items.cart_id
+        JOIN products ON products.id = cart_items.product_id
+        WHERE cart.user_id = ? 
+        AND cart_items.product_id = ?
+    `;
 
-  db.query(sql, [userId, productId], (err)=>{
-    if(err) return res.status(500).json(err);
-    res.json({message:"ok"});
-  });
+    db.query(sql, [userId, productId], (err, result) => {
+
+        if (err) return res.status(500).json(err);
+
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: "Produto não encontrado no carrinho"
+            });
+        }
+
+        const item = result[0];
+
+        const quantidadeAtual = item.quantidade;
+        const estoque = item.estoque;
+        const nomeProduto = item.nome;
+
+        // 🔥 Produto indisponível
+        if (estoque <= 0) {
+            return res.status(400).json({
+                message: `${nomeProduto} está indisponível no momento`
+            });
+        }
+
+        // 🔥 Limite atingido
+        if (quantidadeAtual >= estoque) {
+
+            return res.status(400).json({
+                message:
+                    `Quantidade indisponível. Existem apenas ${estoque} unidades disponíveis. Fale com a loja para saber quando haverá reposição.`
+            });
+        }
+
+        // ✅ Pode aumentar
+        const updateSql = `
+            UPDATE cart_items 
+            JOIN cart ON cart.id = cart_items.cart_id
+            SET quantidade = quantidade + 1
+            WHERE cart.user_id = ? 
+            AND cart_items.product_id = ?
+        `;
+
+        db.query(updateSql, [userId, productId], (err) => {
+
+            if (err) return res.status(500).json(err);
+
+            res.json({
+                message: "Quantidade aumentada!"
+            });
+        });
+
+    });
 
 });
 
@@ -194,7 +247,8 @@ router.get('/cart', authMiddleware, (req, res) =>{
         products.nome,
         products.preco,
         products.imagem,
-        cart_items.quantidade
+        cart_items.quantidade,
+        products.estoque
     FROM cart_items
     JOIN cart ON cart.id = cart_items.cart_id
     JOIN products ON products.id = cart_items.product_id

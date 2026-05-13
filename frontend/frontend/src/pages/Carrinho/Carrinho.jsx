@@ -35,16 +35,31 @@ function Carrinho() {
     return acc + (Number(item.preco) * item.quantidade);
   }, 0);
 
-const aumentar = (id) => {
+const aumentar = async (id) => {
 
-  fetch(`http://localhost:3000/api/cart/increase/${id}`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`
+  try {
+
+    const response = await fetch(
+      `http://localhost:3000/api/cart/increase/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    // 🔥 Se backend bloquear
+    if (!response.ok) {
+
+      alert(data.message);
+
+      return;
     }
-  })
-  .then(() => {
 
+    // ✅ Atualiza frontend
     setCarrinho(prev =>
       prev.map(item =>
         item.product_id === id
@@ -53,7 +68,11 @@ const aumentar = (id) => {
       )
     );
 
-  });
+  } catch (err) {
+
+    console.log(err);
+
+  }
 
 };
 
@@ -111,6 +130,10 @@ const limparCarrinho = () => {
 
 };
 
+const possuiProdutoIndisponivel = carrinho.some(
+  item => item.estoque <= 0
+);
+
   return (
 
     <div className="pagina-carrinho">
@@ -152,9 +175,11 @@ const limparCarrinho = () => {
             {carrinho.map((item) => (
 
               <div
-                key={item.product_id}
-                className="card-carrinho"
-              >
+  key={item.product_id}
+  className={`card-carrinho ${
+    item.estoque <= 0 ? "indisponivel-card" : ""
+  }`}
+>
 
                 <img
                   src={`http://localhost:3000/uploads/produtos/${item.imagem}`}
@@ -165,9 +190,17 @@ const limparCarrinho = () => {
 
                   <h3>{item.nome}</h3>
 
-                  <p>
-                    Quantidade: {item.quantidade}
-                  </p>
+                  {
+  item.estoque <= 0 ? (
+    <p className="indisponivel">
+      Produto indisponível
+    </p>
+  ) : (
+    <p className="estoque">
+  Estoque disponível: {item.estoque}
+</p>
+  )
+}
 
                   <span>
                     R$ {item.preco}
@@ -183,9 +216,16 @@ const limparCarrinho = () => {
 
   <span>{item.quantidade}</span>
 
-  <button className="btn-mais" onClick={() => aumentar(item.product_id)}>
-    +
-  </button>
+<button
+className="btn-mais"
+  onClick={() => aumentar(item.product_id)}
+  disabled={
+  item.quantidade >= item.estoque ||
+  item.estoque <= 0
+}
+>
+  +
+</button>
 
   <button className="btn-delete" onClick={() => remover(item.product_id)}>
     🗑
@@ -205,9 +245,16 @@ const limparCarrinho = () => {
               Total: R$ {total.toFixed(2)}
             </h2>
 
-            <button className="btn-finalizar">
-              Finalizar Compra
-            </button>
+            <button
+  className="btn-finalizar"
+  disabled={possuiProdutoIndisponivel}
+>
+  {
+    possuiProdutoIndisponivel
+      ? "Produto indisponível no carrinho"
+      : "Finalizar Compra"
+  }
+</button>
 
           </div>
 
