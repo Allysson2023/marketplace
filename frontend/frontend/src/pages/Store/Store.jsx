@@ -13,6 +13,7 @@ const [temMaisProdutos, setTemMaisProdutos] = useState(true);
     const [store, setStore] = useState(null);
     const [busca, setBusca] = useState("");
 const [menuConfig, setMenuConfig] = useState(false);
+const [modoAdmin, setModoAdmin] = useState(true); // depois você pode controlar por usuário dono
 
     useEffect(() => {
 
@@ -60,6 +61,38 @@ const [menuConfig, setMenuConfig] = useState(false);
         produto.nome.toLowerCase().includes(busca.toLowerCase().trim())
     );
 
+    const excluirProduto = async (id) => {
+
+  const confirmar = window.confirm("Deseja realmente excluir este produto?");
+
+  if (!confirmar) return;
+
+  try {
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`http://localhost:3000/api/products/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message);
+      return;
+    }
+
+    setProdutos(prev => prev.filter(p => p.id !== id));
+
+  } catch (err) {
+    console.log(err);
+  }
+
+};
+
     return (
 
         <div className="store-page">
@@ -89,9 +122,9 @@ const [menuConfig, setMenuConfig] = useState(false);
                     ✏️ Editar Loja
                 </button>
 
-                <button onClick={() => navigate("/criar-produto")}>
-                    ➕ Adicionar Produto
-                </button>
+                <button onClick={() => navigate(`/store/${id}/admin/produtos`)}>
+  🛠 Gerenciar Produtos
+</button>
 
                 <button onClick={() => navigate(`/pedidos/${store.id}`)}>
                     📦 Pedidos
@@ -202,6 +235,8 @@ const [menuConfig, setMenuConfig] = useState(false);
                     ))}
 
                 </div>
+
+
 
 
                 {/* PAGINAÇÃO */}

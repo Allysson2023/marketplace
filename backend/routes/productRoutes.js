@@ -232,4 +232,55 @@ router.get('/stores/:id/products', (req, res) => {
 
 });
 
+router.put('/products/:id', authMiddleware, (req, res) => {
+
+    const productId = req.params.id;
+
+    const {
+        nome,
+        descricao,
+        preco,
+        preco_antigo,
+        estoque,
+        categoria
+    } = req.body;
+
+    const sql = `
+        UPDATE products
+        SET
+            nome = ?,
+            descricao = ?,
+            preco = ?,
+            preco_antigo = ?,
+            estoque = ?,
+            categoria = ?
+        WHERE id = ?
+    `;
+
+    db.query(
+        sql,
+        [
+            nome,
+            descricao,
+            preco,
+            preco_antigo,
+            estoque,
+            categoria,
+            productId
+        ],
+        (err, result) => {
+
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            return res.json({
+                message: "Produto atualizado com sucesso!"
+            });
+
+        }
+    );
+
+});
+
 module.exports = router;

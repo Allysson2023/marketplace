@@ -8,6 +8,8 @@ import CadastrarLoja from "./pages/CadastrarLoja/CadastrarLoja";
 import AtualizarPerfil from "./pages/AtualizarPerfil/AtualizarPerfil";
 import Store from "./pages/Store/Store";
 import ProductDetalhes from "./pages/ProductDetalhes/ProductDetalhes";
+import AdminProdutos from "./pages/AdminProdutos/AdminProdutos";
+import EditarProduto from "./pages/EditarProduto/EditarProduto";
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
         <Route path="/cadastrar-loja" element={<CadastrarLoja/>} />
         <Route path="/atualizar-perfil" element={<AtualizarPerfil />} />
         <Route path="/store/:id" element={<Store />} />
+        <Route path="/store/:id/admin/produtos" element={<AdminProdutos />} />
+        <Route path="/admin/produto/:id" element={<EditarProduto />} />
 
       </Routes>
     </BrowserRouter>

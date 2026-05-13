@@ -1,0 +1,26 @@
+.admin-page{
+  padding: 30px;
+}
+
+.admin-card{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: white;
+  padding: 15px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+}
+
+.admin-card img{
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.admin-buttons{
+  display: flex;
+  gap: 10px;
+}
