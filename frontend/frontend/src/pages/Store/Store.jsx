@@ -8,20 +8,52 @@ function Store() {
     const navigate = useNavigate();
 
     const [produtos, setProdutos] = useState([]);
+const [pagina, setPagina] = useState(1);
+const [temMaisProdutos, setTemMaisProdutos] = useState(true);
     const [store, setStore] = useState(null);
     const [busca, setBusca] = useState("");
 
     useEffect(() => {
 
-        fetch(`http://localhost:3000/api/stores/${id}/products`)
-            .then(res => res.json())
-            .then(data => setProdutos(data));
+  fetch(`http://localhost:3000/api/stores/${id}/products?pagina=${pagina}`)
+    .then(res => res.json())
+    .then(data => {
 
-        fetch(`http://localhost:3000/api/stores/${id}`)
-            .then(res => res.json())
-            .then(data => setStore(data));
+      if (Array.isArray(data)) {
 
-    }, [id]);
+        if (pagina === 1) {
+          setProdutos(data);
+        } else {
+          setProdutos(prev => [...prev, ...data]);
+        }
+
+        setTemMaisProdutos(data.length >= 20);
+      }
+
+    });
+
+}, [id, pagina]);
+
+    useEffect(() => {
+
+  fetch(
+    fetch(`http://localhost:3000/api/stores/${id}/products?pagina=${pagina}`)
+  )
+    .then(res => res.json())
+    .then(data => {
+
+      if(Array.isArray(data)){
+
+        setProdutos(data);
+
+        setTemMaisProdutos(data.length >= 20);
+
+      }
+
+    })
+    .catch(err => console.log(err));
+
+}, [id, pagina]);
 
     const produtosFiltrados = produtos.filter(produto =>
         produto.nome.toLowerCase().includes(busca.toLowerCase().trim())
@@ -133,6 +165,37 @@ function Store() {
                     ))}
 
                 </div>
+
+
+                {/* PAGINAÇÃO */}
+
+<div className="paginacao">
+
+  {pagina > 1 && (
+
+    <button
+      className="btn-carregar"
+      onClick={() => setPagina(pagina - 1)}
+    >
+      ← Voltar
+    </button>
+
+  )}
+
+  {temMaisProdutos && (
+
+    <button
+      className="btn-carregar"
+      onClick={() => setPagina(pagina + 1)}
+    >
+      Próximo →
+    </button>
+
+  )}
+
+</div>
+
+
 
             </div>
 

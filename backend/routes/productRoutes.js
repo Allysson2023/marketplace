@@ -203,21 +203,32 @@ router.get('/stores/:id/products', (req, res) => {
 
     const storeId = req.params.id;
 
+    const pagina = parseInt(req.query.pagina) || 1;
+
+    const limite = 20;
+
+    const offset = (pagina - 1) * limite;
+
     const sql = `
         SELECT * FROM products
         WHERE store_id = ?
         ORDER BY id DESC
+        LIMIT ? OFFSET ?
     `;
 
-    db.query(sql, [storeId], (err, result) => {
+    db.query(
+        sql,
+        [storeId, limite, offset],
+        (err, result) => {
 
-        if(err){
-            return res.status(500).json(err);
+            if(err){
+                return res.status(500).json(err);
+            }
+
+            res.json(result);
+
         }
-
-        res.json(result);
-
-    });
+    );
 
 });
 
