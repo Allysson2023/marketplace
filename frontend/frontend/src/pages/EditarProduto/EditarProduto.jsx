@@ -48,9 +48,15 @@ const API_URL = "http://localhost:3000";
   formData.append("nome", produto.nome);
   formData.append("descricao", produto.descricao);
   formData.append("preco", produto.preco);
-  formData.append("preco_antigo", produto.preco_antigo);
+  formData.append(
+  "preco_antigo",
+  produto.preco_antigo ? produto.preco_antigo : null
+);
   formData.append("estoque", produto.estoque);
-  formData.append("categoria", produto.categoria);
+  formData.append(
+  "categoria",
+  produto.categoria === "null" ? "" : produto.categoria
+);
 
   if (imagem1 instanceof File) formData.append("imagem", imagem1);
   if (imagem2 instanceof File) formData.append("imagem2", imagem2);

@@ -232,6 +232,7 @@ router.get('/stores/:id/products', (req, res) => {
 
 });
 
+
 router.put(
   '/products/:id',
   authMiddleware,
@@ -253,7 +254,17 @@ router.put(
       categoria
     } = req.body;
 
-    // 🔥 pegando imagens novas (se vierem)
+    const clean = (value) => {
+      if (
+        value === "" ||
+        value === "null" ||
+        value === undefined
+      ) {
+        return null;
+      }
+      return value;
+    };
+
     const imagem = req.files?.imagem
       ? req.files.imagem[0].filename
       : null;
@@ -287,9 +298,9 @@ router.put(
         nome,
         descricao,
         preco,
-        preco_antigo,
+        clean(preco_antigo),
         estoque,
-        categoria,
+        clean(categoria),
         imagem,
         imagem2,
         imagem3,
