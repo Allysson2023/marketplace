@@ -8,12 +8,12 @@ function Store() {
     const navigate = useNavigate();
 
     const [produtos, setProdutos] = useState([]);
-const [pagina, setPagina] = useState(1);
-const [temMaisProdutos, setTemMaisProdutos] = useState(true);
+    const [pagina, setPagina] = useState(1);
+    const [temMaisProdutos, setTemMaisProdutos] = useState(true);
     const [store, setStore] = useState(null);
     const [busca, setBusca] = useState("");
-const [menuConfig, setMenuConfig] = useState(false);
-const [modoAdmin, setModoAdmin] = useState(true); // depois você pode controlar por usuário dono
+    const [menuConfig, setMenuConfig] = useState(false);
+    const [modoAdmin, setModoAdmin] = useState(true); // depois você pode controlar por usuário dono
 
     useEffect(() => {
 
@@ -36,26 +36,12 @@ const [modoAdmin, setModoAdmin] = useState(true); // depois você pode controlar
 
 }, [id, pagina]);
 
-    useEffect(() => {
-
-  fetch(
-    fetch(`http://localhost:3000/api/stores/${id}/products?pagina=${pagina}`)
-  )
+useEffect(() => {
+  fetch(`http://localhost:3000/api/stores/${id}`)
     .then(res => res.json())
-    .then(data => {
-
-      if(Array.isArray(data)){
-
-        setProdutos(data);
-
-        setTemMaisProdutos(data.length >= 20);
-
-      }
-
-    })
+    .then(data => setStore(data))
     .catch(err => console.log(err));
-
-}, [id, pagina]);
+}, [id]);
 
     const produtosFiltrados = produtos.filter(produto =>
         produto.nome.toLowerCase().includes(busca.toLowerCase().trim())
@@ -118,7 +104,7 @@ const [modoAdmin, setModoAdmin] = useState(true); // depois você pode controlar
         {menuConfig && (
             <div className="dropdown-config-top">
 
-                <button onClick={() => navigate(`/editar-loja/${store.id}`)}>
+                <button onClick={() => navigate(`/editar-loja/${id}`)}>
                     ✏️ Editar Loja
                 </button>
 
@@ -172,7 +158,17 @@ const [modoAdmin, setModoAdmin] = useState(true); // depois você pode controlar
 
                         <h1>{store?.nome}</h1>
 
-                        <p>Produtos incríveis com os melhores preços.</p>
+                       <p>
+  {store?.descricao || "Produtos incríveis com os melhores preços."}
+</p>
+
+<div className="horario-loja">
+
+  <span>
+    🕒 {store?.horario_abertura} às {store?.horario_fechamento}
+  </span>
+
+</div>
 
                         <div className="store-stats">
                             <span>{produtos.length} Produtos</span>

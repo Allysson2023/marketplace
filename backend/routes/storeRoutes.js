@@ -104,4 +104,49 @@ router.get('/stores/:id', (req, res) => {
 
 });
 
+router.put('/stores/:id', authMiddleware, (req, res) => {
+
+    const storeId = req.params.id;
+
+    const {
+        nome,
+        descricao,
+        horario_abertura,
+        horario_fechamento
+    } = req.body;
+
+    const sql = `
+        UPDATE stores
+        SET
+            nome = ?,
+            descricao = ?,
+            horario_abertura = ?,
+            horario_fechamento = ?
+        WHERE id = ?
+    `;
+
+    db.query(
+        sql,
+        [
+            nome,
+            descricao,
+            horario_abertura,
+            horario_fechamento,
+            storeId
+        ],
+        (err) => {
+
+            if(err){
+                return res.status(500).json(err);
+            }
+
+            res.json({
+                message: "Loja atualizada!"
+            });
+
+        }
+    );
+
+});
+
 module.exports = router;

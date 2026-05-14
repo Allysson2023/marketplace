@@ -10,6 +10,7 @@ import Store from "./pages/Store/Store";
 import ProductDetalhes from "./pages/ProductDetalhes/ProductDetalhes";
 import AdminProdutos from "./pages/AdminProdutos/AdminProdutos";
 import EditarProduto from "./pages/EditarProduto/EditarProduto";
+import EditarLoja from "./pages/EditarLoja/EditarLoja";
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
         <Route path="/store/:id" element={<Store />} />
         <Route path="/store/:id/admin/produtos" element={<AdminProdutos />} />
         <Route path="/admin/produto/:id" element={<EditarProduto />} />
-
+        <Route path="/editar-loja/:id" element={<EditarLoja />} />
       </Routes>
     </BrowserRouter>
   );
