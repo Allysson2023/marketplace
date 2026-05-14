@@ -7,9 +7,11 @@ function AdminProdutos() {
   const navigate = useNavigate();
 
   const [produtos, setProdutos] = useState([]);
+  const [modalDelete, setModalDelete] = useState(false);
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
   const [busca, setBusca] = useState("");
-const [pagina, setPagina] = useState(1);
-const [temMaisProdutos, setTemMaisProdutos] = useState(true);
+  const [pagina, setPagina] = useState(1);
+  const [temMaisProdutos, setTemMaisProdutos] = useState(true);
 
   useEffect(() => {
 
@@ -25,17 +27,27 @@ const [temMaisProdutos, setTemMaisProdutos] = useState(true);
 
   }, [id, pagina]);
 
-  const excluir = async (produtoId) => {
+  const excluir = async () => {
 
-    if (!window.confirm("Deseja excluir?")) return;
+  if (!produtoSelecionado) return;
 
-    await fetch(`http://localhost:3000/api/products/${produtoId}`, {
+  await fetch(
+    `http://localhost:3000/api/products/${produtoSelecionado.id}`,
+    {
       method: "DELETE"
-    });
+    }
+  );
 
-    setProdutos(prev => prev.filter(p => p.id !== produtoId));
+  setProdutos(prev =>
+    prev.filter(p => p.id !== produtoSelecionado.id)
+  );
 
-  };
+  setModalDelete(false);
+
+  setProdutoSelecionado(null);
+
+};
+
 const produtosFiltrados = produtos.filter(produto =>
   produto.nome.toLowerCase().includes(
     busca.toLowerCase().trim()
@@ -76,6 +88,7 @@ const produtosFiltrados = produtos.filter(produto =>
           <div>
             <h3>{produto.nome}</h3>
             <p>R$ {produto.preco}</p>
+            <p>estoque: {produto.estoque}</p>
           </div>
 
           <div className="admin-buttons">
@@ -86,9 +99,17 @@ const produtosFiltrados = produtos.filter(produto =>
               ✏️ Editar
             </button>
 
-            <button onClick={() => excluir(produto.id)}>
-              🗑 Excluir
-            </button>
+            <button
+  onClick={() => {
+
+    setProdutoSelecionado(produto);
+
+    setModalDelete(true);
+
+  }}
+>
+  🗑 Excluir
+</button>
 
           </div>
 
@@ -120,6 +141,46 @@ const produtosFiltrados = produtos.filter(produto =>
   )}
 
 </div>
+
+{modalDelete && (
+
+  <div className="modal-overlay">
+
+    <div className="modal-delete">
+
+      <h2>Excluir Produto</h2>
+
+      <p>
+        Deseja realmente excluir:
+      </p>
+
+      <strong>
+        {produtoSelecionado?.nome}
+      </strong>
+
+      <div className="modal-actions">
+
+        <button
+          className="btn-cancelar"
+          onClick={() => setModalDelete(false)}
+        >
+          Cancelar
+        </button>
+
+        <button
+          className="btn-confirmar"
+          onClick={excluir}
+        >
+          Excluir
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+)}
 
     </div>
 

@@ -295,6 +295,137 @@ body{
   transform: translateY(-2px);
 }
 
+/* =========================
+   MODAL
+========================= */
+
+.modal-overlay{
+  position: fixed;
+
+  inset: 0;
+
+  background:
+    rgba(0,0,0,0.6);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  z-index: 9999;
+
+  backdrop-filter: blur(5px);
+}
+
+.modal-delete{
+  width: 90%;
+  max-width: 420px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #111827,
+      #1f2937
+    );
+
+  border-radius: 24px;
+
+  padding: 30px;
+
+  color: white;
+
+  text-align: center;
+
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.4);
+
+  animation: modalShow 0.25s ease;
+}
+
+.modal-delete h2{
+  margin-bottom: 15px;
+
+  font-size: 28px;
+}
+
+.modal-delete p{
+  opacity: 0.8;
+
+  margin-bottom: 10px;
+}
+
+.modal-delete strong{
+  display: block;
+
+  margin-bottom: 25px;
+
+  font-size: 20px;
+
+  color: #f87171;
+}
+
+.modal-actions{
+  display: flex;
+
+  gap: 15px;
+}
+
+.modal-actions button{
+  flex: 1;
+
+  border: none;
+
+  padding: 14px;
+
+  border-radius: 14px;
+
+  cursor: pointer;
+
+  font-weight: bold;
+
+  transition: 0.25s;
+}
+
+/* cancelar */
+
+.btn-cancelar{
+  background: #374151;
+
+  color: white;
+}
+
+/* excluir */
+
+.btn-confirmar{
+  background:
+    linear-gradient(
+      135deg,
+      #ef4444,
+      #dc2626
+    );
+
+  color: white;
+}
+
+.modal-actions button:hover{
+  transform: translateY(-2px);
+}
+
+@keyframes modalShow{
+
+  from{
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to{
+    opacity: 1;
+    transform: scale(1);
+  }
+
+}
+
 @media(max-width: 700px){
 
   .admin-card{
