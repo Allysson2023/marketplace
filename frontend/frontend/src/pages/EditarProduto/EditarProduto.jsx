@@ -6,6 +6,7 @@ function EditarProduto() {
 
   const { id } = useParams();
   const [produto, setProduto] = useState(null);
+  const [categorias, setCategorias] = useState([]);
 
   useEffect(() => {
 
@@ -14,6 +15,15 @@ function EditarProduto() {
       .then(data => setProduto(data));
 
   }, [id]);
+
+  useEffect(() => {
+
+  fetch("http://localhost:3000/api/categories")
+    .then(res => res.json())
+    .then(data => setCategorias(data))
+    .catch(err => console.log(err));
+
+}, []);
 
   if (!produto) return <p>Carregando...</p>;
   
@@ -102,13 +112,34 @@ function EditarProduto() {
   </div>
 
   <div className="form-group">
-    <label>Categoria</label>
-    <input value={produto.categoria || ""}
-      onChange={(e) =>
-        setProduto({ ...produto, categoria: e.target.value })
-      }
-    />
-  </div>
+
+  <label>Categoria</label>
+
+  <select
+    value={produto.categoria || ""}
+    onChange={(e) =>
+      setProduto({ ...produto, categoria: e.target.value })
+    }
+  >
+
+    <option value="">
+      Selecione uma categoria
+    </option>
+
+    {categorias.map((categoria, index) => (
+
+      <option
+        key={index}
+        value={categoria}
+      >
+        {categoria}
+      </option>
+
+    ))}
+
+  </select>
+
+</div>
 
   <button className="btn-save" onClick={salvar}>
     Salvar
