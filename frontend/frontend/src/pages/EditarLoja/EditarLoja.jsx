@@ -10,6 +10,8 @@ function EditarLoja(){
 
     const [loja, setLoja] = useState(null);
 
+    const [showModal, setShowModal] = useState(false);
+
     useEffect(() => {
 
         fetch(`http://localhost:3000/api/stores/${id}`)
@@ -22,7 +24,7 @@ function EditarLoja(){
         return <p>Carregando...</p>;
     }
 
-    const salvar = async () => {
+    const confirmarAtualizacao = async () => {
 
         const token = localStorage.getItem("token");
 
@@ -44,8 +46,6 @@ function EditarLoja(){
             alert("Erro ao salvar");
             return;
         }
-
-        alert("Loja atualizada!");
 
     };
 
@@ -130,14 +130,43 @@ function EditarLoja(){
 
                 </div>
 
-                <button
-                    className="btn-save"
-                    onClick={salvar}
-                >
-                    Salvar Loja
-                </button>
+                <button onClick={() => setShowModal(true)}>
+  Atualizar Loja
+</button>
 
             </div>
+
+            {showModal && (
+  <div className="modal-overlay">
+    <div className="modal-box">
+
+      <h2>Confirmar atualização</h2>
+      <p>Tem certeza que deseja atualizar o perfil da sua loja?</p>
+
+      <div className="modal-actions">
+
+        <button
+          className="btn-cancel"
+          onClick={() => setShowModal(false)}
+        >
+          Cancelar
+        </button>
+
+        <button
+          className="btn-confirm"
+          onClick={async () => {
+            await confirmarAtualizacao();
+            setShowModal(false);
+          }}
+        >
+          Sim, atualizar
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
 
         </div>
 

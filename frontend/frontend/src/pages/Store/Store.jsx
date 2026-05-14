@@ -79,6 +79,25 @@ useEffect(() => {
 
 };
 
+const isLojaAberta = () => {
+  if (!store?.horario_abertura || !store?.horario_fechamento) return false;
+
+  const agora = new Date();
+
+  const [hA, mA] = store.horario_abertura.split(":");
+  const [hF, mF] = store.horario_fechamento.split(":");
+
+  const abertura = new Date();
+  abertura.setHours(hA, mA, 0);
+
+  const fechamento = new Date();
+  fechamento.setHours(hF, mF, 0);
+
+  return agora >= abertura && agora <= fechamento;
+};
+
+
+
     return (
 
         <div className="store-page">
@@ -154,6 +173,7 @@ useEffect(() => {
                         alt="logo"
                     />
 
+
                     <div className="store-info">
 
                         <h1>{store?.nome}</h1>
@@ -164,6 +184,11 @@ useEffect(() => {
 
 <div className="horario-loja">
 
+                    <div className={`store-status ${isLojaAberta() ? "open" : "closed"}`}>
+  <span className="dot"></span>
+
+  {isLojaAberta() ? "LOJA ABERTA AGORA" : "LOJA FECHADA"}
+</div>
   <span>
     🕒 {store?.horario_abertura} às {store?.horario_fechamento}
   </span>
