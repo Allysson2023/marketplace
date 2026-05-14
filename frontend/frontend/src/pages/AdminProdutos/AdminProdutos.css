@@ -210,9 +210,42 @@ body{
     rgba(255,255,255,0.18);
 }
 
-/* =========================
-   RESPONSIVO
-========================= */
+.paginacao{
+  display: flex;
+
+  justify-content: center;
+
+  gap: 15px;
+
+  margin-top: 40px;
+}
+
+.btn-page{
+  border: none;
+
+  padding: 14px 22px;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #1d4ed8
+    );
+
+  color: white;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: 0.25s;
+}
+
+.btn-page:hover{
+  transform: translateY(-2px);
+}
 
 @media(max-width: 700px){
 

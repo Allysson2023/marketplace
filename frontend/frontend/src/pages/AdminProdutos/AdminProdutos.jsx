@@ -7,14 +7,22 @@ function AdminProdutos() {
   const navigate = useNavigate();
 
   const [produtos, setProdutos] = useState([]);
+const [pagina, setPagina] = useState(1);
+const [temMaisProdutos, setTemMaisProdutos] = useState(true);
 
   useEffect(() => {
 
-    fetch(`http://localhost:3000/api/stores/${id}/products`)
+    fetch(`http://localhost:3000/api/stores/${id}/products?pagina=${pagina}`)
       .then(res => res.json())
-      .then(data => setProdutos(data));
+      .then(data => {
 
-  }, [id]);
+  setProdutos(data);
+
+  setTemMaisProdutos(data.length >= 15);
+
+});
+
+  }, [id, pagina]);
 
   const excluir = async (produtoId) => {
 
@@ -71,6 +79,31 @@ function AdminProdutos() {
         </div>
 
       ))}
+      <div className="paginacao">
+
+  {pagina > 1 && (
+
+    <button
+      className="btn-page"
+      onClick={() => setPagina(pagina - 1)}
+    >
+      ← Voltar
+    </button>
+
+  )}
+
+  {temMaisProdutos && (
+
+    <button
+      className="btn-page"
+      onClick={() => setPagina(pagina + 1)}
+    >
+      Próxima →
+    </button>
+
+  )}
+
+</div>
 
     </div>
 
