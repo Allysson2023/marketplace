@@ -8,14 +8,25 @@ function EditarProduto() {
   const navigate = useNavigate();
   const [produto, setProduto] = useState(null);
   const [categorias, setCategorias] = useState([]);
+  const [imagem1, setImagem1] = useState(null);
+const [imagem2, setImagem2] = useState(null);
+const [imagem3, setImagem3] = useState(null);
+
+const API_URL = "http://localhost:3000";
 
   useEffect(() => {
 
-    fetch(`http://localhost:3000/api/products/${id}`)
-      .then(res => res.json())
-      .then(data => setProduto(data));
+  fetch(`http://localhost:3000/api/products/${id}`)
+    .then(res => res.json())
+    .then(data => {
+      setProduto(data);
 
-  }, [id]);
+      setImagem1(data.imagem ? `${API_URL}/${data.imagem}` : null);
+      setImagem2(data.imagem2 ? `${API_URL}/${data.imagem2}` : null);
+      setImagem3(data.imagem3 ? `${API_URL}/${data.imagem3}` : null);
+    });
+
+}, [id]);
 
   useEffect(() => {
 
@@ -30,26 +41,29 @@ function EditarProduto() {
   
 
   const salvar = async () => {
-
   const token = localStorage.getItem("token");
+
+  const formData = new FormData();
+
+  formData.append("nome", produto.nome);
+  formData.append("descricao", produto.descricao);
+  formData.append("preco", produto.preco);
+  formData.append("preco_antigo", produto.preco_antigo);
+  formData.append("estoque", produto.estoque);
+  formData.append("categoria", produto.categoria);
+
+  if (imagem1 instanceof File) formData.append("imagem", imagem1);
+  if (imagem2 instanceof File) formData.append("imagem2", imagem2);
+  if (imagem3 instanceof File) formData.append("imagem3", imagem3);
+  console.log([...formData.entries()]);
 
   const res = await fetch(`http://localhost:3000/api/products/${id}`, {
     method: "PUT",
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify({
-      nome: produto.nome,
-      descricao: produto.descricao,
-      preco: produto.preco,
-      preco_antigo: produto.preco_antigo,
-      estoque: produto.estoque,
-      categoria: produto.categoria
-    })
+    body: formData
   });
-
-  const data = await res.json();
 
   if (!res.ok) {
     alert("Erro ao salvar");
@@ -74,6 +88,51 @@ function EditarProduto() {
 
   <h1>Editar Produto</h1>
 
+<div className="form-group">
+  <label>Imagem 1</label>
+
+  {imagem1 && (
+  <img
+    src={typeof imagem1 === "string" ? imagem1 : URL.createObjectURL(imagem1)}
+    className="preview"
+    alt="imagem1"
+  />
+)}
+
+  <input
+    type="file"
+    onChange={(e) => setImagem1(e.target.files[0])}
+  />
+</div>
+
+<div className="form-group">
+  <label>Imagem 2</label>
+
+  {imagem2 && (
+    <img src={typeof imagem2 === "string" ? imagem2 : URL.createObjectURL(imagem2)} className="preview" />
+  )}
+
+  <input
+    type="file"
+    onChange={(e) => setImagem2(e.target.files[0])}
+  />
+</div>
+
+<div className="form-group">
+  <label>Imagem 3</label>
+
+  {imagem3 && (
+    <img src={typeof imagem3 === "string" ? imagem3 : URL.createObjectURL(imagem3)} className="preview" />
+  )}
+
+  <input
+    type="file"
+    onChange={(e) => setImagem3(e.target.files[0])}
+  />
+</div>
+
+
+
   <div className="form-group">
     <label>Nome</label>
     <input value={produto.nome}
@@ -90,10 +149,6 @@ function EditarProduto() {
   onChange={(e) =>
     setProduto({ ...produto, descricao: e.target.value })
   }
-
-      onChange={(e) =>
-        setProduto({ ...produto, descricao: e.target.value })
-      }
     />
   </div>
 
@@ -148,16 +203,16 @@ function EditarProduto() {
       Selecione uma categoria
     </option>
 
-    {categorias.map((categoria, index) => (
+    {categorias.map((categoria) => (
 
-      <option
-        key={index}
-        value={categoria}
-      >
-        {categoria}
-      </option>
+  <option
+    key={categoria.id}
+    value={categoria.nome}
+  >
+    {categoria.nome}
+  </option>
 
-    ))}
+))}
 
   </select>
 

@@ -232,57 +232,83 @@ router.get('/stores/:id/products', (req, res) => {
 
 });
 
-router.put('/products/:id', authMiddleware, (req, res) => {
+router.put(
+  '/products/:id',
+  authMiddleware,
+  upload.fields([
+    { name: "imagem", maxCount: 1 },
+    { name: "imagem2", maxCount: 1 },
+    { name: "imagem3", maxCount: 1 }
+  ]),
+  (req, res) => {
 
     const productId = req.params.id;
 
     const {
+      nome,
+      descricao,
+      preco,
+      preco_antigo,
+      estoque,
+      categoria
+    } = req.body;
+
+    // 🔥 pegando imagens novas (se vierem)
+    const imagem = req.files?.imagem
+      ? req.files.imagem[0].filename
+      : null;
+
+    const imagem2 = req.files?.imagem2
+      ? req.files.imagem2[0].filename
+      : null;
+
+    const imagem3 = req.files?.imagem3
+      ? req.files.imagem3[0].filename
+      : null;
+
+    const sql = `
+      UPDATE products
+      SET
+        nome = ?,
+        descricao = ?,
+        preco = ?,
+        preco_antigo = ?,
+        estoque = ?,
+        categoria = ?,
+        imagem = COALESCE(?, imagem),
+        imagem2 = COALESCE(?, imagem2),
+        imagem3 = COALESCE(?, imagem3)
+      WHERE id = ?
+    `;
+
+    db.query(
+      sql,
+      [
         nome,
         descricao,
         preco,
         preco_antigo,
         estoque,
-        categoria
-    } = req.body;
+        categoria,
+        imagem,
+        imagem2,
+        imagem3,
+        productId
+      ],
+      (err, result) => {
 
-    const sql = `
-        UPDATE products
-        SET
-            nome = ?,
-            descricao = ?,
-            preco = ?,
-            preco_antigo = ?,
-            estoque = ?,
-            categoria = ?
-        WHERE id = ?
-    `;
-
-    db.query(
-        sql,
-        [
-            nome,
-            descricao,
-            preco,
-            preco_antigo,
-            estoque,
-            categoria,
-            productId
-        ],
-        (err, result) => {
-
-            if (err) {
-                return res.status(500).json(err);
-            }
-
-            return res.json({
-                message: "Produto atualizado com sucesso!"
-            });
-
+        if (err) {
+          return res.status(500).json(err);
         }
+
+        return res.json({
+          message: "Produto atualizado com sucesso!"
+        });
+
+      }
     );
-
-});
-
+  }
+);
 
 
 module.exports = router;
