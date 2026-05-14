@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import './EditarProduto.css'
 
 function EditarProduto() {
 
   const { id } = useParams();
+  const navigate = useNavigate();
   const [produto, setProduto] = useState(null);
   const [categorias, setCategorias] = useState([]);
 
@@ -62,6 +63,13 @@ function EditarProduto() {
 
     <div>
 
+      <button
+      className="btn-back"
+      onClick={() => navigate(-1)}
+    >
+      ← Voltar
+    </button>
+
       <div className="edit-container">
 
   <h1>Editar Produto</h1>
@@ -77,7 +85,12 @@ function EditarProduto() {
 
   <div className="form-group">
     <label>Descrição</label>
-    <input value={produto.descricao || ""}
+    <textarea
+  value={produto.descricao || ""}
+  onChange={(e) =>
+    setProduto({ ...produto, descricao: e.target.value })
+  }
+
       onChange={(e) =>
         setProduto({ ...produto, descricao: e.target.value })
       }
@@ -86,7 +99,10 @@ function EditarProduto() {
 
   <div className="form-group">
     <label>Preço</label>
-    <input value={produto.preco}
+    <input
+  type="number"
+  step="0.01"
+  value={produto.preco}
       onChange={(e) =>
         setProduto({ ...produto, preco: e.target.value })
       }
@@ -95,7 +111,10 @@ function EditarProduto() {
 
   <div className="form-group">
     <label>Preço Antigo</label>
-    <input value={produto.preco_antigo || ""}
+    <input
+  type="number"
+  step="0.01"
+  value={produto.preco_antigo || ""}
       onChange={(e) =>
         setProduto({ ...produto, preco_antigo: e.target.value })
       }
@@ -104,7 +123,9 @@ function EditarProduto() {
 
   <div className="form-group">
     <label>Estoque</label>
-    <input value={produto.estoque}
+    <input
+  type="number"
+  value={produto.estoque}
       onChange={(e) =>
         setProduto({ ...produto, estoque: e.target.value })
       }
@@ -116,11 +137,12 @@ function EditarProduto() {
   <label>Categoria</label>
 
   <select
-    value={produto.categoria || ""}
-    onChange={(e) =>
-      setProduto({ ...produto, categoria: e.target.value })
-    }
-  >
+  required
+  value={produto.categoria || ""}
+  onChange={(e) =>
+    setProduto({ ...produto, categoria: e.target.value })
+  }
+>
 
     <option value="">
       Selecione uma categoria
