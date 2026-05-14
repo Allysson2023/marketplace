@@ -11,6 +11,7 @@ function EditarProduto() {
   const [imagem1, setImagem1] = useState(null);
 const [imagem2, setImagem2] = useState(null);
 const [imagem3, setImagem3] = useState(null);
+const [showModal, setShowModal] = useState(false);
 
 const API_URL = "http://localhost:3000";
 
@@ -40,7 +41,7 @@ const API_URL = "http://localhost:3000";
   if (!produto) return <p>Carregando...</p>;
   
 
-  const salvar = async () => {
+  const confirmarSalvar = async () => {
   const token = localStorage.getItem("token");
 
   const formData = new FormData();
@@ -75,8 +76,6 @@ const API_URL = "http://localhost:3000";
     alert("Erro ao salvar");
     return;
   }
-
-  alert("Produto atualizado!");
 };
 
   return (
@@ -224,11 +223,43 @@ const API_URL = "http://localhost:3000";
 
 </div>
 
-  <button className="btn-save" onClick={salvar}>
-    Salvar
-  </button>
+  <button className="btn-save" onClick={() => setShowModal(true)}>
+  Salvar
+</button>
 
 </div>
+
+{showModal && (
+  <div className="modal-overlay">
+    <div className="modal-box">
+
+      <h2>Confirmar alteração</h2>
+      <p>Tem certeza que deseja salvar as alterações do produto?</p>
+
+      <div className="modal-actions">
+
+        <button
+          className="btn-cancel"
+          onClick={() => setShowModal(false)}
+        >
+          Cancelar
+        </button>
+
+        <button
+          className="btn-confirm"
+          onClick={async () => {
+            await confirmarSalvar();
+            setShowModal(false);
+          }}
+        >
+          Sim, salvar
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
 
     </div>
 
