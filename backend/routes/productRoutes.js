@@ -283,27 +283,6 @@ router.put('/products/:id', authMiddleware, (req, res) => {
 
 });
 
-router.get('/categories', (req, res) => {
 
-    const sql = `
-        SELECT DISTINCT categoria
-        FROM products
-        WHERE categoria IS NOT NULL
-        ORDER BY categoria ASC
-    `;
-
-    db.query(sql, (err, result) => {
-
-        if(err){
-            return res.status(500).json(err);
-        }
-
-        res.json(
-            result.map(item => item.categoria)
-        );
-
-    });
-
-});
 
 module.exports = router;

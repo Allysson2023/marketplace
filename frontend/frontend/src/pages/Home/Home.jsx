@@ -63,17 +63,15 @@ function Home() {
     }
   }, []);
 
-  // =========================
-  // CATEGORIAS
-  // =========================
-  useEffect(() => {
-    fetch("http://localhost:3000/api/categories")
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) setCategorias(data);
-      })
-      .catch(err => console.log(err));
-  }, []);
+useEffect(() => {
+  fetch("http://localhost:3000/api/categories")
+    .then(res => res.json())
+    .then(data => {
+      console.log("CATEGORIAS VINDAS DO BACKEND:", data);
+      setCategorias(data);
+    })
+    .catch(err => console.log("ERRO CATEGORIAS:", err));
+}, []);
 
   // =========================
   // LOJAS
@@ -277,14 +275,18 @@ const abrirCarrinho = async () => {
     Todos
   </span>
 
-  {categorias.map((cat) => (
+  {categorias.map((cat, index) => {
+
+  console.log(cat);
+
+  return (
     <span
-      key={cat.id}
+      key={index}
       className={`categoria-item ${
-  categoriaSelecionada === cat.nome
-    ? "categoria-ativa"
-    : ""
-}`}
+        categoriaSelecionada === cat.nome
+          ? "categoria-ativa"
+          : ""
+      }`}
       onClick={() => {
         setCategoriaSelecionada(cat.nome);
         setPagina(1);
@@ -292,7 +294,9 @@ const abrirCarrinho = async () => {
     >
       {cat.nome}
     </span>
-  ))}
+  );
+
+})}
 
 </div>
 
