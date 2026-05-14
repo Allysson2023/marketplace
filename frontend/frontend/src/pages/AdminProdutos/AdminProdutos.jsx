@@ -7,6 +7,7 @@ function AdminProdutos() {
   const navigate = useNavigate();
 
   const [produtos, setProdutos] = useState([]);
+  const [busca, setBusca] = useState("");
 const [pagina, setPagina] = useState(1);
 const [temMaisProdutos, setTemMaisProdutos] = useState(true);
 
@@ -35,7 +36,11 @@ const [temMaisProdutos, setTemMaisProdutos] = useState(true);
     setProdutos(prev => prev.filter(p => p.id !== produtoId));
 
   };
-
+const produtosFiltrados = produtos.filter(produto =>
+  produto.nome.toLowerCase().includes(
+    busca.toLowerCase().trim()
+  )
+);
   return (
 
     <div className="admin-page">
@@ -49,7 +54,18 @@ const [temMaisProdutos, setTemMaisProdutos] = useState(true);
 
       <h1>Gerenciar Produtos</h1>
 
-      {produtos.map(produto => (
+      <div className="search-box">
+
+  <input
+    type="text"
+    placeholder="Buscar produto..."
+    value={busca}
+    onChange={(e) => setBusca(e.target.value)}
+  />
+
+</div>
+
+      {produtosFiltrados.map(produto => (
 
         <div className="admin-card" key={produto.id}>
 
