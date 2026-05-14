@@ -32,6 +32,13 @@ function AdminProdutos() {
 
     <div className="admin-page">
 
+      <button
+      className="btn-back"
+      onClick={() => navigate(-1)}
+    >
+      ← Voltar
+    </button>
+
       <h1>Gerenciar Produtos</h1>
 
       {produtos.map(produto => (
