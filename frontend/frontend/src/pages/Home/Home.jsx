@@ -234,6 +234,8 @@ const abrirCarrinho = async () => {
         <div className="menu-dropdown">
           <a href="/cadastrar-produto">Cadastrar Produto</a>
           <a href="/atualizar-perfil">Atualizar Perfil</a>
+          <a href="/meus-pedidos" className="menu-item">📦 Histórico de Pedidos</a>
+          
         </div>
       )}
 

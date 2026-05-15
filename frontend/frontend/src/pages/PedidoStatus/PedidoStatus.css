@@ -107,3 +107,45 @@
   font-size: 20px;
   color: #111;
 }
+
+.status {
+  font-weight: bold;
+}
+
+.status.AGUARDANDO {
+  color: orange;
+}
+
+.status.CONFIRMADO {
+  color: blue;
+}
+
+.status.ENTREGUE {
+  color: green;
+}
+
+.status.CANCELADO {
+  color: red;
+}
+
+.topo-pedidos {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+/* botão voltar padrão */
+.btn-voltar {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-voltar:hover {
+  background: #333;
+}

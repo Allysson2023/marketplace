@@ -100,4 +100,25 @@ router.get("/pedidos/:id", authMiddleware, (req, res) => {
     });
 
 });
+
+router.get("/meus-pedidos", authMiddleware, (req, res) => {
+
+    const usuario_id = req.user.id;
+
+    const sql = `
+        SELECT * FROM pedidos
+        WHERE usuario_id = ?
+        ORDER BY id DESC
+    `;
+
+    db.query(sql, [usuario_id], (err, result) => {
+
+        if (err) return res.status(500).json(err);
+
+        res.json(result);
+
+    });
+
+});
+
 module.exports = router;
