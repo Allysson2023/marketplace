@@ -63,4 +63,41 @@ router.post("/pedidos", authMiddleware, (req, res) => {
 
 });
 
+
+router.get("/pedidos/:id", authMiddleware, (req, res) => {
+
+    const { id } = req.params;
+
+    const sqlPedido = `
+        SELECT * FROM pedidos WHERE id = ?
+    `;
+
+    const sqlItens = `
+        SELECT 
+            pedido_itens.*,
+            products.nome,
+            products.imagem
+        FROM pedido_itens
+        JOIN products ON products.id = pedido_itens.produto_id
+        WHERE pedido_itens.pedido_id = ?
+    `;
+
+    db.query(sqlPedido, [id], (err, pedidoResult) => {
+
+        if (err) return res.status(500).json(err);
+
+        db.query(sqlItens, [id], (err2, itensResult) => {
+
+            if (err2) return res.status(500).json(err2);
+
+            res.json({
+                pedido: pedidoResult[0],
+                itens: itensResult
+            });
+
+        });
+
+    });
+
+});
 module.exports = router;
