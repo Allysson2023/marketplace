@@ -134,6 +134,59 @@ const possuiProdutoIndisponivel = carrinho.some(
   item => item.estoque <= 0
 );
 
+
+async function finalizarCompra() {
+
+  try {
+
+    const response = await fetch(
+      "http://localhost:3000/api/pedidos",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+
+          loja_id: carrinho[0].loja_id,
+
+          total,
+
+          produtos: carrinho.map(item => ({
+            produto_id: item.product_id,
+            quantidade: item.quantidade,
+            preco: item.preco
+          }))
+
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if(response.ok){
+
+      // limpa carrinho frontend
+      setCarrinho([]);
+
+      // vai para tela do pedido
+      navigate(`/pedido/${data.pedidoId}`);
+
+    } else {
+
+      alert(data.message);
+
+    }
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+}
+
   return (
 
     <div className="pagina-carrinho">
@@ -248,6 +301,7 @@ className="btn-mais"
             <button
   className="btn-finalizar"
   disabled={possuiProdutoIndisponivel}
+  onClick={finalizarCompra}
 >
   {
     possuiProdutoIndisponivel

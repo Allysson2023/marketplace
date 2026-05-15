@@ -24,6 +24,9 @@ app.use('/api', cartRoutes);
 const categoryRoutes = require('./routes/categoryRoutes');
 app.use('/api', categoryRoutes);
 
+const pedidoRoutes = require("./routes/pedidoRoutes");
+app.use("/api", pedidoRoutes);
+
 app.get('/', (req, res) => {
     res.send("Servidor funcionando!");
 });
