@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import "./PainelPedidos.css";
 
 function PainelPedidos() {
 
     const [pedidos, setPedidos] = useState([]);
-
     const token = localStorage.getItem("token");
+
+    const { id: storeId } = useParams(); // 🔥 CORRETO
 
     useEffect(() => {
 
-        fetch("http://localhost:3000/api/loja/pedidos", {
+        fetch(`http://localhost:3000/api/loja/${storeId}/pedidos`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -26,20 +28,44 @@ function PainelPedidos() {
         })
         .catch(err => console.log(err));
 
-    }, [token]);
+    }, [token, storeId]);
+
+    const atualizarStatus = async (id, status) => {
+        try {
+            const res = await fetch(`http://localhost:3000/api/pedidos/${id}/status`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ status })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.message);
+                return;
+            }
+
+            setPedidos(prev =>
+                prev.map(p =>
+                    p.id === id ? { ...p, status } : p
+                )
+            );
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     return (
 
         <div className="painel-container">
 
             <div className="topo-painel">
-
                 <h1>Painel de Pedidos</h1>
-
-                <p>
-                    Gerencie os pedidos da sua loja
-                </p>
-
+                <p>Gerencie os pedidos da sua loja</p>
             </div>
 
             <div className="cards-info">
@@ -53,13 +79,10 @@ function PainelPedidos() {
                     <h2>
                         R$ {
                             pedidos
-                            .reduce((acc, item) =>
-                                acc + Number(item.total), 0
-                            )
+                            .reduce((acc, item) => acc + Number(item.total), 0)
                             .toFixed(2)
                         }
                     </h2>
-
                     <span>Faturamento</span>
                 </div>
 
@@ -67,91 +90,71 @@ function PainelPedidos() {
 
             <div className="lista-pedidos">
 
-                {
-                    pedidos.length === 0 ? (
+                {pedidos.length === 0 ? (
 
-                        <div className="sem-pedidos">
+                    <div className="sem-pedidos">
+                        <h2>Nenhum pedido encontrado</h2>
+                    </div>
 
-                            <h2>
-                                Nenhum pedido encontrado
-                            </h2>
+                ) : (
 
-                        </div>
+                    pedidos.map((pedido) => (
 
-                    ) : (
+                        <div className="card-pedido" key={pedido.id}>
 
-                        pedidos.map((pedido) => (
+                            <div className="pedido-topo">
 
-                            <div
-                                className="card-pedido"
-                                key={pedido.id}
-                            >
-
-                                <div className="pedido-topo">
-
-                                    <div>
-
-                                        <h2>
-                                            Pedido #{pedido.id}
-                                        </h2>
-
-                                        <p>
-                                            Cliente: {pedido.username}
-                                        </p>
-
-                                    </div>
-
-                                    <span className={`status ${pedido.status}`}>
-                                        {pedido.status}
-                                    </span>
-
+                                <div>
+                                    <h2>Pedido #{pedido.id}</h2>
+                                    <p>Cliente: {pedido.username}</p>
                                 </div>
 
-                                <div className="pedido-info">
-
-                                    <p>
-                                        Tipo:
-                                        <strong>
-                                            {" "}
-                                            {pedido.tipo_pedido}
-                                        </strong>
-                                    </p>
-
-                                    <p>
-                                        Total:
-                                        <strong>
-                                            {" "}
-                                            R$ {pedido.total}
-                                        </strong>
-                                    </p>
-
-                                </div>
-
-                                <div className="pedido-acoes">
-
-                                    <button className="btn-aceitar">
-                                        Aceitar
-                                    </button>
-
-                                    <button className="btn-recusar">
-                                        Recusar
-                                    </button>
-
-                                </div>
+                                <span className={`status ${pedido.status}`}>
+                                    {pedido.status}
+                                </span>
 
                             </div>
 
-                        ))
+                            <div className="pedido-info">
 
-                    )
-                }
+                                <p>
+                                    Tipo: <strong>{pedido.tipo_pedido}</strong>
+                                </p>
+
+                                <p>
+                                    Total: <strong>R$ {pedido.total}</strong>
+                                </p>
+
+                            </div>
+
+                            <div className="pedido-acoes">
+
+                                <button
+                                    className="btn-aceitar"
+                                    onClick={() => atualizarStatus(pedido.id, "aceito")}
+                                >
+                                    Aceitar
+                                </button>
+
+                                <button
+                                    className="btn-recusar"
+                                    onClick={() => atualizarStatus(pedido.id, "recusado")}
+                                >
+                                    Recusar
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    ))
+
+                )}
 
             </div>
 
         </div>
-
     );
-
 }
 
 export default PainelPedidos;

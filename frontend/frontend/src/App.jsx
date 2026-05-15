@@ -32,7 +32,7 @@ function App() {
         <Route path="/editar-loja/:id" element={<EditarLoja />} />
         <Route path="/pedido/:id" element={<PedidoStatus />}/>
 <Route path="/meus-pedidos" element={<MeusPedidos />} />
-<Route path="/painel-pedidos" element={<PainelPedidos />} />
+<Route path="/store/:id/pedidos" element={<PainelPedidos />} />
       </Routes>
     </BrowserRouter>
   );

@@ -124,20 +124,20 @@ const isLojaAberta = () => {
             <div className="dropdown-config-top">
 
                 <button onClick={() => navigate(`/editar-loja/${id}`)}>
-                    ✏️ Editar Loja
-                </button>
+  ✏️ Editar Loja
+</button>
 
-                <button onClick={() => navigate(`/store/${id}/admin/produtos`)}>
+<button onClick={() => navigate(`/store/${id}/admin/produtos`)}>
   🛠 Gerenciar Produtos
 </button>
 
-                <button onClick={() => navigate(`/pedidos/${store.id}`)}>
-                    📦 Pedidos
-                </button>
+<button onClick={() => navigate(`/store/${id}/pedidos`)}>
+  📦 Painel de Pedidos
+</button>
 
-                <button onClick={() => navigate(`/config-loja/${store.id}`)}>
-                    ⚙️ Configurações
-                </button>
+<button onClick={() => navigate(`/config-loja/${id}`)}>
+  ⚙️ Configurações
+</button>
 
             </div>
         )}
