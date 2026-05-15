@@ -163,4 +163,36 @@ router.get("/meus-pedidos", authMiddleware, (req, res) => {
 
 });
 
+router.get("/loja/pedidos", authMiddleware, (req, res) => {
+
+    const userId = req.user.id;
+
+    const sql = `
+        SELECT 
+            pedidos.id,
+            pedidos.total,
+            pedidos.status,
+            pedidos.tipo_pedido,
+            pedidos.created_at,
+            users.username,
+            stores.nome AS loja_nome
+        FROM pedidos
+        JOIN stores ON stores.id = pedidos.loja_id
+        JOIN users ON users.id = pedidos.user_id
+        WHERE stores.user_id = ?
+        ORDER BY pedidos.id DESC
+    `;
+
+    db.query(sql, [userId], (err, result) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        res.json(result);
+
+    });
+
+});
+
 module.exports = router;

@@ -13,6 +13,7 @@ import EditarProduto from "./pages/EditarProduto/EditarProduto";
 import EditarLoja from "./pages/EditarLoja/EditarLoja";
 import PedidoStatus from "./pages/PedidoStatus/PedidoStatus";
 import MeusPedidos from "./pages/MeusPedidos/MeusPedidos";
+import PainelPedidos from "./pages/PainelPedidos/PainelPedidos";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/editar-loja/:id" element={<EditarLoja />} />
         <Route path="/pedido/:id" element={<PedidoStatus />}/>
 <Route path="/meus-pedidos" element={<MeusPedidos />} />
+<Route path="/painel-pedidos" element={<PainelPedidos />} />
       </Routes>
     </BrowserRouter>
   );
