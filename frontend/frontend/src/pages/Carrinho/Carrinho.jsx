@@ -88,15 +88,24 @@ const aumentar = async (id) => {
 
 };
 
-const diminuir = (id) => {
+const diminuir = async (id) => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/cart/decrease/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
 
-  fetch(`http://localhost:3000/api/cart/decrease/${id}`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message);
+      return;
     }
-  })
-  .then(() => {
 
     setCarrinho(prev =>
       prev
@@ -108,8 +117,9 @@ const diminuir = (id) => {
         .filter(item => item.quantidade > 0)
     );
 
-  });
-
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const remover = (id) => {
@@ -149,6 +159,10 @@ const possuiProdutoIndisponivel = carrinho.some(
 
 async function finalizarCompra() {
 
+  if (carrinho.length === 0) {
+  return alert("Carrinho vazio");
+}
+
   try {
 
     const response = await fetch("http://localhost:3000/api/pedidos", {
@@ -158,23 +172,22 @@ async function finalizarCompra() {
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
-  loja_id: carrinho[0].loja_id,
-  total,
-  produtos: carrinho.map(item => ({
-    produto_id: item.product_id,
-    quantidade: item.quantidade,
-    preco: item.preco
-  })),
-  tipoPedido,
-  dadosEntrega: form
-})
+        loja_id: carrinho[0].loja_id,
+        total,
+        produtos: carrinho.map(item => ({
+          produto_id: item.product_id,
+          quantidade: item.quantidade,
+          preco: item.preco
+        })),
+        tipoPedido,
+        dadosEntrega: form
+      })
     });
 
     const data = await response.json();
 
     if (response.ok) {
 
-      // 🔥 1. limpa carrinho no backend
       await fetch("http://localhost:3000/api/cart/clear", {
         method: "DELETE",
         headers: {
@@ -182,10 +195,17 @@ async function finalizarCompra() {
         }
       });
 
-      // 🔥 2. limpa carrinho no frontend
       setCarrinho([]);
+      setModalAberto(false);
+setForm({
+  nome: "",
+  endereco: "",
+  numero: "",
+  bairro: "",
+  pagamento: "",
+  cpf: ""
+});
 
-      // 🔥 3. vai para home
       navigate("/meus-pedidos");
 
     } else {
@@ -195,7 +215,6 @@ async function finalizarCompra() {
   } catch (error) {
     console.log(error);
   }
-
 }
   return (
 
@@ -339,41 +358,60 @@ className="btn-mais"
           Entrega
         </button>
 
-        <button onClick={() => setTipoPedido("retirada")}>
-          Retirada
-        </button>
+        <button
+  onClick={() => {
+    setTipoPedido("retirada");
+
+    setForm({
+      nome: "",
+      endereco: "",
+      numero: "",
+      bairro: "",
+      pagamento: "",
+      cpf: ""
+    });
+  }}
+>
+  Retirada
+</button>
       </div>
 
       {/* ENTREGA */}
       {tipoPedido === "entrega" && (
         <>
           <input
+          value={form.nome}
             placeholder="Nome do cliente"
             onChange={(e) => setForm({...form, nome: e.target.value})}
           />
 
           <input
+          value={form.endereco}
             placeholder="Endereço"
             onChange={(e) => setForm({...form, endereco: e.target.value})}
           />
 
           <input
+          value={form.numero}
             placeholder="Número"
             onChange={(e) => setForm({...form, numero: e.target.value})}
           />
 
           <input
+          value={form.bairro}
             placeholder="Bairro"
             onChange={(e) => setForm({...form, bairro: e.target.value})}
           />
 
           <select
-            onChange={(e) => setForm({...form, pagamento: e.target.value})}
-          >
-            <option>Pix</option>
-            <option>Dinheiro</option>
-            <option>Cartão</option>
-          </select>
+  value={form.pagamento}
+  onChange={(e) => setForm({...form, pagamento: e.target.value})}
+>
+  <option value="">Selecione</option>
+  <option value="pix">Pix</option>
+  <option value="dinheiro">Dinheiro</option>
+  <option value="cartao">Cartão</option>
+</select>
         </>
       )}
 
@@ -381,11 +419,13 @@ className="btn-mais"
       {tipoPedido === "retirada" && (
         <>
           <input
+          value={form.nome}
             placeholder="Nome de quem vai retirar"
             onChange={(e) => setForm({...form, nome: e.target.value})}
           />
 
           <input
+  value={form.cpf}
             placeholder="CPF (confirmação)"
             onChange={(e) => setForm({...form, cpf: e.target.value})}
           />

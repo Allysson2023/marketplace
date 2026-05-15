@@ -10,20 +10,38 @@ router.post("/pedidos", authMiddleware, (req, res) => {
     const {
         loja_id,
         total,
-        produtos
+        produtos,
+        tipoPedido,
+        dadosEntrega
     } = req.body;
 
     const status = "AGUARDANDO_CONFIRMACAO";
 
+    const dados = dadosEntrega || {};
+
     const sqlPedido = `
         INSERT INTO pedidos
-        (usuario_id, loja_id, total, status)
-        VALUES (?, ?, ?, ?)
+        (usuario_id, loja_id, total, status,
+         tipo_pedido, nome_cliente, endereco, numero, bairro, pagamento, cpf)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(
         sqlPedido,
-        [usuario_id, loja_id, total, status],
+        [
+            usuario_id,
+            loja_id,
+            total,
+            status,
+
+            tipoPedido,
+            dados.nome || null,
+            dados.endereco || null,
+            dados.numero || null,
+            dados.bairro || null,
+            dados.pagamento || null,
+            dados.cpf || null
+        ],
         (err, result) => {
 
             if (err) {
