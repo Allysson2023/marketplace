@@ -174,108 +174,148 @@ router.put("/cart/increase/:id", authMiddleware, (req, res) => {
 });
 
 router.post('/cart', authMiddleware, (req, res) => {
+
     const userId = req.user.id;
     const { product_id, quantidade } = req.body;
 
+    // 1. buscar carrinho do usuário
     db.query("SELECT * FROM cart WHERE user_id = ?", [userId], (err, cartResult) => {
-        if (err) return res.status(500).json(err);
-
-        if (cartResult.length === 0) {
-            db.query("INSERT INTO cart (user_id) VALUES (?)", [userId], (err, result) => {
-                if (err) return res.status(500).json(err);
-
-                const cartId = result.insertId;
-
-                adicionarItem(cartId);
-            });
-        } else {
-            const cartId = cartResult[0].id;
-            adicionarItem(cartId);
-        }
-
-        function adicionarItem(cartId) {
-
-    const checkSql = `
-        SELECT * FROM cart_items 
-        WHERE cart_id = ? AND product_id = ?
-    `;
-
-    db.query(checkSql, [cartId, product_id], (err, result) => {
 
         if (err) return res.status(500).json(err);
 
-        if (result.length > 0) {
+        const processCart = (cartId) => {
 
-            const quantidadeAtual = result[0].quantidade;
+            // 2. pegar loja do produto novo
+            db.query(
+                "SELECT store_id, estoque, nome FROM products WHERE id = ?",
+                [product_id],
+                (err, productResult) => {
 
-// 🔥 Buscar estoque do produto
-db.query(
-    "SELECT estoque, nome FROM products WHERE id = ?",
-    [product_id],
-    (err, estoqueResult) => {
+                    if (err) return res.status(500).json(err);
 
-        if (err) {
-            return res.status(500).json(err);
-        }
+                    if (productResult.length === 0) {
+                        return res.status(404).json({
+                            message: "Produto não encontrado"
+                        });
+                    }
 
-        if (estoqueResult.length === 0) {
-            return res.status(404).json({
-                message: "Produto não encontrado"
-            });
-        }
+                    const lojaNova = productResult[0].store_id;
+                    const estoque = productResult[0].estoque;
+                    const nomeProduto = productResult[0].nome;
 
-        const estoque = estoqueResult[0].estoque;
-        const nomeProduto = estoqueResult[0].nome;
+                    // 3. pegar loja atual do carrinho
+                    const sqlLojaAtual = `
+                        SELECT products.store_id
+                        FROM cart_items
+                        JOIN cart ON cart.id = cart_items.cart_id
+                        JOIN products ON products.id = cart_items.product_id
+                        WHERE cart.user_id = ?
+                        LIMIT 1
+                    `;
 
-        // 🔥 Verifica limite
-        if ((quantidadeAtual + quantidade) > estoque) {
+                    db.query(sqlLojaAtual, [userId], (err, lojaResult) => {
 
-            return res.status(400).json({
-                message:
-                    `Quantidade indisponível.\n\nExistem apenas ${estoque} Fale com Lojista!.`
-            });
-        }
+                        if (err) return res.status(500).json(err);
 
-        // ✅ Pode atualizar
-        const updateSql = `
-            UPDATE cart_items 
-            SET quantidade = quantidade + ?
-            WHERE cart_id = ? AND product_id = ?
-        `;
+                        const lojaAtual = lojaResult[0]?.store_id;
 
-        db.query(
-            updateSql,
-            [quantidade, cartId, product_id],
-            (err) => {
+                        // 🚨 BLOQUEIO DE LOJA DIFERENTE
+                        if (lojaAtual && lojaAtual !== lojaNova) {
+                            return res.status(400).json({
+                                message: "Você só pode adicionar produtos de uma loja por vez no carrinho"
+                            });
+                        }
 
-                if (err) {
-                    return res.status(500).json(err);
+                        // 4. continuar fluxo normal
+
+                        const checkSql = `
+                            SELECT * FROM cart_items 
+                            WHERE cart_id = ? AND product_id = ?
+                        `;
+
+                        db.query(checkSql, [cartId, product_id], (err, result) => {
+
+                            if (err) return res.status(500).json(err);
+
+                            if (result.length > 0) {
+
+                                const quantidadeAtual = result[0].quantidade;
+
+                                // 🚨 ESTOQUE
+                                if ((quantidadeAtual + quantidade) > estoque) {
+                                    return res.status(400).json({
+                                        message: `Quantidade indisponível. Existem apenas ${estoque} unidades de ${nomeProduto}`
+                                    });
+                                }
+
+                                // ✔ atualizar quantidade
+                                const updateSql = `
+                                    UPDATE cart_items 
+                                    SET quantidade = quantidade + ?
+                                    WHERE cart_id = ? AND product_id = ?
+                                `;
+
+                                db.query(
+                                    updateSql,
+                                    [quantidade, cartId, product_id],
+                                    (err) => {
+
+                                        if (err) return res.status(500).json(err);
+
+                                        return res.json({
+                                            message: "Quantidade atualizada!"
+                                        });
+                                    }
+                                );
+
+                            } else {
+
+                                // ✔ inserir novo item
+                                const insertSql = `
+                                    INSERT INTO cart_items (cart_id, product_id, quantidade)
+                                    VALUES (?, ?, ?)
+                                `;
+
+                                db.query(
+                                    insertSql,
+                                    [cartId, product_id, quantidade],
+                                    (err) => {
+
+                                        if (err) return res.status(500).json(err);
+
+                                        return res.json({
+                                            message: "Produto adicionado!"
+                                        });
+                                    }
+                                );
+                            }
+                        });
+
+                    });
+
                 }
+            );
+        };
 
-                return res.json({
-                    message: "Quantidade atualizada!"
-                });
-            }
-        );
-    }
-);
+        // se não tem carrinho, cria
+        if (cartResult.length === 0) {
+
+            db.query(
+                "INSERT INTO cart (user_id) VALUES (?)",
+                [userId],
+                (err, result) => {
+
+                    if (err) return res.status(500).json(err);
+
+                    processCart(result.insertId);
+                }
+            );
 
         } else {
 
-            // não existe → cria
-            const insertSql = `
-                INSERT INTO cart_items (cart_id, product_id, quantidade)
-                VALUES (?, ?, ?)
-            `;
-
-            db.query(insertSql, [cartId, product_id, quantidade], (err) => {
-                if (err) return res.status(500).json(err);
-
-                return res.json({ message: "Produto adicionado!" });
-            });
+            processCart(cartResult[0].id);
         }
-    });
-}
+
     });
 });
 
@@ -284,16 +324,17 @@ router.get('/cart', authMiddleware, (req, res) =>{
 
     const sql = `
     SELECT 
-        cart_items.product_id,
-        products.nome,
-        products.preco,
-        products.imagem,
-        cart_items.quantidade,
-        products.estoque
-    FROM cart_items
-    JOIN cart ON cart.id = cart_items.cart_id
-    JOIN products ON products.id = cart_items.product_id
-    WHERE cart.user_id = ?
+    cart_items.product_id,
+    products.nome,
+    products.preco,
+    products.imagem,
+    cart_items.quantidade,
+    products.estoque,
+    products.store_id
+FROM cart_items
+JOIN cart ON cart.id = cart_items.cart_id
+JOIN products ON products.id = cart_items.product_id
+WHERE cart.user_id = ?
 `;
     
     db.query(sql, [userId], (err, result) => {

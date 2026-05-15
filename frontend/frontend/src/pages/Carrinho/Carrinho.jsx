@@ -48,9 +48,7 @@ const [form, setForm] = useState({
   }, 0);
 
 const aumentar = async (id) => {
-
   try {
-
     const response = await fetch(
       `http://localhost:3000/api/cart/increase/${id}`,
       {
@@ -63,15 +61,13 @@ const aumentar = async (id) => {
 
     const data = await response.json();
 
-    // 🔥 Se backend bloquear
+    // 🚨 Se backend bloquear (estoque, etc)
     if (!response.ok) {
-
       alert(data.message);
-
       return;
     }
 
-    // ✅ Atualiza frontend
+    // ✅ Atualiza estado local (mais rápido e melhor prática)
     setCarrinho(prev =>
       prev.map(item =>
         item.product_id === id
@@ -81,11 +77,8 @@ const aumentar = async (id) => {
     );
 
   } catch (err) {
-
     console.log(err);
-
   }
-
 };
 
 const diminuir = async (id) => {
@@ -159,63 +152,89 @@ const possuiProdutoIndisponivel = carrinho.some(
 
 async function finalizarCompra() {
 
+  // 🚨 Carrinho vazio
   if (carrinho.length === 0) {
-  return alert("Carrinho vazio");
-}
+    alert("Carrinho vazio");
+    return;
+  }
 
   try {
 
-    const response = await fetch("http://localhost:3000/api/pedidos", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        loja_id: carrinho[0].loja_id,
-        total,
-        produtos: carrinho.map(item => ({
-          produto_id: item.product_id,
-          quantidade: item.quantidade,
-          preco: item.preco
-        })),
-        tipoPedido,
-        dadosEntrega: form
-      })
-    });
+    // ✅ Cria pedido
+    const response = await fetch(
+      "http://localhost:3000/api/pedidos",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          loja_id: carrinho[0].loja_id,
+
+          total,
+
+          produtos: carrinho.map(item => ({
+            produto_id: item.product_id,
+            quantidade: item.quantidade,
+            preco: item.preco
+          })),
+
+          tipoPedido,
+
+          dadosEntrega: form
+        })
+      }
+    );
 
     const data = await response.json();
 
-    if (response.ok) {
-
-      await fetch("http://localhost:3000/api/cart/clear", {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      setCarrinho([]);
-      setModalAberto(false);
-setForm({
-  nome: "",
-  endereco: "",
-  numero: "",
-  bairro: "",
-  pagamento: "",
-  cpf: ""
-});
-
-      navigate("/meus-pedidos");
-
-    } else {
+    // 🚨 Se backend retornar erro
+    if (!response.ok) {
       alert(data.message);
+      return;
     }
 
+    // ✅ Limpa carrinho no backend
+    await fetch("http://localhost:3000/api/cart/clear", {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    // ✅ Limpa estado do frontend
+    setCarrinho([]);
+
+    // ✅ Fecha modal
+    setModalAberto(false);
+
+    // ✅ Limpa formulário
+    setForm({
+      nome: "",
+      endereco: "",
+      numero: "",
+      bairro: "",
+      pagamento: "",
+      cpf: ""
+    });
+
+    // ✅ Mensagem sucesso
+    alert("Pedido realizado com sucesso!");
+
+    // ✅ Vai para pedidos
+    navigate("/meus-pedidos");
+
   } catch (error) {
+
     console.log(error);
+
+    alert("Erro ao finalizar pedido");
+
   }
 }
+
+
   return (
 
     <div className="pagina-carrinho">
