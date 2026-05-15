@@ -185,6 +185,12 @@ const abrirCarrinho = async () => {
 
 };
 
+useEffect(() => {
+  if (location.state?.pedidoSucesso) {
+    alert("Pedido realizado com sucesso!");
+  }
+}, []);
+
   return (
     <div className="home">
 
