@@ -10,6 +10,18 @@ function Carrinho() {
 
   const token = localStorage.getItem("token");
 
+  const [modalAberto, setModalAberto] = useState(false);
+const [tipoPedido, setTipoPedido] = useState("entrega");
+
+const [form, setForm] = useState({
+  nome: "",
+  endereco: "",
+  numero: "",
+  bairro: "",
+  pagamento: "",
+  cpf: ""
+});
+
   useEffect(() => {
 
     fetch("http://localhost:3000/api/cart", {
@@ -146,14 +158,16 @@ async function finalizarCompra() {
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
-        loja_id: carrinho[0].loja_id,
-        total,
-        produtos: carrinho.map(item => ({
-          produto_id: item.product_id,
-          quantidade: item.quantidade,
-          preco: item.preco
-        }))
-      })
+  loja_id: carrinho[0].loja_id,
+  total,
+  produtos: carrinho.map(item => ({
+    produto_id: item.product_id,
+    quantidade: item.quantidade,
+    preco: item.preco
+  })),
+  tipoPedido,
+  dadosEntrega: form
+})
     });
 
     const data = await response.json();
@@ -297,7 +311,7 @@ className="btn-mais"
             <button
   className="btn-finalizar"
   disabled={possuiProdutoIndisponivel}
-  onClick={finalizarCompra}
+  onClick={() => setModalAberto(true)}
 >
   {
     possuiProdutoIndisponivel
@@ -312,8 +326,90 @@ className="btn-mais"
 
       )}
 
+{modalAberto && (
+  <div className="modal-overlay">
+
+    <div className="modal">
+
+      <h2>Finalizar Pedido</h2>
+
+      {/* tipo pedido */}
+      <div className="opcoes">
+        <button onClick={() => setTipoPedido("entrega")}>
+          Entrega
+        </button>
+
+        <button onClick={() => setTipoPedido("retirada")}>
+          Retirada
+        </button>
+      </div>
+
+      {/* ENTREGA */}
+      {tipoPedido === "entrega" && (
+        <>
+          <input
+            placeholder="Nome do cliente"
+            onChange={(e) => setForm({...form, nome: e.target.value})}
+          />
+
+          <input
+            placeholder="Endereço"
+            onChange={(e) => setForm({...form, endereco: e.target.value})}
+          />
+
+          <input
+            placeholder="Número"
+            onChange={(e) => setForm({...form, numero: e.target.value})}
+          />
+
+          <input
+            placeholder="Bairro"
+            onChange={(e) => setForm({...form, bairro: e.target.value})}
+          />
+
+          <select
+            onChange={(e) => setForm({...form, pagamento: e.target.value})}
+          >
+            <option>Pix</option>
+            <option>Dinheiro</option>
+            <option>Cartão</option>
+          </select>
+        </>
+      )}
+
+      {/* RETIRADA */}
+      {tipoPedido === "retirada" && (
+        <>
+          <input
+            placeholder="Nome de quem vai retirar"
+            onChange={(e) => setForm({...form, nome: e.target.value})}
+          />
+
+          <input
+            placeholder="CPF (confirmação)"
+            onChange={(e) => setForm({...form, cpf: e.target.value})}
+          />
+        </>
+      )}
+
+      <div className="modal-botoes">
+
+        <button onClick={() => setModalAberto(false)}>
+          Cancelar
+        </button>
+
+        <button onClick={finalizarCompra}>
+          Confirmar Pedido
+        </button>
+
+      </div>
+
     </div>
 
+  </div>
+)}
+
+    </div>
   );
 
 }
