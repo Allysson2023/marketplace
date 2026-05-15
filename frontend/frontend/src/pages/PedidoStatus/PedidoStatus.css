@@ -149,3 +149,14 @@
 .btn-voltar:hover {
   background: #333;
 }
+
+.info-entrega {
+    margin: 20px 0;
+    padding: 15px;
+    background: #fff;
+    border-radius: 10px;
+}
+
+.card-entrega p {
+    margin: 5px 0;
+}

@@ -17,7 +17,13 @@ router.post("/pedidos", authMiddleware, (req, res) => {
 
     const status = "AGUARDANDO_CONFIRMACAO";
 
-    const dados = dadosEntrega || {};
+    let dados = dadosEntrega;
+
+if (typeof dados === "string") {
+    dados = JSON.parse(dados);
+}
+
+dados = dados || {};
 
     const sqlPedido = `
         INSERT INTO pedidos
@@ -87,8 +93,9 @@ router.get("/pedidos/:id", authMiddleware, (req, res) => {
     const { id } = req.params;
 
     const sqlPedido = `
-        SELECT * FROM pedidos WHERE id = ?
-    `;
+    SELECT * FROM pedidos 
+    WHERE id = ? AND usuario_id = ?
+`;
 
     const sqlItens = `
         SELECT 
@@ -100,7 +107,7 @@ router.get("/pedidos/:id", authMiddleware, (req, res) => {
         WHERE pedido_itens.pedido_id = ?
     `;
 
-    db.query(sqlPedido, [id], (err, pedidoResult) => {
+    db.query(sqlPedido, [id, req.user.id], (err, pedidoResult) => {
 
         if (err) return res.status(500).json(err);
 
@@ -108,8 +115,26 @@ router.get("/pedidos/:id", authMiddleware, (req, res) => {
 
             if (err2) return res.status(500).json(err2);
 
+            if (!pedidoResult.length) {
+    return res.status(404).json({ message: "Pedido não encontrado" });
+}
+
+const p = pedidoResult[0];
+
+            const pedidoFormatado = {
+                ...p,
+                dadosEntrega: {
+                    nome: p.nome_cliente,
+                    endereco: p.endereco,
+                    numero: p.numero,
+                    bairro: p.bairro,
+                    pagamento: p.pagamento,
+                    cpf: p.cpf
+                }
+            };
+
             res.json({
-                pedido: pedidoResult[0],
+                pedido: pedidoFormatado,
                 itens: itensResult
             });
 
@@ -118,7 +143,6 @@ router.get("/pedidos/:id", authMiddleware, (req, res) => {
     });
 
 });
-
 router.get("/meus-pedidos", authMiddleware, (req, res) => {
 
     const usuario_id = req.user.id;

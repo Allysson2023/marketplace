@@ -58,6 +58,39 @@ function PedidoStatus() {
                 </h2>
 
             </div>
+            <div className="info-entrega">
+
+    <h2>📍 Informações do Pedido</h2>
+
+    {infoPedido.tipo_pedido === "entrega" && infoPedido.dadosEntrega && (
+        <div className="card-entrega">
+
+            <p><b>Nome:</b> {infoPedido.dadosEntrega.nome}</p>
+
+            <p><b>Endereço:</b> {infoPedido.dadosEntrega.endereco}</p>
+
+            <p><b>Número:</b> {infoPedido.dadosEntrega.numero}</p>
+
+            <p><b>Bairro:</b> {infoPedido.dadosEntrega.bairro}</p>
+
+            <p><b>Pagamento:</b> {infoPedido.dadosEntrega.pagamento}</p>
+
+        </div>
+    )}
+
+    {infoPedido.tipo_pedido === "retirada" && infoPedido.dadosEntrega && (
+        <div className="card-entrega">
+
+            <p><b>Nome:</b> {infoPedido.dadosEntrega.nome}</p>
+
+            <p><b>CPF:</b> {infoPedido.dadosEntrega.cpf}</p>
+
+            <p><b>Tipo:</b> Retirada na loja</p>
+
+        </div>
+    )}
+
+</div>
 
             <div className="lista-produtos">
 
