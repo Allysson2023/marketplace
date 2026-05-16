@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "./PainelPedidos.css";
 
+
+
 function PainelPedidos() {
+    const navigate = useNavigate();
+    
+    function abrirPedido(id) {
+      navigate(`/pedido/${id}`);
+    }
 
     const [pedidos, setPedidos] = useState([]);
     const token = localStorage.getItem("token");
@@ -100,7 +107,11 @@ function PainelPedidos() {
 
                     pedidos.map((pedido) => (
 
-                        <div className="card-pedido" key={pedido.id}>
+                        <div
+    className="card-pedido"
+    key={pedido.id}
+    onClick={() => abrirPedido(pedido.id)}
+>
 
                             <div className="pedido-topo">
 
@@ -130,18 +141,24 @@ function PainelPedidos() {
                             <div className="pedido-acoes">
 
                                 <button
-                                    className="btn-aceitar"
-                                    onClick={() => atualizarStatus(pedido.id, "aceito")}
-                                >
-                                    Aceitar
-                                </button>
+    className="btn-aceitar"
+    onClick={(e) => {
+        e.stopPropagation();
+        atualizarStatus(pedido.id, "aceito");
+    }}
+>
+    Aceitar
+</button>
 
                                 <button
-                                    className="btn-recusar"
-                                    onClick={() => atualizarStatus(pedido.id, "recusado")}
-                                >
-                                    Recusar
-                                </button>
+    className="btn-recusar"
+    onClick={(e) => {
+        e.stopPropagation();
+        atualizarStatus(pedido.id, "recusado");
+    }}
+>
+    Recusar
+</button>
 
                             </div>
 
@@ -152,6 +169,8 @@ function PainelPedidos() {
                 )}
 
             </div>
+
+           
 
         </div>
     );

@@ -31,7 +31,7 @@ function PedidoStatus() {
 
     }, [id, token]);
 
-    if (!pedido || itens.length === 0) {
+    if (!pedido) {
   return <h2>Carregando...</h2>
 }
 
@@ -97,7 +97,7 @@ function PedidoStatus() {
                 {itens.map(item => (
 
                     <div
-                        key={item.nome}
+                        key={`${item.id}-${item.nome}`}
                         className="card-produto-pedido"
                     >
 
