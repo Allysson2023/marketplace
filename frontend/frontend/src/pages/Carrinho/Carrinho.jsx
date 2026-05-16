@@ -151,6 +151,7 @@ const possuiProdutoIndisponivel = carrinho.some(
 
 
 async function finalizarCompra() {
+  console.log("ITEM CARRINHO:", carrinho[0]);
 
   // 🚨 Carrinho vazio
   if (carrinho.length === 0) {
@@ -170,7 +171,7 @@ async function finalizarCompra() {
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          loja_id: carrinho[0].loja_id,
+          loja_id: carrinho[0].store_id,
 
           total,
 

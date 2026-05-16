@@ -178,7 +178,7 @@ router.get("/loja/pedidos", authMiddleware, (req, res) => {
             stores.nome AS loja_nome
         FROM pedidos
         JOIN stores ON stores.id = pedidos.loja_id
-        JOIN users ON users.id = pedidos.user_id
+        JOIN users ON users.id = pedidos.usuario_id
         WHERE stores.user_id = ?
         ORDER BY pedidos.id DESC
     `;
@@ -191,6 +191,54 @@ router.get("/loja/pedidos", authMiddleware, (req, res) => {
 
         res.json(result);
 
+    });
+
+});
+
+router.get("/loja/:id/pedidos", authMiddleware, (req, res) => {
+
+    const storeId = req.params.id;
+
+    const sql = `
+        SELECT 
+            pedidos.id,
+            pedidos.total,
+            pedidos.status,
+            pedidos.tipo_pedido,
+            users.username
+        FROM pedidos
+        JOIN users ON users.id = pedidos.usuario_id
+        WHERE pedidos.loja_id = ?
+        ORDER BY pedidos.id DESC
+    `;
+
+    db.query(sql, [storeId], (err, result) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        res.json(result);
+
+    });
+
+});
+
+router.put("/pedidos/:id/status", authMiddleware, (req, res) => {
+
+    const pedidoId = req.params.id;
+    const { status } = req.body;
+
+    const sql = `
+        UPDATE pedidos
+        SET status = ?
+        WHERE id = ?
+    `;
+
+    db.query(sql, [status, pedidoId], (err) => {
+        if (err) return res.status(500).json(err);
+
+        res.json({ message: "Status atualizado!" });
     });
 
 });
