@@ -8,7 +8,7 @@ function PainelPedidos() {
     const navigate = useNavigate();
     
     function abrirPedido(id) {
-      navigate(`/pedido/${id}`);
+      navigate(`/admin/pedido/${id}`);
     }
 
     const [pedidos, setPedidos] = useState([]);

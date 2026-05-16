@@ -14,6 +14,7 @@ import EditarLoja from "./pages/EditarLoja/EditarLoja";
 import PedidoStatus from "./pages/PedidoStatus/PedidoStatus";
 import MeusPedidos from "./pages/MeusPedidos/MeusPedidos";
 import PainelPedidos from "./pages/PainelPedidos/PainelPedidos";
+import AdminPedido from "./pages/AdminPedido/AdminPedido";
 
 function App() {
   return (
@@ -33,6 +34,10 @@ function App() {
         <Route path="/pedido/:id" element={<PedidoStatus />}/>
 <Route path="/meus-pedidos" element={<MeusPedidos />} />
 <Route path="/store/:id/pedidos" element={<PainelPedidos />} />
+<Route
+  path="/admin/pedido/:id"
+  element={<AdminPedido />}
+/>
       </Routes>
     </BrowserRouter>
   );
