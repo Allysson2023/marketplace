@@ -71,9 +71,18 @@ function PainelPedidos() {
         <div className="painel-container">
 
             <div className="topo-painel">
-                <h1>Painel de Pedidos</h1>
-                <p>Gerencie os pedidos da sua loja</p>
-            </div>
+
+    <button
+        className="btn-voltar"
+        onClick={() => navigate(-1)}
+    >
+        ← Voltar
+    </button>
+
+    <h1>Painel de Pedidos</h1>
+    <p>Gerencie os pedidos da sua loja</p>
+
+</div>
 
             <div className="cards-info">
 
