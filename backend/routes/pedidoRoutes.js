@@ -271,32 +271,32 @@ router.put("/pedidos/:id/status", authMiddleware, (req, res) => {
 
             const usuarioId = result[0].usuario_id;
 
-            // SALVAR NOTIFICAÇÃO
             const sqlNotificacao = `
-                INSERT INTO notifications
-                (user_id, titulo, mensagem)
-                VALUES (?, ?, ?)
-            `;
+    INSERT INTO notifications
+    (user_id, pedido_id, titulo, mensagem)
+    VALUES (?, ?, ?, ?)
+`;
 
-            db.query(
-                sqlNotificacao,
-                [
-                    usuarioId,
-                    "Atualização do Pedido",
-                    mensagemStatus[status]
-                ],
-                (err3) => {
+db.query(
+    sqlNotificacao,
+    [
+        usuarioId,
+        pedidoId,
+        "Atualização do Pedido",
+        mensagemStatus[status]
+    ],
+    (err3) => {
 
-                    if (err3) {
-                        return res.status(500).json(err3);
-                    }
+        if (err3) {
+            return res.status(500).json(err3);
+        }
 
-                    res.json({
-                        message: "Status atualizado e notificação enviada!"
-                    });
+        res.json({
+            message: "Status atualizado e notificação enviada!"
+        });
 
-                }
-            );
+    }
+);
 
         });
 

@@ -50,20 +50,28 @@ function Notificacoes() {
 
                 <div className="lista-notificacoes">
 
-                    {notificacoes.map((notificacao) => (
+                    {notificacoes.map((n) => (
+    <div
+        key={n.id}
+        className="card-notificacao"
+        onClick={() => navigate(`/pedido/${n.pedido_id}`)}
+        style={{ cursor: "pointer" }}
+    >
 
-                        <div
-                            key={notificacao.id}
-                            className="card-notificacao"
-                        >
+        <h3>{n.titulo}</h3>
 
-                            <h3>{notificacao.titulo}</h3>
+        <p>{n.mensagem}</p>
 
-                            <p>{notificacao.mensagem}</p>
+        <small>
+            📅 {new Date(n.created_at).toLocaleString()}
+        </small>
 
-                        </div>
+        <small style={{ display: "block", color: "#999" }}>
+            Pedido #{n.pedido_id}
+        </small>
 
-                    ))}
+    </div>
+))}
 
                 </div>
 
