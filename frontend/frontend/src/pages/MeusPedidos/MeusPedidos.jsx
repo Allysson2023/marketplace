@@ -9,6 +9,14 @@ function MeusPedidos() {
 
     const token = localStorage.getItem("token");
 
+    const nomesStatus = {
+    aceito: "✅ Pedido Aceito",
+    separacao: "📦 Em Separação",
+    rota: "🛵 Em Rota",
+    finalizado: "✔️ Finalizado",
+    recusado: "❌ Recusado"
+};
+
     useEffect(() => {
 
         fetch("http://localhost:3000/api/meus-pedidos", {
@@ -54,7 +62,7 @@ function MeusPedidos() {
                         <h3>Pedido #{pedido.id}</h3>
 
                         <p className={`status ${pedido.status}`}>
-  {pedido.status}
+    {nomesStatus[pedido.status] || pedido.status}
 </p>
 
                         <span>R$ {pedido.total}</span>

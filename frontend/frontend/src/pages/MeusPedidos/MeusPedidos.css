@@ -63,3 +63,38 @@
   font-weight: bold;
   color: #2ecc71;
 }
+
+/* STATUS BASE */
+.status{
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  color: white !important;
+  width: fit-content;
+}
+
+/* ACEITO */
+.status.aceito{
+  background: #2ecc71;
+}
+
+/* RECUSADO */
+.status.recusado{
+  background: #e74c3c;
+}
+
+/* EM SEPARAÇÃO */
+.status.separacao{
+  background: #f39c12;
+}
+
+/* EM ROTA */
+.status.rota{
+  background: #3498db;
+}
+
+/* FINALIZADO */
+.status.finalizado{
+  background: #27ae60;
+}
