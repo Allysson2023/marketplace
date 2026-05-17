@@ -231,6 +231,12 @@ useEffect(() => {
           >
             +
           </button>
+          <button
+    className="btn-notificacao"
+    onClick={() => navigate("/notificacoes")}
+>
+    🔔
+</button>
 
         </div>
       </header>

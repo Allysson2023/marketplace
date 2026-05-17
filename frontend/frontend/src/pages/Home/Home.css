@@ -683,6 +683,18 @@ PAGINAÇÃO
     box-shadow: 0 15px 30px rgba(37,99,235,0.35);
 }
 
+
+.btn-notificacao{
+    border: none;
+    background: white;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+
+
 @media(max-width: 768px){
 
     .topo{

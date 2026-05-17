@@ -236,9 +236,70 @@ router.put("/pedidos/:id/status", authMiddleware, (req, res) => {
     `;
 
     db.query(sql, [status, pedidoId], (err) => {
-        if (err) return res.status(500).json(err);
 
-        res.json({ message: "Status atualizado!" });
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        // MENSAGENS DOS STATUS
+        const mensagemStatus = {
+            aceito: "Seu pedido foi aceito pela loja ✅",
+            separacao: "Seu pedido está em separação 📦",
+            rota: "Seu pedido saiu para entrega 🛵",
+            finalizado: "Pedido finalizado ✔️",
+            recusado: "Seu pedido foi recusado ❌"
+        };
+
+        // BUSCAR DONO DO PEDIDO
+        const sqlBuscarPedido = `
+            SELECT usuario_id
+            FROM pedidos
+            WHERE id = ?
+        `;
+
+        db.query(sqlBuscarPedido, [pedidoId], (err2, result) => {
+
+            if (err2) {
+                return res.status(500).json(err2);
+            }
+
+            if (result.length === 0) {
+                return res.status(404).json({
+                    message: "Pedido não encontrado"
+                });
+            }
+
+            const usuarioId = result[0].usuario_id;
+
+            // SALVAR NOTIFICAÇÃO
+            const sqlNotificacao = `
+                INSERT INTO notifications
+                (user_id, titulo, mensagem)
+                VALUES (?, ?, ?)
+            `;
+
+            db.query(
+                sqlNotificacao,
+                [
+                    usuarioId,
+                    "Atualização do Pedido",
+                    mensagemStatus[status]
+                ],
+                (err3) => {
+
+                    if (err3) {
+                        return res.status(500).json(err3);
+                    }
+
+                    res.json({
+                        message: "Status atualizado e notificação enviada!"
+                    });
+
+                }
+            );
+
+        });
+
     });
 
 });

@@ -15,7 +15,7 @@ import PedidoStatus from "./pages/PedidoStatus/PedidoStatus";
 import MeusPedidos from "./pages/MeusPedidos/MeusPedidos";
 import PainelPedidos from "./pages/PainelPedidos/PainelPedidos";
 import AdminPedido from "./pages/AdminPedido/AdminPedido";
-
+import Notificacoes from "./pages/Notificacoes/Notificacoes";
 function App() {
   return (
     <BrowserRouter>
@@ -38,6 +38,7 @@ function App() {
   path="/admin/pedido/:id"
   element={<AdminPedido />}
 />
+<Route path="/notificacoes" element={<Notificacoes />} />
       </Routes>
     </BrowserRouter>
   );
