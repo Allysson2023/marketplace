@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 const authMiddleware = require("../middlewares/authMiddleware");
+const { getIo } = require("../utils/socket");
+
 
 router.post("/pedidos", authMiddleware, (req, res) => {
 
@@ -229,6 +231,14 @@ router.put("/pedidos/:id/status", authMiddleware, (req, res) => {
     const pedidoId = req.params.id;
     const { status } = req.body;
 
+    const mensagemStatus = {
+        aceito: "Seu pedido foi aceito pela loja ✅",
+        separacao: "Seu pedido está em separação 📦",
+        rota: "Seu pedido saiu para entrega 🛵",
+        finalizado: "Pedido finalizado ✔️",
+        recusado: "Seu pedido foi recusado ❌"
+    };
+
     const sql = `
         UPDATE pedidos
         SET status = ?
@@ -241,16 +251,7 @@ router.put("/pedidos/:id/status", authMiddleware, (req, res) => {
             return res.status(500).json(err);
         }
 
-        // MENSAGENS DOS STATUS
-        const mensagemStatus = {
-            aceito: "Seu pedido foi aceito pela loja ✅",
-            separacao: "Seu pedido está em separação 📦",
-            rota: "Seu pedido saiu para entrega 🛵",
-            finalizado: "Pedido finalizado ✔️",
-            recusado: "Seu pedido foi recusado ❌"
-        };
-
-        // BUSCAR DONO DO PEDIDO
+        // 🔥 BUSCAR DONO DO PEDIDO
         const sqlBuscarPedido = `
             SELECT usuario_id
             FROM pedidos
@@ -271,32 +272,44 @@ router.put("/pedidos/:id/status", authMiddleware, (req, res) => {
 
             const usuarioId = result[0].usuario_id;
 
+            // 🔥 SALVAR NOTIFICAÇÃO NO BANCO
             const sqlNotificacao = `
-    INSERT INTO notifications
-    (user_id, pedido_id, titulo, mensagem)
-    VALUES (?, ?, ?, ?)
-`;
+                INSERT INTO notifications
+                (user_id, pedido_id, titulo, mensagem)
+                VALUES (?, ?, ?, ?)
+            `;
 
-db.query(
-    sqlNotificacao,
-    [
-        usuarioId,
-        pedidoId,
-        "Atualização do Pedido",
-        mensagemStatus[status]
-    ],
-    (err3) => {
+            db.query(
+                sqlNotificacao,
+                [
+                    usuarioId,
+                    pedidoId,
+                    "Atualização do Pedido",
+                    mensagemStatus[status]
+                ],
+                (err3) => {
 
-        if (err3) {
-            return res.status(500).json(err3);
-        }
+                    if (err3) {
+                        return res.status(500).json(err3);
+                    }
 
-        res.json({
-            message: "Status atualizado e notificação enviada!"
-        });
+                    // 🔥 SOCKET (TEMPO REAL AQUI!)
+                   const io = getIo();
 
-    }
-);
+const mensagem = mensagemStatus[status] || "Atualização do pedido";
+
+io.to(`user_${usuarioId}`).emit("nova_notificacao", {
+    pedido_id: pedidoId,
+    mensagem: mensagem,
+    titulo: "Atualização do Pedido"
+});
+
+                    return res.json({
+                        message: "Status atualizado e notificação enviada!"
+                    });
+
+                }
+            );
 
         });
 
