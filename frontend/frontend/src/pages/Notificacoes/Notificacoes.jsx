@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Notificacoes.css";
+import { io } from "socket.io-client";
 
 function Notificacoes() {
 
@@ -21,7 +22,26 @@ function Notificacoes() {
         .then(data => {
             setNotificacoes(data);
         })
-        .catch(err => console.log(err));
+        const socket = io("http://localhost:3000");
+
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    if (user?.id) {
+        socket.emit("join", user.id);
+    }
+
+    socket.on("nova_notificacao", (data) => {
+
+        console.log("CHEGOU EM TEMPO REAL:", data);
+
+        // adiciona nova notificação na lista
+        setNotificacoes((prev) => [data, ...prev]);
+
+    });
+
+    return () => {
+        socket.disconnect();
+    };
 
     }, []);
 
