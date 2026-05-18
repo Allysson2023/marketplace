@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
 import "./MeusPedidos.css";
 
 function MeusPedidos() {
@@ -9,15 +10,43 @@ function MeusPedidos() {
 
     const token = localStorage.getItem("token");
 
+    const user = JSON.parse(localStorage.getItem("user"));
+
     const nomesStatus = {
-    aceito: "✅ Pedido Aceito",
-    separacao: "📦 Em Separação",
-    rota: "🛵 Em Rota",
-    finalizado: "✔️ Finalizado",
-    recusado: "❌ Recusado"
-};
+        aceito: "✅ Pedido Aceito",
+        separacao: "📦 Em Separação",
+        rota: "🛵 Em Rota",
+        finalizado: "✔️ Finalizado",
+        recusado: "❌ Recusado"
+    };
 
     useEffect(() => {
+
+        fetchPedidos();
+
+        // 🔥 SOCKET
+        const socket = io("http://localhost:3000");
+
+        // 🔥 ENTRAR NA ROOM
+        socket.emit("join", user.id);
+
+        // 🔥 OUVIR NOTIFICAÇÃO
+        socket.on("nova_notificacao", (data) => {
+
+            console.log("Notificação recebida:", data);
+
+            // 🔥 Atualizar pedidos automaticamente
+            fetchPedidos();
+
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+
+    }, []);
+
+    const fetchPedidos = () => {
 
         fetch("http://localhost:3000/api/meus-pedidos", {
             headers: {
@@ -30,53 +59,56 @@ function MeusPedidos() {
         })
         .catch(err => console.log(err));
 
-    }, []);
+    };
 
     return (
-    <div className="pagina-pedidos">
+        <div className="pagina-pedidos">
 
-        <div className="topo-pedidos">
+            <div className="topo-pedidos">
 
-    <button className="btn-voltar" onClick={() => navigate(-1)}>
-        ← Voltar
-    </button>
+                <button
+                    className="btn-voltar"
+                    onClick={() => navigate(-1)}
+                >
+                    ← Voltar
+                </button>
 
-    <h1>📦 Meus Pedidos</h1>
-
-</div>
-
-        {pedidos.length === 0 ? (
-            <p>Você ainda não fez pedidos</p>
-        ) : (
-
-            <div className="lista-pedidos">
-
-                {pedidos.map(pedido => (
-
-                    <div
-                        key={pedido.id}
-                        className="card-pedido"
-                        onClick={() => navigate(`/pedido/${pedido.id}`)}
-                    >
-
-                        <h3>Pedido #{pedido.id}</h3>
-
-                        <p className={`status ${pedido.status}`}>
-    {nomesStatus[pedido.status] || pedido.status}
-</p>
-
-                        <span>R$ {pedido.total}</span>
-
-                    </div>
-
-                ))}
+                <h1>📦 Meus Pedidos</h1>
 
             </div>
 
-        )}
+            {pedidos.length === 0 ? (
+                <p>Você ainda não fez pedidos</p>
+            ) : (
 
-    </div>
-);
+                <div className="lista-pedidos">
+
+                    {pedidos.map(pedido => (
+
+                        <div
+                            key={pedido.id}
+                            className="card-pedido"
+                            onClick={() => navigate(`/pedido/${pedido.id}`)}
+                        >
+
+                            <h3>Pedido #{pedido.id}</h3>
+
+                            <p className={`status ${pedido.status}`}>
+                                {nomesStatus[pedido.status] || pedido.status}
+                            </p>
+
+                            <span>R$ {pedido.total}</span>
+
+                        </div>
+
+                    ))}
+
+                </div>
+
+            )}
+
+        </div>
+    );
 }
 
 export default MeusPedidos;

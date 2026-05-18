@@ -32,6 +32,7 @@ function Login() {
     if (resposta.ok) {
 
       localStorage.setItem("token", dados.token);
+      localStorage.setItem("user", JSON.stringify(dados.user));
 
       fetch("http://localhost:3000/api/minha-loja", {
 

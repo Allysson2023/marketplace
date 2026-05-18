@@ -41,7 +41,11 @@ router.post('/login', (req, res) => {
 );
             res.json({
                 message: "Login feito com sucesso!",
-                token: token
+                token: token,
+                user: {
+    id: user.id,
+        username: user.username
+  }
             });
         } else {
             res.status(401).json({ error: "Usuário ou senha inválidos "});
