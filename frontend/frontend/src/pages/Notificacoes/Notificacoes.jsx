@@ -10,6 +10,7 @@ function Notificacoes() {
     const navigate = useNavigate();
 
     const token = localStorage.getItem("token");
+    const audioNotificacao = new Audio("/src/assets/sounds/notification.mp3");
 
     useEffect(() => {
 
@@ -33,6 +34,9 @@ function Notificacoes() {
     socket.on("nova_notificacao", (data) => {
 
         console.log("CHEGOU EM TEMPO REAL:", data);
+    
+        // 🔊 tocar som
+        audioNotificacao.play();
 
         // adiciona nova notificação na lista
         setNotificacoes((prev) => [data, ...prev]);
