@@ -81,6 +81,14 @@ dados = dados || {};
                     message: "Pedido criado com sucesso",
                     pedidoId: pedido_id
                 });
+                const io = getIo();
+
+io.to(`loja_${loja_id}`).emit("novo_pedido", {
+    pedido_id,
+    usuario_id,
+    total,
+    status: "AGUARDANDO_CONFIRMACAO"
+});
 
             });
 

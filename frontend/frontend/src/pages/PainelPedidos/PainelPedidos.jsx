@@ -1,41 +1,56 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./PainelPedidos.css";
-
-
+import { io } from "socket.io-client";
 
 function PainelPedidos() {
-    const navigate = useNavigate();
-    
-    function abrirPedido(id) {
-      navigate(`/admin/pedido/${id}`);
-    }
 
-    const [pedidos, setPedidos] = useState([]);
+    const navigate = useNavigate();
+    const { id: storeId } = useParams();
     const token = localStorage.getItem("token");
 
-    const { id: storeId } = useParams(); // 🔥 CORRETO
+    const [pedidos, setPedidos] = useState([]);
 
     useEffect(() => {
 
-        fetch(`http://localhost:3000/api/loja/${storeId}/pedidos`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
+        // 🔌 cria socket UMA vez
+        const socket = io("http://localhost:3000");
 
-            console.log(data);
+        // 📥 busca inicial
+        const fetchPedidos = () => {
+            fetch(`http://localhost:3000/api/loja/${storeId}/pedidos`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setPedidos(data);
+                }
+            });
+        };
 
-            if (Array.isArray(data)) {
-                setPedidos(data);
-            }
+        fetchPedidos();
 
-        })
-        .catch(err => console.log(err));
+        // 🏠 entra na sala da loja
+        socket.emit("join_loja", storeId);
 
-    }, [token, storeId]);
+        // 🔥 escuta pedidos novos
+        socket.on("novo_pedido", (data) => {
+
+            console.log("🔥 NOVO PEDIDO CHEGOU:", data);
+
+            fetchPedidos(); // atualiza lista
+
+        });
+
+        // 🧹 limpa ao sair da página
+        return () => {
+            socket.disconnect();
+        };
+
+    }, [storeId, token]);
 
     const atualizarStatus = async (id, status) => {
         try {
@@ -65,6 +80,10 @@ function PainelPedidos() {
             console.log(err);
         }
     };
+
+    function abrirPedido(id) {
+        navigate(`/admin/pedido/${id}`);
+    }
 
     return (
 

@@ -51,6 +51,12 @@ io.on("connection", (socket) => {
     socket.on("join", (userId) => {
         socket.join(`user_${userId}`);
     });
+    socket.on("join_loja", (lojaId) => {
+
+    console.log("🏪 Loja entrou na sala:", lojaId);
+
+    socket.join(`loja_${lojaId}`);
+});
 
 });
 
