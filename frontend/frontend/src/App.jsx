@@ -21,6 +21,7 @@ import PainelPedidos from "./pages/PainelPedidos/PainelPedidos";
 import AdminPedido from "./pages/AdminPedido/AdminPedido";
 import Notificacoes from "./pages/Notificacoes/Notificacoes";
 import somNotificacao from "./assets/sounds/notification.mp3";
+import ChatLoja from "./pages/ChatLoja/ChatLoja";
 
 function App() {
 
@@ -72,6 +73,8 @@ function App() {
         <Route path="/admin/pedido/:id" element={<AdminPedido />} />
         <Route path="/notificacoes" element={<Notificacoes />} />
         <Route path="/chat/:chatId" element={<ChatCliente />} />
+        <Route path="/chat-loja" element={<ChatLoja />} />
+      
       </Routes>
     </BrowserRouter>
   );
