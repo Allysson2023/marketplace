@@ -5,7 +5,6 @@ import "./PedidoStatus.css";
 function PedidoStatus() {
 
     const { id } = useParams();
-
     const navigate = useNavigate();
 
     const [pedido, setPedido] = useState(null);
@@ -13,6 +12,11 @@ function PedidoStatus() {
 
     const token = localStorage.getItem("token");
 
+
+
+    // ===============================
+    // CARREGAR PEDIDO
+    // ===============================
     useEffect(() => {
 
         fetch(`http://localhost:3000/api/pedidos/${id}`, {
@@ -31,11 +35,50 @@ function PedidoStatus() {
 
     }, [id, token]);
 
-    if (!pedido) {
-  return <h2>Carregando...</h2>
-}
 
-    const infoPedido = pedido;
+
+    if (!pedido) {
+        return <h2>Carregando...</h2>;
+    }
+
+
+
+    // ===============================
+    // ABRIR CHAT (SEM DUPLICAR)
+    // ===============================
+    async function abrirChat() {
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:3000/api/chat/mensagem",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        chat_id: pedido.id,
+                        mensagem: "👋 Olá, quero falar sobre o pedido",
+                        tipo: "texto",
+                        remetente_tipo: "cliente",
+                        loja_id: pedido.loja_id
+                    })
+                }
+            );
+
+            await response.json();
+
+            navigate(`/chat/${pedido.id}`);
+
+        } catch (err) {
+            console.log("Erro ao abrir chat:", err);
+        }
+
+    }
+
+
 
     return (
 
@@ -47,60 +90,58 @@ function PedidoStatus() {
                     ← Voltar
                 </button>
 
-                <h1>Pedido #{infoPedido.id}</h1>
+                <h1>Pedido #{pedido.id}</h1>
 
             </div>
 
+
+
             <div className="status-pedido">
 
-    <h2>
-        ⏳ {infoPedido.status}
-    </h2>
+                <h2>⏳ {pedido.status}</h2>
 
 
 
+                <button
+                    className="btn-chat-loja"
+                    onClick={abrirChat}
+                >
+                    💬 Falar com Loja
+                </button>
 
-    <button
-        className="btn-chat-loja"
-        onClick={() => navigate(`/chat/${pedido.id}`)}
-    >
-        💬 Falar com Loja
-    </button>
+            </div>
 
-</div>
+
+
             <div className="info-entrega">
 
-    <h2>📍 Informações do Pedido</h2>
+                <h2>📍 Informações do Pedido</h2>
 
-    {infoPedido.tipo_pedido === "entrega" && infoPedido.dadosEntrega && (
-        <div className="card-entrega">
+                {pedido.tipo_pedido === "entrega" && pedido.dadosEntrega && (
+                    <div className="card-entrega">
 
-            <p><b>Nome:</b> {infoPedido.dadosEntrega.nome}</p>
+                        <p><b>Nome:</b> {pedido.dadosEntrega.nome}</p>
+                        <p><b>Endereço:</b> {pedido.dadosEntrega.endereco}</p>
+                        <p><b>Número:</b> {pedido.dadosEntrega.numero}</p>
+                        <p><b>Bairro:</b> {pedido.dadosEntrega.bairro}</p>
+                        <p><b>Pagamento:</b> {pedido.dadosEntrega.pagamento}</p>
 
-            <p><b>Endereço:</b> {infoPedido.dadosEntrega.endereco}</p>
+                    </div>
+                )}
 
-            <p><b>Número:</b> {infoPedido.dadosEntrega.numero}</p>
+                {pedido.tipo_pedido === "retirada" && pedido.dadosEntrega && (
+                    <div className="card-entrega">
 
-            <p><b>Bairro:</b> {infoPedido.dadosEntrega.bairro}</p>
+                        <p><b>Nome:</b> {pedido.dadosEntrega.nome}</p>
+                        <p><b>CPF:</b> {pedido.dadosEntrega.cpf}</p>
+                        <p><b>Tipo:</b> Retirada na loja</p>
 
-            <p><b>Pagamento:</b> {infoPedido.dadosEntrega.pagamento}</p>
+                    </div>
+                )}
 
-        </div>
-    )}
+            </div>
 
-    {infoPedido.tipo_pedido === "retirada" && infoPedido.dadosEntrega && (
-        <div className="card-entrega">
 
-            <p><b>Nome:</b> {infoPedido.dadosEntrega.nome}</p>
-
-            <p><b>CPF:</b> {infoPedido.dadosEntrega.cpf}</p>
-
-            <p><b>Tipo:</b> Retirada na loja</p>
-
-        </div>
-    )}
-
-</div>
 
             <div className="lista-produtos">
 
@@ -120,13 +161,9 @@ function PedidoStatus() {
 
                             <h3>{item.nome}</h3>
 
-                            <p>
-                                Quantidade: {item.quantidade}
-                            </p>
+                            <p>Quantidade: {item.quantidade}</p>
 
-                            <span>
-                                R$ {item.preco}
-                            </span>
+                            <span>R$ {item.preco}</span>
 
                         </div>
 
@@ -135,6 +172,8 @@ function PedidoStatus() {
                 ))}
 
             </div>
+
+
 
             <div className="footer-pedido">
 

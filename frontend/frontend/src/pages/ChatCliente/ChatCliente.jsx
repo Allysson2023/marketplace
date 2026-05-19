@@ -14,7 +14,9 @@ function ChatCliente() {
 
 
 
-    // 🟢 ENTRAR NO CHAT + SOCKET (SEM DUPLICAR)
+    // ===============================
+    // ENTRAR NO CHAT SOCKET
+    // ===============================
     useEffect(() => {
 
         if (!chatId) return;
@@ -29,59 +31,129 @@ function ChatCliente() {
             socket.on("connect", entrar);
         }
 
-        const handleMessage = (msg) => {
-            setMensagens(prev => [...prev, msg]);
-        };
-
-        socket.on("nova_mensagem", handleMessage);
-
         return () => {
             socket.off("connect", entrar);
-            socket.off("nova_mensagem", handleMessage);
         };
 
     }, [chatId]);
 
 
 
-    // 🟢 CARREGAR MENSAGENS
+    // ===============================
+    // CARREGAR MENSAGENS
+    // ===============================
     useEffect(() => {
 
         if (!chatId) return;
 
-        fetch(`http://localhost:3000/api/chat/${chatId}/mensagens`, {
-            headers: {
-                Authorization: `Bearer ${token}`
+        fetch(
+            `http://localhost:3000/api/chat/${chatId}/mensagens`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             }
-        })
+        )
         .then(res => res.json())
-        .then(data => setMensagens(data))
-        .catch(err => console.log(err));
+        .then(data => {
+
+            if (Array.isArray(data)) {
+                setMensagens(data);
+            }
+
+        })
+        .catch(err => {
+            console.log(
+                "Erro ao carregar mensagens:",
+                err
+            );
+        });
 
     }, [chatId, token]);
 
 
 
-    // 🟢 ENVIAR MENSAGEM
+    // ===============================
+    // SOCKET TEMPO REAL
+    // ===============================
+    useEffect(() => {
+
+        const handleMessage = (msg) => {
+
+            setMensagens(prev => {
+
+                // EVITAR DUPLICAR
+                const jaExiste = prev.some(
+                    m => m.id === msg.id
+                );
+
+                if (jaExiste) {
+                    return prev;
+                }
+
+                return [...prev, msg];
+
+            });
+
+        };
+
+        socket.on("nova_mensagem", handleMessage);
+
+        return () => {
+            socket.off(
+                "nova_mensagem",
+                handleMessage
+            );
+        };
+
+    }, []);
+
+
+
+    // ===============================
+    // ENVIAR MENSAGEM
+    // ===============================
     async function enviarMensagem() {
 
         if (!mensagem.trim()) return;
 
-        await fetch("http://localhost:3000/api/chat/mensagem", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                chat_id: chatId,
-                mensagem,
-                tipo: "texto",
-                remetente_tipo: "cliente"
-            })
-        });
+        try {
 
-        setMensagem("");
+            const response = await fetch(
+                "http://localhost:3000/api/chat/mensagem",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        mensagem,
+                        tipo: "texto",
+                        remetente_tipo: "cliente"
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            console.log(
+                "Mensagem enviada:",
+                data
+            );
+
+            setMensagem("");
+
+        } catch (err) {
+
+            console.log(
+                "Erro ao enviar mensagem:",
+                err
+            );
+
+        }
+
     }
 
 
@@ -94,12 +166,15 @@ function ChatCliente() {
                 Conversa com a Loja
             </div>
 
+
+
+            {/* MENSAGENS */}
             <div className="chat-mensagens">
 
-                {mensagens.map((msg, index) => (
+                {mensagens.map((msg) => (
 
                     <div
-                        key={index}
+                        key={msg.id}
                         className={`mensagem ${msg.remetente_tipo}`}
                     >
 
@@ -113,6 +188,9 @@ function ChatCliente() {
 
             </div>
 
+
+
+            {/* INPUT */}
             <div className="chat-input-area">
 
                 <input
@@ -130,6 +208,7 @@ function ChatCliente() {
         </div>
 
     );
+
 }
 
 export default ChatCliente;
