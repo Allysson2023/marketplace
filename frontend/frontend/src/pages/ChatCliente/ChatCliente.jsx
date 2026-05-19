@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import socket from "../../socket";
+import "./ChatCliente.css";
 
 function ChatCliente() {
 
@@ -111,40 +112,47 @@ function ChatCliente() {
 
     return (
 
-        <div>
+         <div className="chat-container">
 
-            <h1>Chat Cliente</h1>
+        <div className="chat-header">
+            Conversa com a Loja
+        </div>
 
 
 
 
-            <div>
+        <div className="chat-mensagens">
 
-                {mensagens.map((msg, index) => (
+            {mensagens.map((msg, index) => (
 
-                    <div key={index}>
+                <div
+                    key={index}
+                    className={`mensagem ${msg.remetente_tipo}`}
+                >
 
-                        <strong>
-                            {msg.remetente_tipo}
-                        </strong>
-
-                        <p>
-                            {msg.mensagem}
-                        </p>
-
+                    <div className="remetente">
+                        {msg.remetente_tipo}
                     </div>
-                ))}
 
-            </div>
+                    <div className="texto-mensagem">
+                        {msg.mensagem}
+                    </div>
+
+                </div>
+            ))}
+
+        </div>
 
 
 
+
+        <div className="chat-input-area">
 
             <input
                 type="text"
                 value={mensagem}
                 onChange={(e) => setMensagem(e.target.value)}
-                placeholder="Digite..."
+                placeholder="Digite sua mensagem..."
             />
 
 
@@ -154,6 +162,8 @@ function ChatCliente() {
             </button>
 
         </div>
+
+    </div>
     );
 }
 
