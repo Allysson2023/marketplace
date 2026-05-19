@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
 import "./MeusPedidos.css";
+import socket from "../../socket";
 
 function MeusPedidos() {
 
@@ -24,9 +24,6 @@ function MeusPedidos() {
 
         fetchPedidos();
 
-        // 🔥 SOCKET
-        const socket = io("http://localhost:3000");
-
         // 🔥 ENTRAR NA ROOM
         socket.emit("join", user.id);
 
@@ -41,8 +38,8 @@ function MeusPedidos() {
         });
 
         return () => {
-            socket.disconnect();
-        };
+    socket.off("nova_notificacao");
+};
 
     }, []);
 

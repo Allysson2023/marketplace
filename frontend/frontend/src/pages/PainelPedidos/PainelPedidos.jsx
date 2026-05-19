@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./PainelPedidos.css";
-import { io } from "socket.io-client";
+import socket from "../../socket";
 
 function PainelPedidos() {
 
@@ -13,8 +13,6 @@ function PainelPedidos() {
 
     useEffect(() => {
 
-        // 🔌 cria socket UMA vez
-        const socket = io("http://localhost:3000");
 
         // 📥 busca inicial
         const fetchPedidos = () => {
@@ -45,10 +43,9 @@ function PainelPedidos() {
 
         });
 
-        // 🧹 limpa ao sair da página
         return () => {
-            socket.disconnect();
-        };
+    socket.off("novo_pedido");
+};
 
     }, [storeId, token]);
 
