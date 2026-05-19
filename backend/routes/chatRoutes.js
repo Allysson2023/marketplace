@@ -53,6 +53,81 @@ router.get("/:chatId/mensagens", authMiddleware, (req, res) => {
     });
 });
 
+const { getIo } = require("../utils/socket");
 
+router.post("/mensagem", authMiddleware, (req, res) => {
+
+    const {
+        chat_id,
+        mensagem,
+        tipo,
+        remetente_tipo
+    } = req.body;
+
+    const remetente_id = req.user.id;
+
+    const sql = `
+        INSERT INTO mensagens
+        (chat_id, remetente_id, remetente_tipo, tipo, mensagem)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+
+    db.query(sql, [
+        chat_id,
+        remetente_id,
+        remetente_tipo,
+        tipo,
+        mensagem
+    ], (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+
+        // 🔥 SOCKET (TEMPO REAL)
+        const io = getIo();
+
+        const novaMensagem = {
+            id: result.insertId,
+            chat_id,
+            remetente_id,
+            remetente_tipo,
+            tipo,
+            mensagem
+        };
+
+        io.to(`chat_${chat_id}`).emit("nova_mensagem", novaMensagem);
+
+        return res.json(novaMensagem);
+    });
+
+});
+
+router.get("/loja/:lojaId", authMiddleware, (req, res) => {
+
+    const { lojaId } = req.params;
+
+    const sql = `
+        SELECT c.id, c.pedido_id, c.cliente_id,
+        (
+            SELECT mensagem
+            FROM mensagens m
+            WHERE m.chat_id = c.id
+            ORDER BY m.id DESC
+            LIMIT 1
+        ) as ultima_mensagem
+        FROM chats c
+        WHERE c.loja_id = ?
+    `;
+
+    db.query(sql, [lojaId], (err, result) => {
+
+        if (err) return res.status(500).json(err);
+
+        res.json(result);
+    });
+
+});
 
 module.exports = router;

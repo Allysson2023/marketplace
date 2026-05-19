@@ -73,7 +73,7 @@ function App() {
         <Route path="/admin/pedido/:id" element={<AdminPedido />} />
         <Route path="/notificacoes" element={<Notificacoes />} />
         <Route path="/chat/:chatId" element={<ChatCliente />} />
-        <Route path="/chat-loja" element={<ChatLoja />} />
+        <Route path="/chat/:chatId/loja" element={<ChatLoja />} />
       
       </Routes>
     </BrowserRouter>

@@ -1,5 +1,4 @@
 const express = require('express');
-
 const app = express();
 
 require('./config/db');
@@ -9,36 +8,33 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
+// ROTAS
 const userRoutes = require('./routes/userRoutes');
-app.use('/api', userRoutes);
-
 const storeRoutes = require('./routes/storeRoutes');
-app.use('/api', storeRoutes);
-
 const productRoutes = require('./routes/productRoutes');
-app.use('/api', productRoutes);
-
 const cartRoutes = require('./routes/cartRoutes');
-app.use('/api', cartRoutes);
-
 const categoryRoutes = require('./routes/categoryRoutes');
-app.use('/api', categoryRoutes);
-
 const pedidoRoutes = require("./routes/pedidoRoutes");
-app.use("/api", pedidoRoutes);
-
 const notificationRoutes = require("./routes/notificationRoutes");
-app.use("/api", notificationRoutes);
-
 const chatRoutes = require("./routes/chatRoutes");
-app.use("/api/chat", chatRoutes);
+
+app.use('/api', userRoutes);
+app.use('/api', storeRoutes);
+app.use('/api', productRoutes);
+app.use('/api', cartRoutes);
+app.use('/api', categoryRoutes);
+app.use('/api', pedidoRoutes);
+app.use('/api', notificationRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.get('/', (req, res) => {
     res.send("Servidor funcionando!");
 });
 
+// HTTP + SOCKET
 const http = require("http");
 const server = http.createServer(app);
+
 const { Server } = require("socket.io");
 
 const io = new Server(server, {
@@ -47,50 +43,36 @@ const io = new Server(server, {
     }
 });
 
+// 🔥 IMPORTANTE: registrar IO no utils PRIMEIRO
+const socketUtil = require("./utils/socket");
+socketUtil.setIo(io);
+
+// SOCKET CONNECTION
 io.on("connection", (socket) => {
 
     console.log("Cliente conectado:", socket.id);
 
+    // usuário geral
     socket.on("join", (userId) => {
         socket.join(`user_${userId}`);
     });
 
-
+    // loja geral
     socket.on("join_loja", (lojaId) => {
+        console.log("🏪 Loja entrou na sala:", lojaId);
+        socket.join(`loja_${lojaId}`);
+    });
 
-    console.log("🏪 Loja entrou na sala:", lojaId);
+    // chat específico (CLIENTE + LOJA)
+    socket.on("entrar_chat", (chatId) => {
 
-    socket.join(`loja_${lojaId}`);
-});
+        socket.join(`chat_${chatId}`);
 
-
-
-
-// ENTRAR NO CHAT
-socket.on("entrar_chat", (chatId) => {
-
-    socket.join(`chat_${chatId}`);
-
-    console.log(`Entrou no chat ${chatId}`);
-});
-
-
-
-
-// ENVIAR MENSAGEM
-socket.on("enviar_mensagem", (dados) => {
-
-    io.to(`chat_${dados.chatId}`)
-      .emit("nova_mensagem", dados);
-});
-
+        console.log(`💬 Entrou no chat: chat_${chatId}`);
+    });
 
 });
-
-const socket = require("./utils/socket");
-
-socket.setIo(io);
 
 server.listen(3000, () => {
-    console.log("Servidor rodando na porta 3000");
+    console.log("🚀 Servidor rodando na porta 3000");
 });
