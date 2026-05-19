@@ -53,11 +53,21 @@ function PedidoStatus() {
 
             <div className="status-pedido">
 
-                <h2>
-                    ⏳ {infoPedido.status}
-                </h2>
+    <h2>
+        ⏳ {infoPedido.status}
+    </h2>
 
-            </div>
+
+
+
+    <button
+        className="btn-chat-loja"
+        onClick={() => navigate(`/chat/${pedido.id}`)}
+    >
+        💬 Falar com Loja
+    </button>
+
+</div>
             <div className="info-entrega">
 
     <h2>📍 Informações do Pedido</h2>
