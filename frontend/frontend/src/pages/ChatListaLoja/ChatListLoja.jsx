@@ -53,29 +53,29 @@ function ChatListLoja() {
 
                     {chats.map(chat => (
 
-                        <div
-                            key={chat.id}
-                            className="chat-card"
-                            onClick={() => navigate(`/chat/${chat.id}`)}
-                        >
+                         <div
+        key={chat.id}
+        className="chat-card"
+        onClick={() => navigate(`/chat/${chat.id}/loja`)}
+    >
 
-                            <div className="chat-info">
+        <div className="chat-info">
 
-                                <h3>
-                                    Pedido #{chat.pedido_id}
-                                </h3>
+            <h3>
+                Pedido #{chat.pedido_id}
+            </h3>
 
-                                <p className="ultima-msg">
-                                    {chat.ultima_mensagem || "Sem mensagens ainda"}
-                                </p>
+            <p className="ultima-msg">
+                {chat.ultima_mensagem || "Sem mensagens ainda"}
+            </p>
 
-                            </div>
+        </div>
 
-                            <div className="chat-seta">
-                                →
-                            </div>
+        <div className="chat-seta">
+            →
+        </div>
 
-                        </div>
+    </div>
 
                     ))}
 
