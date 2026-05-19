@@ -30,6 +30,9 @@ app.use("/api", pedidoRoutes);
 const notificationRoutes = require("./routes/notificationRoutes");
 app.use("/api", notificationRoutes);
 
+const chatRoutes = require("./routes/chatRoutes");
+app.use("/api/chat", chatRoutes);
+
 app.get('/', (req, res) => {
     res.send("Servidor funcionando!");
 });
@@ -51,12 +54,36 @@ io.on("connection", (socket) => {
     socket.on("join", (userId) => {
         socket.join(`user_${userId}`);
     });
+
+
     socket.on("join_loja", (lojaId) => {
 
     console.log("🏪 Loja entrou na sala:", lojaId);
 
     socket.join(`loja_${lojaId}`);
 });
+
+
+
+
+// ENTRAR NO CHAT
+socket.on("entrar_chat", (chatId) => {
+
+    socket.join(`chat_${chatId}`);
+
+    console.log(`Entrou no chat ${chatId}`);
+});
+
+
+
+
+// ENVIAR MENSAGEM
+socket.on("enviar_mensagem", (dados) => {
+
+    io.to(`chat_${dados.chatId}`)
+      .emit("nova_mensagem", dados);
+});
+
 
 });
 
