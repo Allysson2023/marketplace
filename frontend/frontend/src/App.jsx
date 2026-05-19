@@ -5,6 +5,7 @@ import socket from "./socket";
 
 import Login from "./pages/Login/Login";
 import Home from "./pages/Home/Home";
+import ChatCliente from "./pages/ChatCliente/ChatCliente";
 import Carrinho from "./pages/Carrinho/Carrinho";
 import CadastrarProduto from "./pages/CadastrarProduto/CadastrarProduto";
 import CadastrarLoja from "./pages/CadastrarLoja/CadastrarLoja";
@@ -70,7 +71,7 @@ function App() {
         <Route path="/store/:id/pedidos" element={<PainelPedidos />} />
         <Route path="/admin/pedido/:id" element={<AdminPedido />} />
         <Route path="/notificacoes" element={<Notificacoes />} />
-
+        <Route path="/chat/:chatId" element={<ChatCliente />} />
       </Routes>
     </BrowserRouter>
   );
