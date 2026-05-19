@@ -1,147 +1,150 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-
 const jwt = require('jsonwebtoken');
-
 const authMiddleware = require('../middlewares/authMiddleware');
-
 const upload = require('../middlewares/uploadLojas');
 
+const SECRET = "segredo_super";
+
+
+// ===============================
+// CRIAR USUÁRIO
+// ===============================
 router.post('/users', (req, res) => {
-    const {username, password, tipo} = req.body;
 
-    const sql = "INSERT INTO users (username, password, tipo) VALUES (?, ?,?)";
+    const { username, password, tipo } = req.body;
 
-    db.query(sql, [username, password, tipo], (err, result) => {
+    const sql = `
+        INSERT INTO users (username, password, tipo)
+        VALUES (?, ?, ?)
+    `;
+
+    db.query(sql, [username, password, tipo], (err) => {
+
         if (err) {
             console.log(err);
             return res.status(500).json(err);
         }
-        res.json({ message: "Usuário criado! "});
+
+        res.json({ message: "Usuário criado com sucesso!" });
+
     });
+
 });
 
+
+// ===============================
+// LOGIN (CORRIGIDO)
+// ===============================
 router.post('/login', (req, res) => {
+
     const { username, password } = req.body;
 
-    const sql = "SELECT * FROM users WHERE username = ? AND password = ?";
-
-    db.query(sql, [username, password], (err, result) => {
-        if (err) {
-            return res.status(500).json(err);
-        }
-        if(result.length > 0) {
-            const user = result[0];
-
-            const token = jwt.sign(
-    { id: user.id },
-    "segredo_super",
-    { expiresIn: "1h" }
-);
-            res.json({
-                message: "Login feito com sucesso!",
-                token: token,
-                user: {
-    id: user.id,
-        username: user.username
-  }
-            });
-        } else {
-            res.status(401).json({ error: "Usuário ou senha inválidos "});
-        }
-    });
-});
-
-router.get('/users', (req, res) => {
-    db.query("SELECT * FROM users", (err, result) => {
-        if (err) {
-            return res.status(500).json(err);
-        }
-        res.json(result);
-    });
-});
-
-router.get('/perfil', authMiddleware, (req, res) => {
-    res.json({
-        message: "Voce está logado!",
-        user: req.user
-    });
-});
-
-router.put('/update-profile', authMiddleware, upload.single('imagem'),
-  (req, res) => {
-
-    const userId = req.user.id;
-    const { username, nomeLoja, categoria} = req.body;
-
-    const imagem = req.file ? req.file.filename : null;
-
-    const sqlUser = `
-      UPDATE users SET username = ? WHERE id = ?
+    const sql = `
+        SELECT 
+            users.id,
+            users.username,
+            users.tipo,
+            stores.id AS loja_id
+        FROM users
+        LEFT JOIN stores 
+            ON stores.user_id = users.id
+        WHERE users.username = ? 
+        AND users.password = ?
+        LIMIT 1
     `;
 
-    db.query( sqlUser, [username, userId], (err, result) => {
-        if(err){
-          return res.status(500).json(err);
-        }
-        let sqlStore = `
-             UPDATE stores SET nome = ?, categoria = ?
-        `;
+    db.query(sql, [username, password], (err, result) => {
 
-        let valores = [ nomeLoja, categoria];
-
-        if(imagem){
-          sqlStore = `
-            UPDATE stores SET nome = ?, categoria = ?, imagem = ?
-            WHERE user_id = ?
-          `;
-
-          valores = [
-            nomeLoja, categoria, imagem, userId ];
-
-        }else{
-          sqlStore = `
-            UPDATE stores SET nome = ?, categoria = ?
-            WHERE user_id = ?
-          `;
-
-          valores = [ nomeLoja, categoria, userId ];
+        if (err) {
+            console.log(err);
+            return res.status(500).json(err);
         }
 
-        db.query( sqlStore, valores,
-          (err, result) => {
-            if(err){
-              return res.status(500).json(err);
-            }
-            res.json({
-              message: "Perfil atualizado com sucesso"
-            });
-          }
+        if (result.length === 0) {
+            return res.status(401).json({ error: "Usuário ou senha inválidos" });
+        }
+
+        const user = result[0];
+
+        const token = jwt.sign(
+            { id: user.id },
+            SECRET,
+            { expiresIn: "1h" }
         );
-      }
-    );
+
+        res.json({
+            message: "Login feito com sucesso!",
+            token,
+            user: {
+                id: user.id,
+                username: user.username,
+                tipo: user.tipo,
+                loja_id: user.loja_id || null
+            }
+        });
+
+    });
+
 });
 
+
+// ===============================
+// LISTAR USUÁRIOS
+// ===============================
+router.get('/users', (req, res) => {
+
+    db.query("SELECT * FROM users", (err, result) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        res.json(result);
+
+    });
+
+});
+
+
+// ===============================
+// PERFIL LOGADO
+// ===============================
+router.get('/perfil', authMiddleware, (req, res) => {
+
+    res.json({
+        message: "Você está logado!",
+        user: req.user
+    });
+
+});
+
+
+// ===============================
+// PEGAR PERFIL COMPLETO
+// ===============================
 router.get('/profile', authMiddleware, (req, res) => {
 
     const userId = req.user.id;
 
     const sql = `
-        SELECT
+        SELECT 
+            users.id,
             users.username,
             stores.nome AS nomeLoja,
             stores.categoria,
             stores.imagem
         FROM users
-        LEFT JOIN stores
-        ON users.id = stores.user_id
+        LEFT JOIN stores 
+            ON users.id = stores.user_id
         WHERE users.id = ?
+        LIMIT 1
     `;
 
     db.query(sql, [userId], (err, result) => {
 
-        if(err){
+        if (err) {
             return res.status(500).json(err);
         }
 
@@ -151,4 +154,121 @@ router.get('/profile', authMiddleware, (req, res) => {
 
 });
 
-module.exports = router
+
+// ===============================
+// ATUALIZAR PERFIL + LOJA
+// ===============================
+router.put('/update-profile', authMiddleware, upload.single('imagem'), (req, res) => {
+
+    const userId = req.user.id;
+    const { username, nomeLoja, categoria } = req.body;
+    const imagem = req.file ? req.file.filename : null;
+
+    // atualizar user
+    const sqlUser = `
+        UPDATE users 
+        SET username = ? 
+        WHERE id = ?
+    `;
+
+    db.query(sqlUser, [username, userId], (err) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        // verificar se loja existe
+        db.query(
+            "SELECT id FROM stores WHERE user_id = ?",
+            [userId],
+            (err2, result) => {
+
+                if (err2) {
+                    return res.status(500).json(err2);
+                }
+
+                // se não existe loja, cria
+                if (result.length === 0) {
+
+                    const sqlInsert = `
+                        INSERT INTO stores 
+                        (user_id, nome, categoria, imagem)
+                        VALUES (?, ?, ?, ?)
+                    `;
+
+                    db.query(sqlInsert, [
+                        userId,
+                        nomeLoja,
+                        categoria,
+                        imagem
+                    ], (err3) => {
+
+                        if (err3) {
+                            return res.status(500).json(err3);
+                        }
+
+                        return res.json({
+                            message: "Perfil e loja criados com sucesso"
+                        });
+
+                    });
+
+                } else {
+
+                    // atualiza loja existente
+                    let sqlStore;
+                    let valores;
+
+                    if (imagem) {
+
+                        sqlStore = `
+                            UPDATE stores 
+                            SET nome = ?, categoria = ?, imagem = ?
+                            WHERE user_id = ?
+                        `;
+
+                        valores = [
+                            nomeLoja,
+                            categoria,
+                            imagem,
+                            userId
+                        ];
+
+                    } else {
+
+                        sqlStore = `
+                            UPDATE stores 
+                            SET nome = ?, categoria = ?
+                            WHERE user_id = ?
+                        `;
+
+                        valores = [
+                            nomeLoja,
+                            categoria,
+                            userId
+                        ];
+
+                    }
+
+                    db.query(sqlStore, valores, (err4) => {
+
+                        if (err4) {
+                            return res.status(500).json(err4);
+                        }
+
+                        res.json({
+                            message: "Perfil atualizado com sucesso"
+                        });
+
+                    });
+
+                }
+
+            }
+        );
+
+    });
+
+});
+
+module.exports = router;

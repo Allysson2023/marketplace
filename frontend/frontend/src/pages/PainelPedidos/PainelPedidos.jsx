@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./PainelPedidos.css";
 import socket from "../../socket";
 
+
 function PainelPedidos() {
 
     const navigate = useNavigate();
@@ -97,6 +98,19 @@ function PainelPedidos() {
 
     <h1>Painel de Pedidos</h1>
     <p>Gerencie os pedidos da sua loja</p>
+    <button
+    onClick={() => navigate("/chats")}
+    style={{
+        padding: "10px 15px",
+        background: "#ff4d4d",
+        color: "#fff",
+        border: "none",
+        borderRadius: 8,
+        cursor: "pointer"
+    }}
+>
+    💬 Conversas
+</button>
 
 </div>
 

@@ -33,6 +33,7 @@ function Login() {
 
       localStorage.setItem("token", dados.token);
       localStorage.setItem("user", JSON.stringify(dados.user));
+      localStorage.setItem("lojaId", dados.user.loja_id);
 
       fetch("http://localhost:3000/api/minha-loja", {
 

@@ -56,9 +56,7 @@ router.post("/mensagem", authMiddleware, (req, res) => {
     // VERIFICA SE CHAT EXISTE
     // ===============================
     const verificarChat = `
-        SELECT *
-        FROM chats
-        WHERE id = ?
+        SELECT id FROM chats WHERE id = ?
     `;
 
     db.query(verificarChat, [chat_id], (err, result) => {
@@ -71,13 +69,12 @@ router.post("/mensagem", authMiddleware, (req, res) => {
 
 
         // ===============================
-        // CHAT NÃO EXISTE -> CRIA
+        // CRIA CHAT SE NÃO EXISTIR
         // ===============================
         if (result.length === 0) {
 
             const criarChat = `
-                INSERT INTO chats
-                (id, pedido_id, cliente_id, loja_id)
+                INSERT INTO chats (id, pedido_id, cliente_id, loja_id)
                 VALUES (?, ?, ?, ?)
             `;
 
@@ -86,9 +83,7 @@ router.post("/mensagem", authMiddleware, (req, res) => {
                 [
                     chat_id,
                     chat_id,
-                    remetente_tipo === "cliente"
-                        ? remetente_id
-                        : null,
+                    remetente_tipo === "cliente" ? remetente_id : null,
                     loja_id || null
                 ],
                 (err2) => {
@@ -104,9 +99,7 @@ router.post("/mensagem", authMiddleware, (req, res) => {
             );
 
         } else {
-
             salvarMensagem();
-
         }
 
     });
@@ -120,13 +113,7 @@ router.post("/mensagem", authMiddleware, (req, res) => {
 
         const sql = `
             INSERT INTO mensagens
-            (
-                chat_id,
-                remetente_id,
-                remetente_tipo,
-                tipo,
-                mensagem
-            )
+            (chat_id, remetente_id, remetente_tipo, tipo, mensagem)
             VALUES (?, ?, ?, ?, ?)
         `;
 
@@ -146,11 +133,6 @@ router.post("/mensagem", authMiddleware, (req, res) => {
                     return res.status(500).json(err);
                 }
 
-
-
-                // ===============================
-                // SOCKET TEMPO REAL
-                // ===============================
                 const io = getIo();
 
                 const novaMensagem = {
@@ -179,7 +161,7 @@ router.post("/mensagem", authMiddleware, (req, res) => {
 
 
 // ===============================
-// LISTAR CHATS DA LOJA
+// LISTAR CHATS DA LOJA (INBOX)
 // ===============================
 router.get("/loja/:lojaId", authMiddleware, (req, res) => {
 
@@ -203,7 +185,7 @@ router.get("/loja/:lojaId", authMiddleware, (req, res) => {
 
         FROM chats c
         WHERE c.loja_id = ?
-        ORDER BY c.id DESC
+        ORDER BY c.criado_em DESC
     `;
 
     db.query(sql, [lojaId], (err, result) => {
