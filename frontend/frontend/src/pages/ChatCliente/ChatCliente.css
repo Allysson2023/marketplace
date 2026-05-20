@@ -2,172 +2,93 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background: #f5f5f5;
+    background: #e5ddd5;
+    font-family: Arial, sans-serif;
 }
 
-
-
-
+/* HEADER */
 .chat-header {
-    background: #0044ff;
-    color: rgb(255, 255, 255);
-    padding: 18px;
-    font-size: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #075e54;
+    color: white;
     font-weight: bold;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
+/* BOTÃO VOLTAR */
+.chat-header button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
 
-
-
+/* MENSAGENS */
 .chat-mensagens {
     flex: 1;
+    padding: 15px;
     overflow-y: auto;
-    padding: 20px;
-
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
 }
 
-
-
-
+/* BOLHAS */
 .mensagem {
-    max-width: 75%;
-    padding: 12px 16px;
-    border-radius: 18px;
+    max-width: 70%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    position: relative;
     word-break: break-word;
-
-    animation: aparecer 0.2s ease;
 }
 
-
-
-
+/* CLIENTE */
 .mensagem.cliente {
     align-self: flex-end;
-    background: #ff4d4d;
-    color: white;
-
-    border-bottom-right-radius: 5px;
+    background: #dcf8c6;
+    border-bottom-right-radius: 4px;
 }
 
-
-
-
+/* LOJA */
 .mensagem.loja {
     align-self: flex-start;
-    background: white;
-    color: #333;
-
-    border-bottom-left-radius: 5px;
-
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    background: #fff;
+    border-bottom-left-radius: 4px;
 }
 
-
-
-
-.remetente {
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom: 5px;
-    opacity: 0.7;
+/* HORA */
+.msg-hora {
+    font-size: 10px;
+    opacity: 0.6;
+    text-align: right;
+    margin-top: 4px;
 }
 
-
-
-
-.texto-mensagem {
-    font-size: 15px;
-}
-
-
-
-
+/* INPUT */
 .chat-input-area {
-    background: white;
-    padding: 15px;
     display: flex;
+    padding: 10px;
+    background: #f0f0f0;
     gap: 10px;
-
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
 }
-
-
-
 
 .chat-input-area input {
     flex: 1;
-
+    padding: 10px;
+    border-radius: 20px;
     border: none;
     outline: none;
-
-    padding: 14px;
-
-    border-radius: 12px;
-
-    background: #f0f0f0;
-
-    font-size: 15px;
 }
-
-
-
 
 .chat-input-area button {
-    border: none;
-
-    background: #0400ec;
-
+    background: #075e54;
     color: white;
-
-    padding: 14px 22px;
-
-    border-radius: 12px;
-
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
     cursor: pointer;
-
-    font-weight: bold;
-
-    transition: 0.2s;
-}
-
-
-
-
-.chat-input-area button:hover {
-    transform: scale(1.05);
-}
-
-
-
-
-@keyframes aparecer {
-
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
-
-
-/* RESPONSIVO */
-@media (max-width: 600px) {
-
-    .mensagem {
-        max-width: 90%;
-    }
-
-    .chat-header {
-        font-size: 18px;
-    }
 }
