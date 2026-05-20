@@ -830,6 +830,46 @@ img{
 }
 
 /* =========================
+   PAGINAÇÃO BOTÕES
+========================= */
+
+.paginacao {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 40px;
+}
+
+.btn-carregar {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+
+    font-weight: bold;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    color: white;
+
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+
+    transition: 0.25s;
+}
+
+.btn-carregar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.35);
+}
+
+.btn-carregar:active {
+    transform: scale(0.97);
+}
+
+
+/* =========================
    ANIMAÇÕES
 ========================= */
 @keyframes pulseGreen {
