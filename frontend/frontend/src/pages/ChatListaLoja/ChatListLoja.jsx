@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import socket from "../../socket";
 import "./ChatListLoja.css";
 
 function ChatListLoja() {
@@ -8,14 +9,14 @@ function ChatListLoja() {
     const navigate = useNavigate();
 
     const token = localStorage.getItem("token");
-
-    // ✔ CORRETO: pega do user
     const user = JSON.parse(localStorage.getItem("user"));
     const lojaId = user?.loja_id;
 
-    useEffect(() => {
+    // ===============================
+    // CARREGAR CHATS
+    // ===============================
+    const carregarChats = () => {
 
-        // 🚨 trava de segurança
         if (!lojaId || !token) return;
 
         fetch(`http://localhost:3000/api/chat/loja/${lojaId}`, {
@@ -27,22 +28,56 @@ function ChatListLoja() {
         .then(data => {
             if (Array.isArray(data)) {
                 setChats(data);
-            } else {
-                setChats([]);
             }
         })
-        .catch(err => console.log("Erro ao carregar chats:", err));
+        .catch(err => console.log(err));
+    };
 
-    }, [lojaId, token]);
+    // ===============================
+    // INIT
+    // ===============================
+    useEffect(() => {
+
+        carregarChats();
+
+        // entra na sala da loja (IMPORTANTE)
+        if (lojaId) {
+            socket.emit("join_loja", lojaId);
+        }
+
+    }, [lojaId]);
+
+    // ===============================
+    // SOCKET TEMPO REAL
+    // ===============================
+    useEffect(() => {
+
+        const handleNovaMensagem = (msg) => {
+            console.log("Nova mensagem recebida:", msg);
+
+            // atualiza lista inteira (simples e seguro)
+            carregarChats();
+        };
+
+        socket.on("nova_mensagem_loja", handleNovaMensagem);
+
+        return () => {
+            socket.off("nova_mensagem_loja", handleNovaMensagem);
+        };
+
+    }, [lojaId]);
 
     return (
-
         <div className="chat-list-container">
 
             <h2 className="titulo">💬 Conversas</h2>
 
-            {/* debug útil */}
-            {/* <p>Loja ID: {String(lojaId)}</p> */}
+            <button
+                className="btn-voltar"
+                onClick={() => window.history.back()}
+            >
+                ← Voltar
+            </button>
 
             {chats.length === 0 ? (
                 <p className="sem-chats">
@@ -52,31 +87,29 @@ function ChatListLoja() {
                 <div className="lista-chats">
 
                     {chats.map(chat => (
+                        <div
+                            key={chat.id}
+                            className="chat-card"
+                            onClick={() => navigate(`/chat/${chat.id}/loja`)}
+                        >
 
-                         <div
-        key={chat.id}
-        className="chat-card"
-        onClick={() => navigate(`/chat/${chat.id}/loja`)}
-    >
+                            <div className="chat-info">
 
-        <div className="chat-info">
+                                <h3>
+                                    Pedido #{chat.pedido_id}
+                                </h3>
 
-            <h3>
-                Pedido #{chat.pedido_id}
-            </h3>
+                                <p className="ultima-msg">
+                                    {chat.ultima_mensagem || "Sem mensagens ainda"}
+                                </p>
 
-            <p className="ultima-msg">
-                {chat.ultima_mensagem || "Sem mensagens ainda"}
-            </p>
+                            </div>
 
-        </div>
+                            <div className="chat-seta">
+                                →
+                            </div>
 
-        <div className="chat-seta">
-            →
-        </div>
-
-    </div>
-
+                        </div>
                     ))}
 
                 </div>

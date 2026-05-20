@@ -92,7 +92,7 @@ router.post("/mensagem", authMiddleware, (req, res) => {
 
 
     // ===============================
-    // VERIFICA SE CHAT EXISTE
+    // VERIFICA CHAT
     // ===============================
     const verificarChat = `
         SELECT * FROM chats WHERE id = ?
@@ -107,39 +107,58 @@ router.post("/mensagem", authMiddleware, (req, res) => {
 
 
         // ===============================
-        // CRIA CHAT SE NÃO EXISTIR
+        // BUSCAR LOJA DO PEDIDO (CORREÇÃO PRINCIPAL)
         // ===============================
-        if (result.length === 0) {
+        const buscarLoja = `
+            SELECT loja_id FROM pedidos WHERE id = ?
+        `;
 
-            const criarChat = `
-                INSERT INTO chats
-                (id, pedido_id, cliente_id, loja_id)
-                VALUES (?, ?, ?, ?)
-            `;
+        db.query(buscarLoja, [chat_id], (err2, pedidoRes) => {
 
-            db.query(
-                criarChat,
-                [
-                    chat_id,
-                    chat_id,
-                    remetente_tipo === "cliente" ? remetente_id : null,
-                    loja_id || null
-                ],
-                (err2) => {
+            if (err2) {
+                console.log(err2);
+                return res.status(500).json(err2);
+            }
 
-                    if (err2) {
-                        console.log(err2);
-                        return res.status(500).json(err2);
+            const lojaIdFinal = pedidoRes[0]?.loja_id || null;
+
+
+            // ===============================
+            // CRIA CHAT SE NÃO EXISTE
+            // ===============================
+            if (result.length === 0) {
+
+                const criarChat = `
+                    INSERT INTO chats
+                    (id, pedido_id, cliente_id, loja_id)
+                    VALUES (?, ?, ?, ?)
+                `;
+
+                db.query(
+                    criarChat,
+                    [
+                        chat_id,
+                        chat_id,
+                        remetente_tipo === "cliente" ? remetente_id : null,
+                        lojaIdFinal
+                    ],
+                    (err3) => {
+
+                        if (err3) {
+                            console.log(err3);
+                            return res.status(500).json(err3);
+                        }
+
+                        salvarMensagem(lojaIdFinal);
+
                     }
+                );
 
-                    salvarMensagem();
+            } else {
+                salvarMensagem(lojaIdFinal);
+            }
 
-                }
-            );
-
-        } else {
-            salvarMensagem();
-        }
+        });
 
     });
 
@@ -147,7 +166,7 @@ router.post("/mensagem", authMiddleware, (req, res) => {
     // ===============================
     // SALVAR MENSAGEM
     // ===============================
-    function salvarMensagem() {
+    function salvarMensagem(lojaIdFinal) {
 
         const sql = `
             INSERT INTO mensagens
@@ -182,10 +201,13 @@ router.post("/mensagem", authMiddleware, (req, res) => {
                     mensagem
                 };
 
-                io.to(`chat_${chat_id}`).emit(
-                    "nova_mensagem",
-                    novaMensagem
-                );
+                // envia para sala do chat
+                io.to(`chat_${chat_id}`).emit("nova_mensagem", novaMensagem);
+
+                // envia alerta pra loja (IMPORTANTE pro inbox tipo WhatsApp)
+                if (lojaIdFinal) {
+                    io.to(`loja_${lojaIdFinal}`).emit("nova_mensagem_loja", novaMensagem);
+                }
 
                 return res.json(novaMensagem);
 
