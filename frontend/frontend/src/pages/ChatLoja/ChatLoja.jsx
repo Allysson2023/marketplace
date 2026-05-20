@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import socket from "../../socket";
+import "./ChatLoja.css";
 
 function ChatLoja() {
 
     const { chatId } = useParams();
+    const navigate = useNavigate();
 
     const [mensagens, setMensagens] = useState([]);
     const [texto, setTexto] = useState("");
@@ -14,78 +16,48 @@ function ChatLoja() {
 
     const mensagensRef = useRef(null);
 
-    // ===============================
-    // ENTRAR NO SOCKET DO CHAT
-    // ===============================
+    // SOCKET
     useEffect(() => {
-
-        if (!chatId) return;
-
         socket.emit("entrar_chat", chatId);
-
     }, [chatId]);
 
-    // ===============================
-    // CARREGAR MENSAGENS (AO ENTRAR)
-    // ===============================
+    // CARREGAR MENSAGENS
     useEffect(() => {
 
-        if (!chatId || !token) return;
-
         fetch(`http://localhost:3000/api/chat/${chatId}/mensagens`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
+            headers: { Authorization: `Bearer ${token}` }
         })
         .then(res => res.json())
         .then(data => {
-            if (Array.isArray(data)) {
-                setMensagens(data);
-            }
+            if (Array.isArray(data)) setMensagens(data);
         });
 
     }, [chatId, token]);
 
-    // ===============================
-    // SOCKET TEMPO REAL
-    // ===============================
+    // SOCKET REALTIME
     useEffect(() => {
 
-        const handleMessage = (msg) => {
-
+        const handle = (msg) => {
             if (Number(msg.chat_id) === Number(chatId)) {
-
-                setMensagens(prev => {
-                    const existe = prev.some(m => m.id === msg.id);
-                    if (existe) return prev;
-                    return [...prev, msg];
-                });
-
+                setMensagens(prev => [...prev, msg]);
             }
-
         };
 
-        socket.on("nova_mensagem", handleMessage);
+        socket.on("nova_mensagem", handle);
 
-        return () => socket.off("nova_mensagem", handleMessage);
+        return () => socket.off("nova_mensagem", handle);
 
     }, [chatId]);
 
-    // ===============================
-    // SCROLL AUTOMÁTICO
-    // ===============================
+    // SCROLL
     useEffect(() => {
-
         if (mensagensRef.current) {
             mensagensRef.current.scrollTop =
                 mensagensRef.current.scrollHeight;
         }
-
     }, [mensagens]);
 
-    // ===============================
-    // ENVIAR MENSAGEM
-    // ===============================
+    // ENVIAR
     async function enviar() {
 
         if (!texto.trim()) return;
@@ -109,39 +81,30 @@ function ChatLoja() {
     }
 
     return (
-        <div style={{ padding: 20 }}>
 
-            <h2>💬 Chat Loja</h2>
+        <div className="chat-loja-container">
 
-            <div
-                ref={mensagensRef}
-                style={{
-                    height: "70vh",
-                    overflowY: "auto",
-                    border: "1px solid #ddd",
-                    padding: 10,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "8px"
-                }}
-            >
+            {/* HEADER */}
+            <div className="chat-loja-header">
+
+                <button
+                    className="btn-voltar"
+                    onClick={() => navigate(-1)}
+                >
+                    ← Voltar
+                </button>
+
+                <h2>💬 Chat da Loja</h2>
+
+            </div>
+
+            {/* MENSAGENS */}
+            <div className="chat-loja-mensagens" ref={mensagensRef}>
 
                 {mensagens.map(m => (
                     <div
                         key={m.id}
-                        style={{
-                            alignSelf:
-                                m.remetente_tipo === "loja"
-                                    ? "flex-end"
-                                    : "flex-start",
-                            background:
-                                m.remetente_tipo === "loja"
-                                    ? "#DCF8C6"
-                                    : "#FFF",
-                            padding: "8px 12px",
-                            borderRadius: "10px",
-                            maxWidth: "70%"
-                        }}
+                        className={`msg ${m.remetente_tipo}`}
                     >
                         {m.mensagem}
                     </div>
@@ -149,13 +112,14 @@ function ChatLoja() {
 
             </div>
 
-            <div style={{ display: "flex", marginTop: 10 }}>
+            {/* INPUT */}
+            <div className="chat-loja-input">
 
                 <input
                     value={texto}
                     onChange={e => setTexto(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && enviar()}
-                    style={{ flex: 1, padding: 10 }}
+                    placeholder="Digite uma mensagem..."
                 />
 
                 <button onClick={enviar}>
