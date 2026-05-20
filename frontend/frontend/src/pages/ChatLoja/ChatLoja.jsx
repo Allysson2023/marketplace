@@ -16,30 +16,106 @@ function ChatLoja() {
 
     const mensagensRef = useRef(null);
 
-    // SOCKET
-    useEffect(() => {
-        socket.emit("entrar_chat", chatId);
-    }, [chatId]);
+    const [chatInfo, setChatInfo] = useState(null);
+    const [cliente, setCliente] = useState(null);
 
-    // CARREGAR MENSAGENS
+    // ===============================
+    // BUSCAR INFO DO CHAT (pedido + cliente_id)
+    // ===============================
     useEffect(() => {
 
-        fetch(`http://localhost:3000/api/chat/${chatId}/mensagens`, {
-            headers: { Authorization: `Bearer ${token}` }
+        if (!chatId || !user?.loja_id) return;
+
+        fetch(`http://localhost:3000/api/chat/loja/${user.loja_id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         })
         .then(res => res.json())
         .then(data => {
-            if (Array.isArray(data)) setMensagens(data);
-        });
+
+            const chat = data.find(c => String(c.id) === String(chatId));
+
+            if (chat) {
+                setChatInfo(chat);
+            }
+
+        })
+        .catch(err => console.log("Erro chatInfo:", err));
+
+    }, [chatId, user?.loja_id, token]);
+
+    // ===============================
+    // BUSCAR DADOS DO CLIENTE
+    // ===============================
+    useEffect(() => {
+
+        const clienteId = chatInfo?.cliente_id;
+
+        if (!clienteId) return;
+
+        fetch(`http://localhost:3000/api/users/${clienteId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            setCliente(data);
+        })
+        .catch(err => console.log("Erro cliente:", err));
+
+    }, [chatInfo?.cliente_id, token]);
+
+    // ===============================
+    // SOCKET ENTRAR NO CHAT
+    // ===============================
+    useEffect(() => {
+        if (chatId) {
+            socket.emit("entrar_chat", chatId);
+        }
+    }, [chatId]);
+
+    // ===============================
+    // CARREGAR MENSAGENS
+    // ===============================
+    useEffect(() => {
+
+        if (!chatId) return;
+
+        fetch(`http://localhost:3000/api/chat/${chatId}/mensagens`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data)) {
+                setMensagens(data);
+            }
+        })
+        .catch(err => console.log("Erro mensagens:", err));
 
     }, [chatId, token]);
 
+    // ===============================
     // SOCKET REALTIME
+    // ===============================
     useEffect(() => {
 
         const handle = (msg) => {
-            if (Number(msg.chat_id) === Number(chatId)) {
-                setMensagens(prev => [...prev, msg]);
+
+            if (String(msg.chat_id) === String(chatId)) {
+
+                setMensagens(prev => {
+
+                    const exists = prev.some(m => m.id === msg.id);
+
+                    if (exists) return prev;
+
+                    return [...prev, msg];
+                });
+
             }
         };
 
@@ -49,35 +125,48 @@ function ChatLoja() {
 
     }, [chatId]);
 
-    // SCROLL
+    // ===============================
+    // AUTO SCROLL
+    // ===============================
     useEffect(() => {
+
         if (mensagensRef.current) {
             mensagensRef.current.scrollTop =
                 mensagensRef.current.scrollHeight;
         }
+
     }, [mensagens]);
 
-    // ENVIAR
+    // ===============================
+    // ENVIAR MENSAGEM
+    // ===============================
     async function enviar() {
 
         if (!texto.trim()) return;
 
-        await fetch("http://localhost:3000/api/chat/mensagem", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                chat_id: chatId,
-                mensagem: texto,
-                tipo: "texto",
-                remetente_tipo: "loja",
-                loja_id: user?.loja_id
-            })
-        });
-
+        const msg = texto.trim();
         setTexto("");
+
+        try {
+
+            await fetch("http://localhost:3000/api/chat/mensagem", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    mensagem: msg,
+                    tipo: "texto",
+                    remetente_tipo: "loja",
+                    loja_id: user?.loja_id
+                })
+            });
+
+        } catch (err) {
+            console.log("Erro enviar:", err);
+        }
     }
 
     return (
@@ -94,7 +183,13 @@ function ChatLoja() {
                     ← Voltar
                 </button>
 
-                <h2>💬 Chat da Loja</h2>
+                <h2>
+                    💬 Pedido : {chatInfo?.pedido_id}
+                    {" - "}
+                    {cliente
+                        ? cliente.nome
+                        : `Cliente : ${chatInfo?.cliente_id}`}
+                </h2>
 
             </div>
 
