@@ -118,3 +118,10 @@
 .chat-loja-input button:hover {
     background: #1ebe5d;
 }
+
+.msg-hora {
+    font-size: 11px;
+    margin-top: 4px;
+    opacity: 0.6;
+    text-align: right;
+}

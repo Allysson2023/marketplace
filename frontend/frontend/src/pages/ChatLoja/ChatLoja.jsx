@@ -196,14 +196,27 @@ function ChatLoja() {
             {/* MENSAGENS */}
             <div className="chat-loja-mensagens" ref={mensagensRef}>
 
-                {mensagens.map(m => (
-                    <div
-                        key={m.id}
-                        className={`msg ${m.remetente_tipo}`}
-                    >
-                        {m.mensagem}
-                    </div>
-                ))}
+                {mensagens.map(m => {
+
+    const hora = new Date(m.criado_em || Date.now())
+        .toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+
+    return (
+        <div
+            key={m.id}
+            className={`msg ${m.remetente_tipo}`}
+        >
+            <div>{m.mensagem}</div>
+
+            <div className="msg-hora">
+                {hora}
+            </div>
+        </div>
+    );
+})}
 
             </div>
 
