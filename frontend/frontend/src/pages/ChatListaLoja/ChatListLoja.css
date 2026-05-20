@@ -1,36 +1,63 @@
-.chatlist-loja-container {
-    padding: 20px;
+.chat-list-container {
+    padding: 15px;
+    font-family: Arial;
 }
 
-.chatlist-loja-container h1 {
-    margin-bottom: 20px;
+.top-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
-.chat-list {
+.btn-voltar {
+    padding: 8px 12px;
+    border: none;
+    background: #eee;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.lista-chats {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
 }
 
 .chat-card {
-    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
     border-radius: 12px;
-    padding: 15px;
+    background: #f5f5f5;
     cursor: pointer;
-    border: 1px solid #ddd;
     transition: 0.2s;
+    position: relative;
 }
 
 .chat-card:hover {
-    background: #f5f5f5;
+    background: #eaeaea;
 }
 
-.chat-info h3 {
-    margin: 0;
+.chat-card.ativo {
+    background: #dff6ff;
+}
+
+.ultima-msg {
+    font-size: 13px;
+    color: #666;
+}
+
+.chat-seta {
     font-size: 18px;
 }
 
-.chat-info p {
-    margin-top: 5px;
-    color: #666;
+.bolinha-notificacao {
+    width: 10px;
+    height: 10px;
+    background: red;
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }

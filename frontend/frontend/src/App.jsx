@@ -20,35 +20,51 @@ import MeusPedidos from "./pages/MeusPedidos/MeusPedidos";
 import PainelPedidos from "./pages/PainelPedidos/PainelPedidos";
 import AdminPedido from "./pages/AdminPedido/AdminPedido";
 import Notificacoes from "./pages/Notificacoes/Notificacoes";
-import somNotificacao from "./assets/sounds/notification.mp3";
 import ChatLoja from "./pages/ChatLoja/ChatLoja";
 import ChatListLoja from "./pages/ChatListaLoja/ChatListLoja";
+
+import somNotificacao from "./assets/sounds/notification.mp3";
 
 function App() {
 
   useEffect(() => {
 
     const user = JSON.parse(localStorage.getItem("user"));
-    
+
     if (user?.id) {
       socket.emit("join", user.id);
     }
+
     const notificationSound = new Audio(somNotificacao);
 
-    socket.on("nova_notificacao", (data) => {
+    // ===============================
+    // 🔥 NOTIFICAÇÃO GLOBAL CHAT + SISTEMA
+    // ===============================
+    const handleNovaMensagem = (msg) => {
 
-      console.log("Nova notificação:", data);
+      // evita erro se não tiver
+      if (!msg) return;
 
       notificationSound.currentTime = 0;
 
-      notificationSound.play().catch((err) => {
-        console.log("Erro ao tocar áudio:", err);
+      notificationSound.play().catch(() => {
+        console.log("Som bloqueado pelo navegador");
       });
+    };
 
-    });
+    const handleNotificacao = (data) => {
+
+      notificationSound.currentTime = 0;
+
+      notificationSound.play().catch(() => {});
+    };
+
+    socket.on("nova_mensagem", handleNovaMensagem);
+    socket.on("nova_notificacao", handleNotificacao);
 
     return () => {
-      socket.off("nova_notificacao");
+      socket.off("nova_mensagem", handleNovaMensagem);
+      socket.off("nova_notificacao", handleNotificacao);
     };
 
   }, []);
@@ -76,6 +92,7 @@ function App() {
         <Route path="/chat/:chatId" element={<ChatCliente />} />
         <Route path="/chat/:chatId/loja" element={<ChatLoja />} />
         <Route path="/chats" element={<ChatListLoja />} />
+
       </Routes>
     </BrowserRouter>
   );
