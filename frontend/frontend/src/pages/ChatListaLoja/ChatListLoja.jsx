@@ -12,6 +12,7 @@ function ChatListLoja() {
 
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user"));
+
     const lojaId = user?.loja_id;
 
     const audioRef = useRef(new Audio(somNotificacao));
@@ -37,7 +38,14 @@ function ChatListLoja() {
             const data = await res.json();
 
             if (Array.isArray(data)) {
-                setChats(data);
+
+                // ordena logo ao carregar
+                const chatsOrdenados = data.sort((a, b) =>
+                    new Date(b.atualizado_em || 0) -
+                    new Date(a.atualizado_em || 0)
+                );
+
+                setChats(chatsOrdenados);
             }
 
         } catch (err) {
@@ -59,50 +67,77 @@ function ChatListLoja() {
     }, [lojaId]);
 
     // ===============================
-    // SOCKET (TEMPO REAL WHATSAPP)
+    // SOCKET TEMPO REAL
     // ===============================
     useEffect(() => {
 
         const handleNovaMsg = (msg) => {
 
-            // 🔊 SOM GLOBAL (funciona mesmo fora da página)
+            console.log("Nova mensagem recebida:", msg);
+
+            // 🔊 SOM
             audioRef.current.currentTime = 0;
-            audioRef.current.play().catch(() => {});
+
+            audioRef.current.play().catch((err) => {
+                console.log("Erro ao tocar áudio:", err);
+            });
 
             setChats(prev => {
 
                 let updated = [...prev];
 
                 const index = updated.findIndex(
-                    c => c.id === msg.chat_id
+                    c => Number(c.id) === Number(msg.chat_id)
                 );
 
+                // ===============================
+                // CHAT JÁ EXISTE
+                // ===============================
                 if (index !== -1) {
 
                     updated[index] = {
                         ...updated[index],
-                        ultima_mensagem: msg.mensagem,
+
+                        ultima_mensagem:
+                            msg.mensagem || "Nova mensagem",
+
                         tem_nova_msg: true,
-                        atualizado_em: new Date()
+
+                        atualizado_em:
+                            msg.criado_em || new Date().toISOString()
                     };
 
                 } else {
-                    // caso chat ainda não esteja listado
-                    updated.push({
+
+                    // ===============================
+                    // NOVO CHAT
+                    // ===============================
+                    updated.unshift({
+
                         id: msg.chat_id,
-                        pedido_id: msg.chat_id,
-                        ultima_mensagem: msg.mensagem,
-                        tem_nova_msg: true
+
+                        pedido_id:
+                            msg.pedido_id || msg.chat_id,
+
+                        ultima_mensagem:
+                            msg.mensagem || "Nova mensagem",
+
+                        tem_nova_msg: true,
+
+                        atualizado_em:
+                            msg.criado_em || new Date().toISOString()
                     });
                 }
 
-                // 🔥 ORDENAÇÃO WHATSAPP (mais recente em cima)
+                // ===============================
+                // ORDENAÇÃO
+                // ===============================
                 updated.sort((a, b) =>
                     new Date(b.atualizado_em || 0) -
                     new Date(a.atualizado_em || 0)
                 );
 
-                return updated;
+                return [...updated];
             });
         };
 
@@ -117,18 +152,37 @@ function ChatListLoja() {
     // ===============================
     // ABRIR CHAT
     // ===============================
-    function abrirChat(chatId) {
+    async function abrirChat(chatId) {
+
+    try {
+
+        await fetch(
+            `http://localhost:3000/api/chat/visualizar/${chatId}`,
+            {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
 
         setChats(prev =>
-            prev.map(c =>
-                c.id === chatId
-                    ? { ...c, tem_nova_msg: false }
-                    : c
+            prev.map(chat =>
+                Number(chat.id) === Number(chatId)
+                    ? {
+                        ...chat,
+                        tem_nova_msg: false
+                    }
+                    : chat
             )
         );
 
         navigate(`/chat/${chatId}/loja`);
+
+    } catch (err) {
+        console.log(err);
     }
+}
 
     // ===============================
     // VOLTAR
@@ -142,18 +196,26 @@ function ChatListLoja() {
         <div className="chat-list-container">
 
             <div className="top-bar">
-                <button className="btn-voltar" onClick={voltar}>
+
+                <button
+                    className="btn-voltar"
+                    onClick={voltar}
+                >
                     ← Voltar
                 </button>
 
                 <h2>💬 Conversas</h2>
+
             </div>
 
             {chats.length === 0 ? (
+
                 <p className="sem-chats">
                     Nenhuma conversa encontrada
                 </p>
+
             ) : (
+
                 <div className="lista-chats">
 
                     {chats.map(chat => (
@@ -167,7 +229,7 @@ function ChatListLoja() {
                         >
 
                             {chat.tem_nova_msg && (
-                                <span className="bolinha-notificacao" />
+                                <span className="bolinha-notificacao"></span>
                             )}
 
                             <div className="chat-info">
@@ -177,18 +239,22 @@ function ChatListLoja() {
                                 </h3>
 
                                 <p className="ultima-msg">
-                                    {chat.ultima_mensagem || "Sem mensagens ainda"}
+                                    {chat.ultima_mensagem ||
+                                        "Sem mensagens ainda"}
                                 </p>
 
                             </div>
 
-                            <div className="chat-seta">→</div>
+                            <div className="chat-seta">
+                                →
+                            </div>
 
                         </div>
 
                     ))}
 
                 </div>
+
             )}
 
         </div>
