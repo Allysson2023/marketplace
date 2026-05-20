@@ -12,8 +12,6 @@ function PedidoStatus() {
 
     const token = localStorage.getItem("token");
 
-
-
     // ===============================
     // CARREGAR PEDIDO
     // ===============================
@@ -44,38 +42,12 @@ function PedidoStatus() {
 
 
     // ===============================
-    // ABRIR CHAT (SEM DUPLICAR)
+    // ABRIR CHAT (SEM MENSAGEM AUTOMÁTICA)
     // ===============================
-    async function abrirChat() {
+    function abrirChat() {
 
-        try {
-
-            const response = await fetch(
-                "http://localhost:3000/api/chat/mensagem",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        chat_id: pedido.id,
-                        mensagem: "👋 Olá, quero falar sobre o pedido",
-                        tipo: "texto",
-                        remetente_tipo: "cliente",
-                        loja_id: pedido.loja_id
-                    })
-                }
-            );
-
-            await response.json();
-
-            navigate(`/chat/${pedido.id}`);
-
-        } catch (err) {
-            console.log("Erro ao abrir chat:", err);
-        }
-
+        // apenas abre o chat
+        navigate(`/chat/${pedido.id}`);
     }
 
 

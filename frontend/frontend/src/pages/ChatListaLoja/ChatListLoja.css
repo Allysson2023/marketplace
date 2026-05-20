@@ -1,57 +1,36 @@
-.chat-list-container {
+.chatlist-loja-container {
     padding: 20px;
-    max-width: 600px;
-    margin: 0 auto;
-    font-family: Arial, sans-serif;
 }
 
-.titulo {
-    font-size: 22px;
+.chatlist-loja-container h1 {
     margin-bottom: 20px;
 }
 
-.sem-chats {
-    text-align: center;
-    color: #777;
-    margin-top: 30px;
-}
-
-.lista-chats {
+.chat-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
 }
 
 .chat-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    border-radius: 10px;
     background: #fff;
-    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 15px;
     cursor: pointer;
+    border: 1px solid #ddd;
     transition: 0.2s;
 }
 
 .chat-card:hover {
     background: #f5f5f5;
-    transform: scale(1.01);
 }
 
 .chat-info h3 {
     margin: 0;
-    font-size: 16px;
-    color: #222;
+    font-size: 18px;
 }
 
-.ultima-msg {
-    margin: 5px 0 0 0;
-    font-size: 13px;
+.chat-info p {
+    margin-top: 5px;
     color: #666;
-}
-
-.chat-seta {
-    font-size: 20px;
-    color: #999;
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import socket from "../../socket";
 import "./ChatCliente.css";
@@ -12,7 +12,7 @@ function ChatCliente() {
 
     const token = localStorage.getItem("token");
 
-
+    const mensagensRef = useRef(null);
 
     // ===============================
     // ENTRAR NO CHAT SOCKET
@@ -21,30 +21,16 @@ function ChatCliente() {
 
         if (!chatId) return;
 
-        const entrar = () => {
-            socket.emit("entrar_chat", chatId);
-        };
-
-        if (socket.connected) {
-            entrar();
-        } else {
-            socket.on("connect", entrar);
-        }
-
-        return () => {
-            socket.off("connect", entrar);
-        };
+        socket.emit("entrar_chat", chatId);
 
     }, [chatId]);
-
-
 
     // ===============================
     // CARREGAR MENSAGENS
     // ===============================
     useEffect(() => {
 
-        if (!chatId) return;
+        if (!chatId || !token) return;
 
         fetch(
             `http://localhost:3000/api/chat/${chatId}/mensagens`,
@@ -56,22 +42,12 @@ function ChatCliente() {
         )
         .then(res => res.json())
         .then(data => {
-
             if (Array.isArray(data)) {
                 setMensagens(data);
             }
-
-        })
-        .catch(err => {
-            console.log(
-                "Erro ao carregar mensagens:",
-                err
-            );
         });
 
     }, [chatId, token]);
-
-
 
     // ===============================
     // SOCKET TEMPO REAL
@@ -82,14 +58,8 @@ function ChatCliente() {
 
             setMensagens(prev => {
 
-                // EVITAR DUPLICAR
-                const jaExiste = prev.some(
-                    m => m.id === msg.id
-                );
-
-                if (jaExiste) {
-                    return prev;
-                }
+                const existe = prev.some(m => m.id === msg.id);
+                if (existe) return prev;
 
                 return [...prev, msg];
 
@@ -99,16 +69,21 @@ function ChatCliente() {
 
         socket.on("nova_mensagem", handleMessage);
 
-        return () => {
-            socket.off(
-                "nova_mensagem",
-                handleMessage
-            );
-        };
+        return () => socket.off("nova_mensagem", handleMessage);
 
     }, []);
 
+    // ===============================
+    // SCROLL
+    // ===============================
+    useEffect(() => {
 
+        if (mensagensRef.current) {
+            mensagensRef.current.scrollTop =
+                mensagensRef.current.scrollHeight;
+        }
+
+    }, [mensagens]);
 
     // ===============================
     // ENVIAR MENSAGEM
@@ -117,86 +92,58 @@ function ChatCliente() {
 
         if (!mensagem.trim()) return;
 
-        try {
+        await fetch(
+            "http://localhost:3000/api/chat/mensagem",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    mensagem,
+                    tipo: "texto",
+                    remetente_tipo: "cliente"
+                })
+            }
+        );
 
-            const response = await fetch(
-                "http://localhost:3000/api/chat/mensagem",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        mensagem,
-                        tipo: "texto",
-                        remetente_tipo: "cliente"
-                    })
-                }
-            );
-
-            const data = await response.json();
-
-            console.log(
-                "Mensagem enviada:",
-                data
-            );
-
-            setMensagem("");
-
-        } catch (err) {
-
-            console.log(
-                "Erro ao enviar mensagem:",
-                err
-            );
-
-        }
-
+        setMensagem("");
     }
 
-
-
     return (
-
         <div className="chat-container">
 
             <div className="chat-header">
-                Conversa com a Loja
+                💬 Conversa
             </div>
 
+            <div
+                ref={mensagensRef}
+                className="chat-mensagens"
+            >
 
-
-            {/* MENSAGENS */}
-            <div className="chat-mensagens">
-
-                {mensagens.map((msg) => (
-
+                {mensagens.map(msg => (
                     <div
                         key={msg.id}
                         className={`mensagem ${msg.remetente_tipo}`}
                     >
-
-                        <div className="texto-mensagem">
-                            {msg.mensagem}
-                        </div>
-
+                        {msg.mensagem}
                     </div>
-
                 ))}
 
             </div>
 
-
-
-            {/* INPUT */}
             <div className="chat-input-area">
 
                 <input
                     value={mensagem}
                     onChange={(e) => setMensagem(e.target.value)}
                     placeholder="Digite sua mensagem..."
+                    onKeyDown={(e) =>
+                        e.key === "Enter" && enviarMensagem()
+                    }
                 />
 
                 <button onClick={enviarMensagem}>
@@ -206,9 +153,7 @@ function ChatCliente() {
             </div>
 
         </div>
-
     );
-
 }
 
 export default ChatCliente;

@@ -5,6 +5,47 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const { getIo } = require("../utils/socket");
 
 
+// ===============================
+// LISTAR CHATS DA LOJA (INBOX)
+// ===============================
+router.get("/loja/:lojaId", authMiddleware, (req, res) => {
+
+    const { lojaId } = req.params;
+
+    const sql = `
+        SELECT
+            c.id,
+            c.pedido_id,
+            c.cliente_id,
+            c.loja_id,
+            c.criado_em,
+
+            (
+                SELECT mensagem
+                FROM mensagens m
+                WHERE m.chat_id = c.id
+                ORDER BY m.id DESC
+                LIMIT 1
+            ) as ultima_mensagem
+
+        FROM chats c
+        WHERE c.loja_id = ?
+        ORDER BY c.criado_em DESC
+    `;
+
+    db.query(sql, [lojaId], (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+
+        res.json(result);
+
+    });
+
+});
+
 
 // ===============================
 // LISTAR MENSAGENS DO CHAT
@@ -34,7 +75,6 @@ router.get("/:chatId/mensagens", authMiddleware, (req, res) => {
 });
 
 
-
 // ===============================
 // ENVIAR MENSAGEM
 // ===============================
@@ -51,12 +91,11 @@ router.post("/mensagem", authMiddleware, (req, res) => {
     const remetente_id = req.user.id;
 
 
-
     // ===============================
     // VERIFICA SE CHAT EXISTE
     // ===============================
     const verificarChat = `
-        SELECT id FROM chats WHERE id = ?
+        SELECT * FROM chats WHERE id = ?
     `;
 
     db.query(verificarChat, [chat_id], (err, result) => {
@@ -67,14 +106,14 @@ router.post("/mensagem", authMiddleware, (req, res) => {
         }
 
 
-
         // ===============================
         // CRIA CHAT SE NÃO EXISTIR
         // ===============================
         if (result.length === 0) {
 
             const criarChat = `
-                INSERT INTO chats (id, pedido_id, cliente_id, loja_id)
+                INSERT INTO chats
+                (id, pedido_id, cliente_id, loja_id)
                 VALUES (?, ?, ?, ?)
             `;
 
@@ -103,7 +142,6 @@ router.post("/mensagem", authMiddleware, (req, res) => {
         }
 
     });
-
 
 
     // ===============================
@@ -157,50 +195,5 @@ router.post("/mensagem", authMiddleware, (req, res) => {
     }
 
 });
-
-
-
-// ===============================
-// LISTAR CHATS DA LOJA (INBOX)
-// ===============================
-router.get("/loja/:lojaId", authMiddleware, (req, res) => {
-
-    const { lojaId } = req.params;
-
-    const sql = `
-        SELECT
-            c.id,
-            c.pedido_id,
-            c.cliente_id,
-            c.loja_id,
-            c.criado_em,
-
-            (
-                SELECT mensagem
-                FROM mensagens m
-                WHERE m.chat_id = c.id
-                ORDER BY m.id DESC
-                LIMIT 1
-            ) as ultima_mensagem
-
-        FROM chats c
-        WHERE c.loja_id = ?
-        ORDER BY c.criado_em DESC
-    `;
-
-    db.query(sql, [lojaId], (err, result) => {
-
-        if (err) {
-            console.log(err);
-            return res.status(500).json(err);
-        }
-
-        res.json(result);
-
-    });
-
-});
-
-
 
 module.exports = router;
