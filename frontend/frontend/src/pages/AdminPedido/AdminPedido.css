@@ -76,6 +76,10 @@ STATUS
 .status.finalizado{
     background: #8e44ad;
 }
+.status.cancelado{
+    background: black;
+    color: white;
+}
 
 /* =========================
 GRID

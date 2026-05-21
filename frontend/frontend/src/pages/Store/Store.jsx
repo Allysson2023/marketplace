@@ -129,6 +129,10 @@ function Store() {
       👤 Atualizar Perfil
     </button>
 
+    <button onClick={() => navigate(`/store/${id}/dashboard`)}>
+  📊 Painel da Loja
+</button>
+
   </div>
                     )}
 

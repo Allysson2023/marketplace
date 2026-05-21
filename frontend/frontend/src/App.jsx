@@ -22,8 +22,9 @@ import AdminPedido from "./pages/AdminPedido/AdminPedido";
 import Notificacoes from "./pages/Notificacoes/Notificacoes";
 import ChatLoja from "./pages/ChatLoja/ChatLoja";
 import ChatListLoja from "./pages/ChatListaLoja/ChatListLoja";
-
+import StoreDashboard from "./pages/StoreDashboard/StoreDashboard";
 import somNotificacao from "./assets/sounds/notification.mp3";
+
 
 function App() {
 
@@ -92,7 +93,7 @@ function App() {
         <Route path="/chat/:chatId" element={<ChatCliente />} />
         <Route path="/chat/:chatId/loja" element={<ChatLoja />} />
         <Route path="/chats" element={<ChatListLoja />} />
-
+        <Route path="/store/:id/dashboard" element={<StoreDashboard />} />
       </Routes>
     </BrowserRouter>
   );
