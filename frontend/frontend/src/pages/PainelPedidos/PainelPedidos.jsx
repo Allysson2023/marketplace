@@ -136,8 +136,9 @@ audioRef.current.volume = 1;
                     <h2>
                         R$ {
                             pedidos
-                            .reduce((acc, item) => acc + Number(item.total), 0)
-                            .toFixed(2)
+.filter(pedido => pedido.status === "finalizado")
+.reduce((acc, item) => acc + Number(item.total), 0)
+.toFixed(2)
                         }
                     </h2>
                     <span>Faturamento</span>
