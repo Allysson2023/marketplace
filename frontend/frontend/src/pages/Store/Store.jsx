@@ -100,32 +100,36 @@ function Store() {
                 <div className="top-actions" ref={menuRef}>
 
                     <button
-                        className="btn-config-top"
-                        onClick={() => setMenuConfig(prev => !prev)}
-                    >
-                        ⚙️
-                    </button>
+  className="btn-mais"
+  onClick={() => setMenuConfig(prev => !prev)}
+>
+  +
+</button>
 
                     {menuConfig && (
-                        <div className="dropdown-config-top">
+                         <div className="dropdown-config-top" ref={menuRef}>
 
-                            <button onClick={() => navigate(`/editar-loja/${id}`)}>
-                                ✏️ Editar Loja
-                            </button>
+    <button onClick={() => navigate(`/editar-loja/${id}`)}>
+      ✏️ Editar Loja
+    </button>
 
-                            <button onClick={() => navigate(`/store/${id}/admin/produtos`)}>
-                                🛠 Gerenciar Produtos
-                            </button>
+    <button onClick={() => navigate(`/store/${id}/admin/produtos`)}>
+      🛠 Gerenciar Produtos
+    </button>
 
-                            <button onClick={() => navigate(`/store/${id}/pedidos`)}>
-                                📦 Painel de Pedidos
-                            </button>
+    <button onClick={() => navigate(`/store/${id}/pedidos`)}>
+      📦 Painel de Pedidos
+    </button>
 
-                            <button onClick={() => navigate(`/config-loja/${id}`)}>
-                                ⚙️ Configurações
-                            </button>
+    <button onClick={() => navigate("/cadastrar-produto")}>
+      ➕ Cadastrar Produto
+    </button>
 
-                        </div>
+    <button onClick={() => navigate("/atualizar-perfil")}>
+      👤 Atualizar Perfil
+    </button>
+
+  </div>
                     )}
 
                 </div>

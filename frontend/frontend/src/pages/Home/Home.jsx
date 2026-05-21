@@ -270,8 +270,6 @@ useEffect(() => {
       {/* MENU */}
       {menuAberto && (
   <div className="menu-dropdown" ref={menuRef}>
-          <a href="/cadastrar-produto">Cadastrar Produto</a>
-          <a href="/atualizar-perfil">Atualizar Perfil</a>
           <a href="/meus-pedidos" className="menu-item">📦 Histórico de Pedidos</a>
           
         </div>
