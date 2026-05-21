@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
@@ -6,6 +6,7 @@ function Home() {
   const navigate = useNavigate();
 
   const [lojas, setLojas] = useState([]);
+  
   const [produtos, setProdutos] = useState([]);
   const [menuAberto, setMenuAberto] = useState(false);
   const [modalSair, setModalSair] = useState(false);
@@ -15,8 +16,33 @@ function Home() {
   const [pagina, setPagina] = useState(1);
   const [temMaisProdutos, setTemMaisProdutos] = useState(true);
   const [quantidadeCarrinho, setQuantidadeCarrinho] = useState(0);
+  const menuRef = useRef(null);
 
   const token = localStorage.getItem("token");
+
+  useEffect(() => {
+
+  function handleClickFora(event) {
+
+    if (
+      menuRef.current &&
+      !menuRef.current.contains(event.target)
+    ) {
+      setMenuAberto(false);
+    }
+
+  }
+
+  document.addEventListener("mousedown", handleClickFora);
+
+  return () => {
+    document.removeEventListener(
+      "mousedown",
+      handleClickFora
+    );
+  };
+
+}, []);
 
   const sair = () => {
   localStorage.removeItem("token");
@@ -243,7 +269,7 @@ useEffect(() => {
 
       {/* MENU */}
       {menuAberto && (
-        <div className="menu-dropdown">
+  <div className="menu-dropdown" ref={menuRef}>
           <a href="/cadastrar-produto">Cadastrar Produto</a>
           <a href="/atualizar-perfil">Atualizar Perfil</a>
           <a href="/meus-pedidos" className="menu-item">📦 Histórico de Pedidos</a>
