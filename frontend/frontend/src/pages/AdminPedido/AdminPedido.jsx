@@ -19,14 +19,12 @@ function AdminPedido() {
                 Authorization: `Bearer ${token}`
             }
         })
-        .then(res => res.json())
-        .then(data => {
-
-            setPedido(data.pedido);
-            setItens(data.itens);
-
-        })
-        .catch(err => console.log(err));
+            .then(res => res.json())
+            .then(data => {
+                setPedido(data.pedido);
+                setItens(data.itens);
+            })
+            .catch(err => console.log(err));
 
     }, [id, token]);
 
@@ -58,12 +56,15 @@ function AdminPedido() {
         } catch (err) {
             console.log(err);
         }
-
     }
 
     if (!pedido) {
         return <h1>Carregando...</h1>;
     }
+
+    const status = pedido.status;
+
+    const isFinal = status === "finalizado" || status === "cancelado" || status === "recusado";
 
     return (
 
@@ -71,21 +72,16 @@ function AdminPedido() {
 
             <div className="topo-admin">
 
-                <button
-                    className="btn-voltar"
-                    onClick={() => navigate(-1)}
-                >
+                <button className="btn-voltar" onClick={() => navigate(-1)}>
                     ← Voltar
                 </button>
 
                 <div>
-
                     <h1>Pedido #{pedido.id}</h1>
 
-                    <span className={`status ${pedido.status}`}>
-                        {pedido.status}
+                    <span className={`status ${status}`}>
+                        {status}
                     </span>
-
                 </div>
 
             </div>
@@ -93,57 +89,32 @@ function AdminPedido() {
             <div className="grid-admin">
 
                 <div className="card-admin">
-
                     <h2>Cliente</h2>
 
-                    <p>
-                        <strong>Nome:</strong> {pedido.username}
-                    </p>
+                    <p><strong>Nome:</strong> {pedido.username}</p>
 
                     {pedido.dadosEntrega && (
                         <>
-                            <p>
-                                <strong>Telefone:</strong> {pedido.dadosEntrega.telefone}
-                            </p>
-
-                            <p>
-                                <strong>Pagamento:</strong> {pedido.dadosEntrega.pagamento}
-                            </p>
+                            <p><strong>Telefone:</strong> {pedido.dadosEntrega.telefone}</p>
+                            <p><strong>Pagamento:</strong> {pedido.dadosEntrega.pagamento}</p>
                         </>
                     )}
-
                 </div>
 
                 <div className="card-admin">
-
                     <h2>Entrega</h2>
 
                     {pedido.tipo_pedido === "entrega" && pedido.dadosEntrega && (
-
                         <>
-                            <p>
-                                <strong>Endereço:</strong> {pedido.dadosEntrega.endereco}
-                            </p>
-
-                            <p>
-                                <strong>Número:</strong> {pedido.dadosEntrega.numero}
-                            </p>
-
-                            <p>
-                                <strong>Bairro:</strong> {pedido.dadosEntrega.bairro}
-                            </p>
+                            <p><strong>Endereço:</strong> {pedido.dadosEntrega.endereco}</p>
+                            <p><strong>Número:</strong> {pedido.dadosEntrega.numero}</p>
+                            <p><strong>Bairro:</strong> {pedido.dadosEntrega.bairro}</p>
                         </>
-
                     )}
 
                     {pedido.tipo_pedido === "retirada" && (
-
-                        <p>
-                            Cliente vai retirar na loja
-                        </p>
-
+                        <p>Cliente vai retirar na loja</p>
                     )}
-
                 </div>
 
             </div>
@@ -153,11 +124,7 @@ function AdminPedido() {
                 <h2>Produtos do Pedido</h2>
 
                 {itens.map(item => (
-
-                    <div
-                        key={item.id}
-                        className="produto-item"
-                    >
+                    <div key={item.id} className="produto-item">
 
                         <img
                             src={`http://localhost:3000/uploads/produtos/${item.imagem}`}
@@ -165,21 +132,12 @@ function AdminPedido() {
                         />
 
                         <div>
-
                             <h3>{item.nome}</h3>
-
-                            <p>
-                                Quantidade: {item.quantidade}
-                            </p>
-
-                            <span>
-                                R$ {item.preco}
-                            </span>
-
+                            <p>Quantidade: {item.quantidade}</p>
+                            <span>R$ {item.preco}</span>
                         </div>
 
                     </div>
-
                 ))}
 
             </div>
@@ -189,13 +147,23 @@ function AdminPedido() {
                 <button
                     className="btn-status aceito"
                     onClick={() => atualizarStatus("aceito")}
+                    disabled={status !== "pendente"}
                 >
                     Aceitar
                 </button>
 
                 <button
+                    className="btn-status recusado"
+                    onClick={() => atualizarStatus("recusado")}
+                    disabled={status !== "pendente"}
+                >
+                    Recusar
+                </button>
+
+                <button
                     className="btn-status separacao"
                     onClick={() => atualizarStatus("separacao")}
+                    disabled={status !== "aceito"}
                 >
                     Em Separação
                 </button>
@@ -203,6 +171,7 @@ function AdminPedido() {
                 <button
                     className="btn-status rota"
                     onClick={() => atualizarStatus("rota")}
+                    disabled={status !== "separacao"}
                 >
                     Em Rota
                 </button>
@@ -210,31 +179,27 @@ function AdminPedido() {
                 <button
                     className="btn-status finalizado"
                     onClick={() => atualizarStatus("finalizado")}
+                    disabled={status !== "rota"}
                 >
                     Finalizar
                 </button>
 
                 <button
-                    className="btn-status recusado"
-                    onClick={() => atualizarStatus("recusado")}
+                    className="btn-status cancelar"
+                    onClick={() => atualizarStatus("cancelado")}
+                    disabled={isFinal}
                 >
-                    Recusar
+                    Cancelar
                 </button>
 
             </div>
 
             <div className="footer-admin">
-
-                <h2>
-                    Total: R$ {pedido.total}
-                </h2>
-
+                <h2>Total: R$ {pedido.total}</h2>
             </div>
 
         </div>
-
     );
-
 }
 
 export default AdminPedido;
