@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./PainelPedidos.css";
 import socket from "../../socket";
+import somPedido from "../../assets/sounds/notification.mp3";
 
 
 function PainelPedidos() {
@@ -11,8 +12,13 @@ function PainelPedidos() {
     const token = localStorage.getItem("token");
 
     const [pedidos, setPedidos] = useState([]);
+    const audioRef = useRef(null);
 
     useEffect(() => {
+
+        audioRef.current = new Audio(somPedido);
+
+audioRef.current.volume = 1;
 
 
         // 📥 busca inicial
@@ -38,11 +44,16 @@ function PainelPedidos() {
         // 🔥 escuta pedidos novos
         socket.on("novo_pedido", (data) => {
 
-            console.log("🔥 NOVO PEDIDO CHEGOU:", data);
+    console.log("🔥 NOVO PEDIDO CHEGOU:", data);
+    audioRef.current.currentTime = 0;
 
-            fetchPedidos(); // atualiza lista
+    audioRef.current.play().catch(err => {
+    console.log("ERRO AUDIO:", err);
+});
 
-        });
+    fetchPedidos();
+
+});
 
         return () => {
     socket.off("novo_pedido");
