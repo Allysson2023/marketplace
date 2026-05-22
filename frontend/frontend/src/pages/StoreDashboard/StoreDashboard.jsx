@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "./StoreDashboard.css";
 import {
   LineChart,
@@ -14,6 +14,7 @@ import socket from "../../socket";
 function StoreDashboard() {
 
   const { id } = useParams();
+  const navigate = useNavigate();
   const [resumo, setResumo] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -112,6 +113,58 @@ function StoreDashboard() {
       </div>
 
     </div>
+    {/* AÇÕES RÁPIDAS */}
+<div className="quick-actions">
+
+  <div
+    className="quick-card"
+    onClick={() => navigate("/cadastrar-produto")}
+  >
+    <span>➕</span>
+    <h3>Novo Produto</h3>
+  </div>
+
+  <div
+    className="quick-card"
+    onClick={() => navigate(`/store/${id}/admin/produtos`)}
+  >
+    <span>📦</span>
+    <h3>Produtos</h3>
+  </div>
+
+  <div
+    className="quick-card"
+    onClick={() => navigate(`/store/${id}/pedidos`)}
+  >
+    <span>🛒</span>
+    <h3>Pedidos</h3>
+  </div>
+
+  <div
+    className="quick-card"
+    onClick={() => navigate(`/editar-loja/${id}`)}
+  >
+    <span>🏪</span>
+    <h3>Editar Loja</h3>
+  </div>
+
+  <div
+    className="quick-card"
+    onClick={() => navigate("/atualizar-perfil")}
+  >
+    <span>👤</span>
+    <h3>Perfil</h3>
+  </div>
+
+  <div
+    className="quick-card"
+    onClick={() => navigate("/chats")}
+  >
+    <span>💬</span>
+    <h3>Chats</h3>
+  </div>
+
+</div>
 
     {/* GRÁFICO */}
     <div className="section chart-section">
