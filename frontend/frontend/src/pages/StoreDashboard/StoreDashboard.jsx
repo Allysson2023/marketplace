@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./StoreDashboard.css";
-
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer
+} from "recharts";
 function StoreDashboard() {
 
   const { id } = useParams();
@@ -39,6 +46,36 @@ function StoreDashboard() {
     <div className="dashboard-container">
 
       <h1 className="dashboard-title">📊 Dashboard da Loja</h1>
+
+      <div className="section">
+
+  <h2>📈 Vendas dos últimos 7 dias</h2>
+
+  <div style={{ width: "50%", height: 300 }}>
+
+    <ResponsiveContainer>
+      <LineChart data={resumo.vendasPorDia || []}>
+
+        <XAxis dataKey="data" 
+        tick={{ fontSize: 12 }}
+        />
+        <YAxis />
+        <Tooltip formatter={(value) => `R$ ${value}`} />
+
+        <Line
+  type="monotone"
+  dataKey="total"
+  stroke="#4f46e5"
+  strokeWidth={3}
+  dot={{ r: 4 }}
+/>
+
+      </LineChart>
+    </ResponsiveContainer>
+
+  </div>
+
+</div>
 
       <div className="cards">
 

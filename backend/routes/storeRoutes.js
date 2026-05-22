@@ -156,6 +156,17 @@ router.get('/stores/:id/dashboard', (req, res) => {
 
     console.log("ENTROU NO DASHBOARD:", storeId);
 
+    const sqlUltimosDias = `
+    SELECT 
+        DATE(created_at) as data,
+        SUM(total) as total
+    FROM pedidos
+    WHERE loja_id = ?
+    AND created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+    GROUP BY DATE(created_at)
+    ORDER BY data ASC
+`;
+
     // FATURAMENTO HOJE
     const sqlHoje = `
         SELECT COALESCE(SUM(total), 0) AS total
@@ -178,6 +189,12 @@ router.get('/stores/:id/dashboard', (req, res) => {
         WHERE loja_id = ?
         AND YEAR(created_at) = YEAR(CURDATE())
     `;
+
+    db.query(sqlUltimosDias, [storeId], (err, vendasPorDia) => {
+
+    if (err) {
+        return res.status(500).json(err);
+    }
 
     db.query(sqlHoje, [storeId], (err, hojeResult) => {
 
@@ -237,13 +254,15 @@ router.get('/stores/:id/dashboard', (req, res) => {
                             faturamentoMes: mesResult[0].total,
                             faturamentoAno: anoResult[0].total,
                             topProdutos,
-                            estoqueBaixo
-                        });
+                            estoqueBaixo,
+                            vendasPorDia
+
+                     });
 
                     });
 
                 });
-
+                });
             });
 
         });
