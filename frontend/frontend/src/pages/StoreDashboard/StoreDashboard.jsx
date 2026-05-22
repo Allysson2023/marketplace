@@ -252,14 +252,37 @@ function StoreDashboard() {
           <span>🏪</span>
           <h3>Editar Loja</h3>
         </div>
+<div
+  className="quick-card"
+  onClick={() => navigate(`/store/${id}/mais-vendidos`)}
+>
+  <span>🔥</span>
+  <h3>Mais Vendidos</h3>
+</div>
 
-        <div
-          className="quick-card"
-          onClick={() => navigate("/atualizar-perfil")}
-        >
-          <span>👤</span>
-          <h3>Perfil</h3>
-        </div>
+<div
+  className="quick-card"
+  onClick={() => navigate(`/store/${id}/estoque`)}
+>
+  <span>⚠️</span>
+  <h3>Estoque</h3>
+</div>
+
+<div
+  className="quick-card"
+  onClick={() => navigate(`/store/${id}/financeiro`)}
+>
+  <span>💰</span>
+  <h3>Financeiro</h3>
+</div>
+
+<div
+  className="quick-card"
+  onClick={() => navigate(`/store/${id}/clientes`)}
+>
+  <span>👥</span>
+  <h3>Clientes</h3>
+</div>
 
         <div
           className="quick-card"
@@ -267,6 +290,14 @@ function StoreDashboard() {
         >
           <span>💬</span>
           <h3>Chats</h3>
+        </div>
+        
+        <div
+          className="quick-card"
+          onClick={() => navigate("/atualizar-perfil")}
+        >
+          <span>👤</span>
+          <h3>Perfil</h3>
         </div>
 
       </div>
@@ -282,7 +313,7 @@ function StoreDashboard() {
 
         <div className="chart-container">
 
-          <ResponsiveContainer width="100%" height={320}>
+          <ResponsiveContainer width="100%" height={220}>
 
             <LineChart
               data={resumo.vendasPorDia || []}
@@ -326,7 +357,7 @@ function StoreDashboard() {
 
         <div className="chart-container">
 
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={220}>
 
             <LineChart
               data={pedidosPorDia}
@@ -399,78 +430,7 @@ function StoreDashboard() {
 
 </div>
 
-      {/* GRID */}
-      <div className="dashboard-grid">
-
-        {/* TOP PRODUTOS */}
-        <div className="section">
-
-          <h2>🔥 Produtos mais vendidos</h2>
-
-          {resumo.topProdutos?.length === 0 ? (
-
-            <p>Nenhum produto vendido ainda.</p>
-
-          ) : (
-
-            <ul className="product-list">
-
-              {resumo.topProdutos?.map((p) => (
-
-                <li
-                  key={p.id}
-                  className="product-item"
-                >
-
-                  <span>{p.nome}</span>
-
-                  <b>{p.quantidade} vendas</b>
-
-                </li>
-
-              ))}
-
-            </ul>
-
-          )}
-
-        </div>
-
-        {/* ESTOQUE */}
-        <div className="section">
-
-          <h2>⚠️ Estoque baixo</h2>
-
-          {resumo.estoqueBaixo?.length === 0 ? (
-
-            <p>Estoque OK 👍</p>
-
-          ) : (
-
-            <ul className="product-list">
-
-              {resumo.estoqueBaixo?.map((p) => (
-
-                <li
-                  key={p.id}
-                  className="product-item"
-                >
-
-                  <span>{p.nome}</span>
-
-                  <b>{p.estoque} un.</b>
-
-                </li>
-
-              ))}
-
-            </ul>
-
-          )}
-
-        </div>
-
-      </div>
+      
 
     </div>
 

@@ -237,6 +237,9 @@
 
 /* RESPONSIVO */
 @media (max-width: 900px) {
+  .charts-grid{
+    grid-template-columns:1fr;
+  }
 
   .dashboard-grid {
     grid-template-columns: 1fr;
@@ -264,6 +267,9 @@
 
   .dashboard-actions button {
     flex: 1;
+  }
+  .charts-grid{
+    grid-template-columns:1fr;
   }
 
 }

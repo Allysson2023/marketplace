@@ -24,7 +24,10 @@ import ChatLoja from "./pages/ChatLoja/ChatLoja";
 import ChatListLoja from "./pages/ChatListaLoja/ChatListLoja";
 import StoreDashboard from "./pages/StoreDashboard/StoreDashboard";
 import somNotificacao from "./assets/sounds/notification.mp3";
-
+import MaisVendidos from "./pages/MaisVendidos/MaisVendidos";
+import Estoque from "./pages/Estoque/Estoque";
+import Financeiro from "./pages/Financeiro/Financeiro";
+import Clientes from "./pages/Clientes/Clientes";
 
 function App() {
 
@@ -94,6 +97,10 @@ function App() {
         <Route path="/chat/:chatId/loja" element={<ChatLoja />} />
         <Route path="/chats" element={<ChatListLoja />} />
         <Route path="/store/:id/dashboard" element={<StoreDashboard />} />
+        <Route path="/store/:id/mais-vendidos" element={<MaisVendidos />}/>
+        <Route path="/store/:id/estoque" element={<Estoque />}/>
+        <Route path="/store/:id/financeiro" element={<Financeiro />}/>
+        <Route path="/store/:id/clientes" element={<Clientes />}/>
       </Routes>
     </BrowserRouter>
   );

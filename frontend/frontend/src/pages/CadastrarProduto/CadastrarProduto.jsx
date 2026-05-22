@@ -174,7 +174,7 @@ if(imagem3){
           <button
             type="button"
             className="btn-voltar"
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
           >
             Voltar
           </button>
