@@ -9,12 +9,27 @@ function StoreDashboard() {
 
   useEffect(() => {
 
-    fetch(`http://localhost:3000/api/stores/${id}/dashboard`)
-      .then(res => res.json())
-      .then(data => setResumo(data))
-      .catch(err => console.log(err));
+  console.log("ID:", id);
 
-  }, [id]);
+  fetch(`http://localhost:3000/api/stores/${id}/dashboard`)
+    .then(async (res) => {
+
+      console.log("STATUS:", res.status);
+
+      const text = await res.text();
+      console.log("RAW RESPONSE:", text);
+
+      return JSON.parse(text);
+    })
+    .then(data => {
+      console.log("DADOS:", data);
+      setResumo(data);
+    })
+    .catch(err => {
+      console.log("ERRO REAL:", err);
+    });
+
+}, [id]);
 
   return (
     <div style={{ padding: 20 }}>

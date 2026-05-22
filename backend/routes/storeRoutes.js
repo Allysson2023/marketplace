@@ -149,4 +149,108 @@ router.put('/stores/:id', authMiddleware, (req, res) => {
 
 });
 
+// DASHBOARD DA LOJA
+router.get('/stores/:id/dashboard', (req, res) => {
+
+    const storeId = req.params.id;
+
+    console.log("ENTROU NO DASHBOARD:", storeId);
+
+    // FATURAMENTO HOJE
+    const sqlHoje = `
+        SELECT COALESCE(SUM(total), 0) AS total
+        FROM pedidos
+        WHERE loja_id = ?
+        AND DATE(created_at) = CURDATE()
+    `;
+
+    const sqlMes = `
+        SELECT COALESCE(SUM(total), 0) AS total
+        FROM pedidos
+        WHERE loja_id = ?
+        AND MONTH(created_at) = MONTH(CURDATE())
+        AND YEAR(created_at) = YEAR(CURDATE())
+    `;
+
+    const sqlAno = `
+        SELECT COALESCE(SUM(total), 0) AS total
+        FROM pedidos
+        WHERE loja_id = ?
+        AND YEAR(created_at) = YEAR(CURDATE())
+    `;
+
+    db.query(sqlHoje, [storeId], (err, hojeResult) => {
+
+        if(err){
+            return res.status(500).json(err);
+        }
+
+        db.query(sqlMes, [storeId], (err, mesResult) => {
+
+            if(err){
+                return res.status(500).json(err);
+            }
+
+            db.query(sqlAno, [storeId], (err, anoResult) => {
+
+                if(err){
+                    return res.status(500).json(err);
+                }
+
+                const sqlTopProdutos = `
+                    SELECT 
+                        p.id,
+                        p.nome,
+                        SUM(pi.quantidade) AS quantidade
+                    FROM pedido_itens pi
+                    JOIN products p
+                        ON p.id = pi.produto_id
+                    JOIN pedidos ped
+                        ON ped.id = pi.pedido_id
+                    WHERE ped.loja_id = ?
+                    GROUP BY p.id, p.nome
+                    ORDER BY quantidade DESC
+                    LIMIT 5
+                `;
+
+                db.query(sqlTopProdutos, [storeId], (err, topProdutos) => {
+
+                    if(err){
+                        return res.status(500).json(err);
+                    }
+
+                    const sqlEstoque = `
+                        SELECT id, nome, estoque
+                        FROM products
+                        WHERE store_id = ?
+                        AND estoque <= 5
+                    `;
+
+                    db.query(sqlEstoque, [storeId], (err, estoqueBaixo) => {
+
+                        if(err){
+                            return res.status(500).json(err);
+                        }
+
+                        res.json({
+                            faturamentoHoje: hojeResult[0].total,
+                            faturamentoMes: mesResult[0].total,
+                            faturamentoAno: anoResult[0].total,
+                            topProdutos,
+                            estoqueBaixo
+                        });
+
+                    });
+
+                });
+
+            });
+
+        });
+
+    });
+
+});
+
+
 module.exports = router;
