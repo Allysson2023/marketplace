@@ -150,7 +150,7 @@ function StoreDashboard() {
         className="meta-progress"
         style={{
           width: `${
-            (resumo.faturamentoMes / 10000) * 100
+            (resumo.faturamentoMes / 100000) * 100
           }%`
         }}
       />
@@ -158,7 +158,7 @@ function StoreDashboard() {
     </div>
 
     <p>
-      R$ {resumo.faturamentoMes} de R$ 10.000
+      R$ {resumo.faturamentoMes} de R$ 100.000.00
     </p>
 
   </div>
@@ -271,7 +271,9 @@ function StoreDashboard() {
 
       </div>
 
+
       {/* GRÁFICO VENDAS */}
+      <div className="charts-grid">
       <div className="section chart-section">
 
         <div className="section-header">
@@ -312,6 +314,7 @@ function StoreDashboard() {
 
         </div>
 
+      
       </div>
 
       {/* GRÁFICO PEDIDOS */}
@@ -355,6 +358,7 @@ function StoreDashboard() {
 
         </div>
 
+      </div>
       </div>
 
       {/* ÚLTIMO PEDIDO */}
