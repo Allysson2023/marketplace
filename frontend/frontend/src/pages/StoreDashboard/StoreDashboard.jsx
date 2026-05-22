@@ -135,8 +135,35 @@ function StoreDashboard() {
 
       </div>
 
+
       {/* CARDS */}
       <div className="cards">
+      <div className="section">
+
+  <h2>🎯 Meta do mês</h2>
+
+  <div className="meta-box">
+
+    <div className="meta-bar">
+
+      <div
+        className="meta-progress"
+        style={{
+          width: `${
+            (resumo.faturamentoMes / 10000) * 100
+          }%`
+        }}
+      />
+
+    </div>
+
+    <p>
+      R$ {resumo.faturamentoMes} de R$ 10.000
+    </p>
+
+  </div>
+
+</div>
 
         <div className="card">
   <h3>Hoje</h3>
@@ -178,6 +205,15 @@ function StoreDashboard() {
       }
     )}
   </p>
+</div>
+<div className="card">
+  <h3>Pedidos</h3>
+  <p>{resumo.totalPedidos}</p>
+</div>
+
+<div className="card">
+  <h3>Produtos</h3>
+  <p>{resumo.totalProdutos}</p>
 </div>
 
       </div>
@@ -320,6 +356,44 @@ function StoreDashboard() {
         </div>
 
       </div>
+
+      {/* ÚLTIMO PEDIDO */}
+<div className="section">
+
+  <h2>🛒 Último pedido</h2>
+
+  {!resumo.ultimoPedido ? (
+
+    <p>Nenhum pedido ainda.</p>
+
+  ) : (
+
+    <div className="ultimo-pedido-box">
+
+      <p>
+        <strong>ID:</strong> {resumo.ultimoPedido.id}
+      </p>
+
+      <p>
+        <strong>Total:</strong>{" "}
+        {Number(resumo.ultimoPedido.total).toLocaleString(
+          "pt-BR",
+          {
+            style: "currency",
+            currency: "BRL"
+          }
+        )}
+      </p>
+
+      <p>
+        <strong>Status:</strong> {resumo.ultimoPedido.status}
+      </p>
+
+    </div>
+
+  )}
+
+</div>
 
       {/* GRID */}
       <div className="dashboard-grid">

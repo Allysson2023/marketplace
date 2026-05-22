@@ -381,6 +381,15 @@ router.get('/stores/:id/dashboard', (req, res) => {
     WHERE loja_id = ?
   `;
 
+  // ÚLTIMO PEDIDO
+const sqlUltimoPedido = `
+  SELECT *
+  FROM pedidos
+  WHERE loja_id = ?
+  ORDER BY id DESC
+  LIMIT 1
+`;
+
   // EXECUTANDO CONSULTAS
   db.query(sqlPedidosPorDia, [storeId], (err, pedidosPorDia) => {
 
@@ -448,27 +457,42 @@ router.get('/stores/:id/dashboard', (req, res) => {
 
                   db.query(sqlTotalPedidos, [storeId], (err, totalPedidosResult) => {
 
-                    if (err) {
-                      console.log(err);
+  if (err) {
+    console.log(err);
 
-                      return res.status(500).json(err);
-                    }
+    return res.status(500).json(err);
+  }
 
-                    res.json({
-                      faturamentoHoje: hojeResult[0].total,
-                      faturamentoMes: mesResult[0].total,
-                      faturamentoAno: anoResult[0].total,
+  // ÚLTIMO PEDIDO
+  db.query(sqlUltimoPedido, [storeId], (err, ultimoPedidoResult) => {
 
-                      totalProdutos: totalProdutosResult[0].total,
-                      totalPedidos: totalPedidosResult[0].total,
+    if (err) {
+      console.log(err);
 
-                      topProdutos,
-                      estoqueBaixo,
-                      vendasPorDia,
-                      pedidosPorDia
-                    });
+      return res.status(500).json(err);
+    }
 
-                  });
+    res.json({
+
+      faturamentoHoje: hojeResult[0].total,
+      faturamentoMes: mesResult[0].total,
+      faturamentoAno: anoResult[0].total,
+
+      totalProdutos: totalProdutosResult[0].total,
+      totalPedidos: totalPedidosResult[0].total,
+
+      topProdutos,
+      estoqueBaixo,
+      vendasPorDia,
+      pedidosPorDia,
+
+      ultimoPedido: ultimoPedidoResult[0] || null
+
+    });
+
+  });
+
+});
 
                 });
 
