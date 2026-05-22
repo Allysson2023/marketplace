@@ -68,62 +68,91 @@ function StoreDashboard() {
   }
 
   return (
-    <div className="dashboard-container">
+  <div className="dashboard-container">
 
-      <h1 className="dashboard-title">📊 Dashboard da Loja</h1>
+    {/* HEADER */}
+    <div className="dashboard-header">
 
-      <div className="section">
+      <div>
+        <h1 className="dashboard-title">
+          📊 Dashboard da Loja
+        </h1>
 
+        <p className="dashboard-subtitle">
+          Visão geral das vendas e desempenho
+        </p>
+      </div>
+
+      <div className="dashboard-actions">
+
+        <button>➕ Novo Produto</button>
+        <button>📦 Produtos</button>
+        <button>🛒 Pedidos</button>
+
+      </div>
+
+    </div>
+
+    {/* CARDS */}
+    <div className="cards">
+
+      <div className="card">
+        <h3>Hoje</h3>
+        <p>R$ {resumo.faturamentoHoje}</p>
+      </div>
+
+      <div className="card">
+        <h3>Mês</h3>
+        <p>R$ {resumo.faturamentoMes}</p>
+      </div>
+
+      <div className="card">
+        <h3>Ano</h3>
+        <p>R$ {resumo.faturamentoAno}</p>
+      </div>
+
+    </div>
+
+    {/* GRÁFICO */}
+    <div className="section chart-section">
+
+      <div className="section-header">
         <h2>📈 Vendas dos últimos 7 dias</h2>
+      </div>
 
-        <div style={{ width: "50%", height: 300 }}>
+      <div className="chart-container">
 
-          <ResponsiveContainer>
+        <ResponsiveContainer width="100%" height={320}>
 
-            <LineChart
-              data={resumo.vendasPorDia || []}
-              margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
-            >
+          <LineChart
+            data={resumo.vendasPorDia || []}
+            margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+          >
 
-              <XAxis dataKey="data" />
-              <YAxis />
-              <Tooltip />
+            <XAxis dataKey="data" />
+            <YAxis />
+            <Tooltip />
 
-              <Line
-                type="monotone"
-                dataKey="total"
-                stroke="#4f46e5"
-                strokeWidth={3}
-                dot={{ r: 4 }}
-              />
+            <Line
+              type="monotone"
+              dataKey="total"
+              stroke="#4f46e5"
+              strokeWidth={3}
+              dot={{ r: 5 }}
+            />
 
-            </LineChart>
+          </LineChart>
 
-          </ResponsiveContainer>
-
-        </div>
+        </ResponsiveContainer>
 
       </div>
 
-      <div className="cards">
+    </div>
 
-        <div className="card">
-          <h3>Hoje</h3>
-          <p>R$ {resumo.faturamentoHoje}</p>
-        </div>
+    {/* GRID */}
+    <div className="dashboard-grid">
 
-        <div className="card">
-          <h3>Mês</h3>
-          <p>R$ {resumo.faturamentoMes}</p>
-        </div>
-
-        <div className="card">
-          <h3>Ano</h3>
-          <p>R$ {resumo.faturamentoAno}</p>
-        </div>
-
-      </div>
-
+      {/* TOP PRODUTOS */}
       <div className="section">
 
         <h2>🔥 Produtos mais vendidos</h2>
@@ -131,17 +160,26 @@ function StoreDashboard() {
         {resumo.topProdutos.length === 0 ? (
           <p>Nenhum produto vendido ainda.</p>
         ) : (
-          <ul>
+          <ul className="product-list">
+
             {resumo.topProdutos.map((p) => (
-              <li key={p.id}>
-                {p.nome} — <b>{p.quantidade}</b>
+
+              <li key={p.id} className="product-item">
+
+                <span>{p.nome}</span>
+
+                <b>{p.quantidade} vendas</b>
+
               </li>
+
             ))}
+
           </ul>
         )}
 
       </div>
 
+      {/* ESTOQUE */}
       <div className="section">
 
         <h2>⚠️ Estoque baixo</h2>
@@ -149,19 +187,29 @@ function StoreDashboard() {
         {resumo.estoqueBaixo.length === 0 ? (
           <p>Estoque OK 👍</p>
         ) : (
-          <ul>
+          <ul className="product-list">
+
             {resumo.estoqueBaixo.map((p) => (
-              <li key={p.id}>
-                {p.nome} — {p.estoque} unidades
+
+              <li key={p.id} className="product-item">
+
+                <span>{p.nome}</span>
+
+                <b>{p.estoque} un.</b>
+
               </li>
+
             ))}
+
           </ul>
         )}
 
       </div>
 
     </div>
-  );
+
+  </div>
+);
 }
 
 export default StoreDashboard;
