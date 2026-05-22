@@ -1,0 +1,27 @@
+.financeiro-container{
+  padding:20px;
+}
+
+.financeiro-container h1{
+  margin-bottom:15px;
+}
+
+.financeiro-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:15px;
+}
+
+.financeiro-item{
+  display:flex;
+  justify-content:space-between;
+  padding:15px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.financeiro-item strong{
+  color:#10b981;
+}

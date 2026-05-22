@@ -1,0 +1,23 @@
+.clientes-container{
+  padding:20px;
+}
+
+.clientes-container h1{
+  margin-bottom:15px;
+}
+
+.clientes-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:15px;
+}
+
+.cliente-item{
+  display:flex;
+  justify-content:space-between;
+  padding:15px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}

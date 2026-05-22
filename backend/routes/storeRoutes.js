@@ -512,4 +512,112 @@ const sqlUltimoPedido = `
 
 });
 
+router.get('/stores/:id/estoque', (req, res) => {
+
+  const storeId = req.params.id;
+
+  const sql = `
+    SELECT id, nome, estoque
+    FROM products
+    WHERE store_id = ?
+    ORDER BY estoque ASC
+  `;
+
+  db.query(sql, [storeId], (err, result) => {
+
+    if (err) {
+      return res.status(500).json(err);
+    }
+
+    res.json(result);
+
+  });
+
+});
+
+router.get('/stores/:id/mais-vendidos', (req, res) => {
+
+  const storeId = req.params.id;
+
+  const sql = `
+    SELECT 
+      p.id,
+      p.nome,
+      SUM(pi.quantidade) AS total_vendido
+    FROM pedido_itens pi
+    JOIN products p ON p.id = pi.produto_id
+    JOIN pedidos ped ON ped.id = pi.pedido_id
+    WHERE ped.loja_id = ?
+    GROUP BY p.id, p.nome
+    ORDER BY total_vendido DESC
+    LIMIT 10
+  `;
+
+  db.query(sql, [storeId], (err, result) => {
+
+    if (err) {
+      return res.status(500).json(err);
+    }
+
+    res.json(result);
+
+  });
+
+});
+
+router.get('/stores/:id/financeiro', (req, res) => {
+
+  const storeId = req.params.id;
+
+  const sql = `
+    SELECT 
+      DATE(created_at) as data,
+      SUM(total) as total
+    FROM pedidos
+    WHERE loja_id = ?
+    AND status = 'finalizado'
+    GROUP BY DATE(created_at)
+    ORDER BY data ASC
+  `;
+
+  db.query(sql, [storeId], (err, result) => {
+
+    if (err) {
+      return res.status(500).json(err);
+    }
+
+    res.json(result);
+
+  });
+
+});
+
+router.get('/stores/:id/clientes', (req, res) => {
+
+  const storeId = req.params.id;
+
+  const sql = `
+    SELECT 
+      u.id,
+      u.nome,
+      COUNT(p.id) as total_pedidos
+    FROM pedidos p
+    JOIN users u ON u.id = p.user_id
+    WHERE p.loja_id = ?
+    GROUP BY u.id, u.nome
+    ORDER BY total_pedidos DESC
+  `;
+
+  db.query(sql, [storeId], (err, result) => {
+
+    if (err) {
+      return res.status(500).json(err);
+    }
+
+    res.json(result);
+
+  });
+
+});
+
 module.exports = router;
