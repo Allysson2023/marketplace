@@ -162,6 +162,7 @@ router.get('/stores/:id/dashboard', (req, res) => {
         SUM(total) as total
     FROM pedidos
     WHERE loja_id = ?
+    AND status = 'finalizado'
     AND created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
     GROUP BY DATE(created_at)
     ORDER BY data ASC
@@ -172,6 +173,7 @@ router.get('/stores/:id/dashboard', (req, res) => {
         SELECT COALESCE(SUM(total), 0) AS total
         FROM pedidos
         WHERE loja_id = ?
+        AND status = 'finalizado'
         AND DATE(created_at) = CURDATE()
     `;
 
@@ -179,6 +181,7 @@ router.get('/stores/:id/dashboard', (req, res) => {
         SELECT COALESCE(SUM(total), 0) AS total
         FROM pedidos
         WHERE loja_id = ?
+        AND status = 'finalizado'
         AND MONTH(created_at) = MONTH(CURDATE())
         AND YEAR(created_at) = YEAR(CURDATE())
     `;
@@ -187,6 +190,7 @@ router.get('/stores/:id/dashboard', (req, res) => {
         SELECT COALESCE(SUM(total), 0) AS total
         FROM pedidos
         WHERE loja_id = ?
+        AND status = 'finalizado'
         AND YEAR(created_at) = YEAR(CURDATE())
     `;
 

@@ -9,14 +9,16 @@ import {
   Tooltip,
   ResponsiveContainer
 } from "recharts";
+import socket from "../../socket";
+
 function StoreDashboard() {
 
   const { id } = useParams();
   const [resumo, setResumo] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-
+  // 🔥 FUNÇÃO PRA BUSCAR DADOS
+  const carregarDashboard = () => {
     fetch(`http://localhost:3000/api/stores/${id}/dashboard`)
       .then(res => res.json())
       .then(data => {
@@ -27,6 +29,29 @@ function StoreDashboard() {
         console.log(err);
         setLoading(false);
       });
+  };
+
+  // 🔥 CARREGAMENTO INICIAL
+  useEffect(() => {
+    carregarDashboard();
+  }, [id]);
+
+  // 🔥 TEMPO REAL
+  useEffect(() => {
+
+    const handleUpdate = (data) => {
+
+      if (data.lojaId === Number(id)) {
+        carregarDashboard();
+      }
+
+    };
+
+    socket.on("dashboard_update", handleUpdate);
+
+    return () => {
+      socket.off("dashboard_update", handleUpdate);
+    };
 
   }, [id]);
 
@@ -49,33 +74,36 @@ function StoreDashboard() {
 
       <div className="section">
 
-  <h2>📈 Vendas dos últimos 7 dias</h2>
+        <h2>📈 Vendas dos últimos 7 dias</h2>
 
-  <div style={{ width: "50%", height: 300 }}>
+        <div style={{ width: "50%", height: 300 }}>
 
-    <ResponsiveContainer>
-      <LineChart data={resumo.vendasPorDia || []}>
+          <ResponsiveContainer>
 
-        <XAxis dataKey="data" 
-        tick={{ fontSize: 12 }}
-        />
-        <YAxis />
-        <Tooltip formatter={(value) => `R$ ${value}`} />
+            <LineChart
+              data={resumo.vendasPorDia || []}
+              margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+            >
 
-        <Line
-  type="monotone"
-  dataKey="total"
-  stroke="#4f46e5"
-  strokeWidth={3}
-  dot={{ r: 4 }}
-/>
+              <XAxis dataKey="data" />
+              <YAxis />
+              <Tooltip />
 
-      </LineChart>
-    </ResponsiveContainer>
+              <Line
+                type="monotone"
+                dataKey="total"
+                stroke="#4f46e5"
+                strokeWidth={3}
+                dot={{ r: 4 }}
+              />
 
-  </div>
+            </LineChart>
 
-</div>
+          </ResponsiveContainer>
+
+        </div>
+
+      </div>
 
       <div className="cards">
 

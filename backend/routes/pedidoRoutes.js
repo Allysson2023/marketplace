@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require("../config/db");
 const authMiddleware = require("../middlewares/authMiddleware");
 const { getIo } = require("../utils/socket");
+const socketUtil = require("../utils/socket");
 
 
 router.post("/pedidos", authMiddleware, (req, res) => {
@@ -272,15 +273,9 @@ router.put("/pedidos/:id/status", authMiddleware, (req, res) => {
                 return res.status(500).json(err2);
             }
 
-            if (result.length === 0) {
-                return res.status(404).json({
-                    message: "Pedido não encontrado"
-                });
-            }
+            const usuarioId = result[0]?.usuario_id;
 
-            const usuarioId = result[0].usuario_id;
-
-            // 🔥 SALVAR NOTIFICAÇÃO NO BANCO
+            // 🔥 SALVAR NOTIFICAÇÃO
             const sqlNotificacao = `
                 INSERT INTO notifications
                 (user_id, pedido_id, titulo, mensagem)
@@ -301,19 +296,35 @@ router.put("/pedidos/:id/status", authMiddleware, (req, res) => {
                         return res.status(500).json(err3);
                     }
 
-                    // 🔥 SOCKET (TEMPO REAL AQUI!)
-                   const io = getIo();
+                    // 🔥 SOCKET REALTIME
+                    const io = getIo();
 
-const mensagem = mensagemStatus[status] || "Atualização do pedido";
+                    io.to(`user_${usuarioId}`).emit("nova_notificacao", {
+                        pedido_id: pedidoId,
+                        mensagem: mensagemStatus[status],
+                        titulo: "Atualização do Pedido"
+                    });
 
-io.to(`user_${usuarioId}`).emit("nova_notificacao", {
-    pedido_id: pedidoId,
-    mensagem: mensagem,
-    titulo: "Atualização do Pedido"
-});
+                    // 🔥 AQUI O DASHBOARD UPDATE (SE FINALIZADO)
+                    if (status === "finalizado") {
+                        // precisa buscar loja_id primeiro
+                        const sqlLoja = `
+                            SELECT loja_id FROM pedidos WHERE id = ?
+                        `;
+
+                        db.query(sqlLoja, [pedidoId], (err4, r) => {
+
+                            if (!err4 && r.length > 0) {
+
+                                io.emit("dashboard_update", {
+                                    lojaId: r[0].loja_id
+                                });
+                            }
+                        });
+                    }
 
                     return res.json({
-                        message: "Status atualizado e notificação enviada!"
+                        message: "Status atualizado com sucesso!"
                     });
 
                 }
