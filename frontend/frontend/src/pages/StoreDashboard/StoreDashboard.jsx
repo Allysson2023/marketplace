@@ -117,6 +117,9 @@ function StoreDashboard() {
   return (
 
     <div className="dashboard-container">
+      <button className="btn-voltar" onClick={() => navigate(-1)}>
+          ⬅ Voltar
+        </button>
 
       {/* HEADER */}
       <div className="dashboard-header">
