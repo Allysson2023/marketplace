@@ -149,7 +149,25 @@ useEffect(() => {
       <button className="btn-voltar" onClick={() => navigate(-1)}>
           ⬅ Voltar
         </button>
-<div className="section">
+
+      {/* HEADER */}
+      <div className="dashboard-header">
+
+        <div>
+
+          <h1 className="dashboard-title">
+            📊 Dashboard da Loja
+          </h1>
+
+          <p className="dashboard-subtitle">
+            Visão geral das vendas e desempenho
+          </p>
+
+        </div>
+
+      </div>
+
+<div className="section activity-section">
 
   <h2>🔴 Atividade em Tempo Real</h2>
 
@@ -176,22 +194,8 @@ useEffect(() => {
   </div>
 
 </div>
-      {/* HEADER */}
-      <div className="dashboard-header">
 
-        <div>
 
-          <h1 className="dashboard-title">
-            📊 Dashboard da Loja
-          </h1>
-
-          <p className="dashboard-subtitle">
-            Visão geral das vendas e desempenho
-          </p>
-
-        </div>
-
-      </div>
 
 
       {/* CARDS */}
@@ -360,6 +364,44 @@ useEffect(() => {
 
       </div>
 
+      {/* ÚLTIMO PEDIDO */}
+<div className="section">
+
+  <h2>🛒 Último pedido</h2>
+
+  {!resumo.ultimoPedido ? (
+
+    <p>Nenhum pedido ainda.</p>
+
+  ) : (
+
+    <div className="ultimo-pedido-box">
+
+      <p>
+        <strong>ID:</strong> {resumo.ultimoPedido.id}
+      </p>
+
+      <p>
+        <strong>Total:</strong>{" "}
+        {Number(resumo.ultimoPedido.total).toLocaleString(
+          "pt-BR",
+          {
+            style: "currency",
+            currency: "BRL"
+          }
+        )}
+      </p>
+
+      <p>
+        <strong>Status:</strong> {resumo.ultimoPedido.status}
+      </p>
+
+    </div>
+
+  )}
+
+</div>
+
 
       {/* GRÁFICO VENDAS */}
       <div className="charts-grid">
@@ -450,43 +492,7 @@ useEffect(() => {
       </div>
       </div>
 
-      {/* ÚLTIMO PEDIDO */}
-<div className="section">
-
-  <h2>🛒 Último pedido</h2>
-
-  {!resumo.ultimoPedido ? (
-
-    <p>Nenhum pedido ainda.</p>
-
-  ) : (
-
-    <div className="ultimo-pedido-box">
-
-      <p>
-        <strong>ID:</strong> {resumo.ultimoPedido.id}
-      </p>
-
-      <p>
-        <strong>Total:</strong>{" "}
-        {Number(resumo.ultimoPedido.total).toLocaleString(
-          "pt-BR",
-          {
-            style: "currency",
-            currency: "BRL"
-          }
-        )}
-      </p>
-
-      <p>
-        <strong>Status:</strong> {resumo.ultimoPedido.status}
-      </p>
-
-    </div>
-
-  )}
-
-</div>
+      
 
       
 
