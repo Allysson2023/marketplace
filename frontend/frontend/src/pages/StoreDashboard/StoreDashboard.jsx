@@ -21,11 +21,12 @@ function StoreDashboard() {
   const [resumo, setResumo] = useState(null);
   const [pedidosPorDia, setPedidosPorDia] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [atividades, setAtividades] = useState([]);
   // =========================
   // 📦 CARREGAR DASHBOARD
   // =========================
   const carregarDashboard = async () => {
+    
 
     try {
 
@@ -55,7 +56,7 @@ function StoreDashboard() {
   // 🚀 LOAD INICIAL
   // =========================
   useEffect(() => {
-
+    
     carregarDashboard();
 
   }, [id]);
@@ -64,26 +65,54 @@ function StoreDashboard() {
   // 🔥 SOCKET TEMPO REAL
   // =========================
   useEffect(() => {
+    socket.emit("join_loja", id);
 
-    const handleUpdate = (data) => {
+  const handleUpdate = (data) => {
 
-      if (data.lojaId === Number(id)) {
+    if (data.lojaId === Number(id)) {
 
-        carregarDashboard();
+      carregarDashboard();
 
-      }
+    }
 
-    };
+  };
 
-    socket.on("dashboard_update", handleUpdate);
+  socket.on("dashboard_update", handleUpdate);
 
-    return () => {
+  return () => {
 
-      socket.off("dashboard_update", handleUpdate);
+    socket.off("dashboard_update", handleUpdate);
 
-    };
+  };
 
-  }, [id]);
+}, [id]);
+
+useEffect(() => {
+
+  const handleNovaAtividade = (atividade) => {
+
+    setAtividades(prev => [
+      atividade,
+      ...prev
+    ]);
+
+  };
+
+  socket.on(
+    "nova_atividade",
+    handleNovaAtividade
+  );
+
+  return () => {
+
+    socket.off(
+      "nova_atividade",
+      handleNovaAtividade
+    );
+
+  };
+
+}, []);
 
   // =========================
   // ⏳ LOADING
@@ -120,7 +149,33 @@ function StoreDashboard() {
       <button className="btn-voltar" onClick={() => navigate(-1)}>
           ⬅ Voltar
         </button>
+<div className="section">
 
+  <h2>🔴 Atividade em Tempo Real</h2>
+
+  <div className="activity-feed">
+
+    {atividades.map((item, index) => (
+
+      <div className="activity-item" key={index}>
+
+        <div>
+          <strong>{item.titulo}</strong>
+
+          <p>{item.descricao}</p>
+        </div>
+
+        <span>
+          {item.tempo}
+        </span>
+
+      </div>
+
+    ))}
+
+  </div>
+
+</div>
       {/* HEADER */}
       <div className="dashboard-header">
 

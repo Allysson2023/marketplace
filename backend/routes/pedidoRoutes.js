@@ -3,8 +3,6 @@ const router = express.Router();
 const db = require("../config/db");
 const authMiddleware = require("../middlewares/authMiddleware");
 const { getIo } = require("../utils/socket");
-const socketUtil = require("../utils/socket");
-
 
 router.post("/pedidos", authMiddleware, (req, res) => {
 
@@ -22,11 +20,11 @@ router.post("/pedidos", authMiddleware, (req, res) => {
 
     let dados = dadosEntrega;
 
-if (typeof dados === "string") {
-    dados = JSON.parse(dados);
-}
+    if (typeof dados === "string") {
+        dados = JSON.parse(dados);
+    }
 
-dados = dados || {};
+    dados = dados || {};
 
     const sqlPedido = `
         INSERT INTO pedidos
@@ -42,7 +40,6 @@ dados = dados || {};
             loja_id,
             total,
             status,
-
             tipoPedido,
             dados.nome || null,
             dados.endereco || null,
@@ -78,24 +75,30 @@ dados = dados || {};
                     return res.status(500).json(err2);
                 }
 
-                res.json({
+                // =========================
+                // 🔥 SOCKET (TEMPO REAL)
+                // =========================
+                const io = getIo();
+
+                io.to(`loja_${loja_id}`).emit("nova_atividade", {
+                    titulo: "🛒 Novo pedido",
+                    descricao: `Pedido #${pedido_id} recebido`,
+                    tempo: "Agora"
+                });
+
+                io.to(`loja_${loja_id}`).emit("dashboard_update", {
+                    lojaId: loja_id
+                });
+
+                return res.json({
                     message: "Pedido criado com sucesso",
                     pedidoId: pedido_id
                 });
-                const io = getIo();
-
-io.to(`loja_${loja_id}`).emit("novo_pedido", {
-    pedido_id,
-    usuario_id,
-    total,
-    status: "AGUARDANDO_CONFIRMACAO"
-});
 
             });
 
         }
     );
-
 });
 
 
