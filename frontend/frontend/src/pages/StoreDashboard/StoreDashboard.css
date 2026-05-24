@@ -310,6 +310,11 @@
   white-space: nowrap;
 }
 
+
+
+
+
+
 /* RESPONSIVO */
 @media (max-width: 900px) {
   .charts-grid{

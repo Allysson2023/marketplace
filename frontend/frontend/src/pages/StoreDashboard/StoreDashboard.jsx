@@ -8,7 +8,10 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  CartesianGrid
 } from "recharts";
 
 import socket from "../../socket";
@@ -139,10 +142,7 @@ useEffect(() => {
     );
 
   }
-
-  // =========================
-  // 📊 UI
-  // =========================
+console.log(resumo);
   return (
 
     <div className="dashboard-container">
@@ -360,9 +360,57 @@ useEffect(() => {
 
       </div>
 
+      
+
 
       {/* GRÁFICO VENDAS */}
       <div className="charts-grid">
+      
+      {/* PRODUTOS MAIS VENDIDOS */}
+<div className="section chart-section">
+
+  <div className="section-header">
+    <h2>🔥 Produtos Mais Vendidos</h2>
+  </div>
+
+  <div className="chart-container">
+
+    <ResponsiveContainer width="100%" height={220}>
+
+      <BarChart
+        data={resumo.topProdutos || []}
+        margin={{
+          top: 10,
+          right: 20,
+          left: 0,
+          bottom: 0
+        }}
+      >
+
+        <CartesianGrid strokeDasharray="3 3" />
+
+        <XAxis dataKey="nome" />
+
+        <YAxis />
+
+        <Tooltip />
+
+        <Bar
+          dataKey="quantidade"
+          fill="#00ff40"
+          radius={[10, 10, 0, 0]}
+        />
+
+      </BarChart>
+
+    </ResponsiveContainer>
+
+  </div>
+
+</div>
+
+
+
       <div className="section chart-section">
 
         <div className="section-header">
