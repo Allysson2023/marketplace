@@ -375,7 +375,7 @@ console.log(resumo);
 
   <div className="chart-container">
 
-    <ResponsiveContainer width="100%" height={220}>
+    <ResponsiveContainer width="100%" height={300}>
 
       <BarChart
         data={resumo.topProdutos || []}
@@ -410,6 +410,50 @@ console.log(resumo);
 </div>
 
 
+{/* PRODUTOS MENOS VENDIDOS */}
+<div className="section chart-section">
+
+  <div className="section-header">
+    <h2>⚠️ Produtos Menos Vendidos</h2>
+  </div>
+
+  <div className="chart-container">
+
+    <ResponsiveContainer width="100%" height={300}>
+
+      <BarChart
+        data={resumo.menosVendidos || []}
+        margin={{
+          top: 10,
+          right: 20,
+          left: 0,
+          bottom: 0
+        }}
+      >
+
+        <CartesianGrid strokeDasharray="3 3" />
+
+        <XAxis dataKey="nome" />
+
+        <YAxis />
+
+        <Tooltip />
+
+        <Bar
+          dataKey="quantidade"
+          fill="#ff0000"
+          radius={[10, 10, 0, 0]}
+        />
+
+      </BarChart>
+
+    </ResponsiveContainer>
+
+  </div>
+
+</div>
+
+
 
       <div className="section chart-section">
 
@@ -419,7 +463,7 @@ console.log(resumo);
 
         <div className="chart-container">
 
-          <ResponsiveContainer width="100%" height={220}>
+          <ResponsiveContainer width="100%" height={300}>
 
             <LineChart
               data={resumo.vendasPorDia || []}
@@ -463,7 +507,7 @@ console.log(resumo);
 
         <div className="chart-container">
 
-          <ResponsiveContainer width="100%" height={220}>
+          <ResponsiveContainer width="100%" height={300}>
 
             <LineChart
               data={pedidosPorDia}

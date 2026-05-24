@@ -356,6 +356,32 @@ router.get('/stores/:id/dashboard', (req, res) => {
     LIMIT 5
   `;
 
+
+  const sqlMenosVendidos = `
+  SELECT
+    p.id,
+    p.nome,
+    SUM(pi.quantidade) AS quantidade
+  FROM pedido_itens pi
+
+  JOIN products p
+    ON p.id = pi.produto_id
+
+  JOIN pedidos ped
+    ON ped.id = pi.pedido_id
+
+  WHERE ped.loja_id = ?
+
+  GROUP BY p.id, p.nome
+
+  ORDER BY quantidade ASC
+
+  LIMIT 5
+`;
+
+
+
+
   // ESTOQUE BAIXO
   const sqlEstoque = `
     SELECT
@@ -439,6 +465,13 @@ const sqlUltimoPedido = `
                 return res.status(500).json(err);
               }
 
+              db.query(sqlMenosVendidos, [storeId], (err, menosVendidos) => {
+                if (err) {
+                console.log(err);
+
+                return res.status(500).json(err);
+              }
+
               db.query(sqlEstoque, [storeId], (err, estoqueBaixo) => {
 
                 if (err) {
@@ -482,6 +515,7 @@ const sqlUltimoPedido = `
       totalPedidos: totalPedidosResult[0].total,
 
       topProdutos,
+      menosVendidos,
       estoqueBaixo,
       vendasPorDia,
       pedidosPorDia,
@@ -490,6 +524,7 @@ const sqlUltimoPedido = `
 
     });
 
+  });
   });
 
 });
