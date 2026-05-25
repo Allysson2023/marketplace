@@ -100,3 +100,39 @@
 .btn-voltar:hover {
   background: #3730a3;
 }
+
+.status-badge {
+  display: inline-block;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f3f4f6;
+}
+
+/* cores por status */
+.status-badge.aceito {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.status-badge.separacao {
+  background: #fef3c7;
+  color: #f59e0b;
+}
+
+.status-badge.rota {
+  background: #ede9fe;
+  color: #8b5cf6;
+}
+
+.status-badge.finalizado {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.status-badge.recusado {
+  background: #fee2e2;
+  color: #ef4444;
+}

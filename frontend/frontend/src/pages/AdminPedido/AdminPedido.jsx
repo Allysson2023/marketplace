@@ -66,6 +66,16 @@ function AdminPedido() {
 
     const isFinal = status === "finalizado" || status === "cancelado" || status === "recusado";
 
+    const nomesStatus = {
+    pendente: "⏳ Pendente",
+    aceito: "✅ Pedido Aceito",
+    separacao: "📦 Em Separação",
+    rota: "🛵 Em Rota",
+    finalizado: "✔️ Finalizado",
+    recusado: "❌ Recusado",
+    cancelado: "🚫 Cancelado"
+};
+
     return (
 
         <div className="admin-pedido">
@@ -80,8 +90,8 @@ function AdminPedido() {
                     <h1>Pedido #{pedido.id}</h1>
 
                     <span className={`status ${status}`}>
-                        {status}
-                    </span>
+    {nomesStatus[status] || status}
+</span>
                 </div>
 
             </div>
@@ -184,17 +194,22 @@ function AdminPedido() {
                 </button>
 
                 <button
-                    className="btn-status cancelar"
-                    onClick={() => atualizarStatus("cancelado")}
-                    disabled={isFinal}
-                >
-                    Cancelar
-                </button>
+    className="btn-status cancelar"
+    onClick={() => atualizarStatus("cancelado")}
+    disabled={status === "finalizado" || status === "cancelado"}
+>
+    Cancelar
+</button>
 
             </div>
 
             <div className="footer-admin">
-                <h2>Total: R$ {pedido.total}</h2>
+                <h2>
+    Total: {Number(pedido.total).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    })}
+</h2>
             </div>
 
         </div>

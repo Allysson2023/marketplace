@@ -99,9 +99,11 @@ function MeusPedidos() {
       </span>
     </div>
 
-    <p className={`status ${pedido.status}`}>
-      {nomesStatus[pedido.status] || pedido.status}
-    </p>
+
+
+    <span className={`status-badge ${pedido.status}`}>
+  {nomesStatus[pedido.status] || pedido.status}
+</span>
 
     {/* 📅 DATA DO PEDIDO */}
     <p className="data-pedido">
