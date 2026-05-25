@@ -89,6 +89,18 @@ function Home() {
     }
   }, []);
 
+  useEffect(() => {
+
+  const interval = setInterval(() => {
+    window.location.reload();
+  }, 30000);
+
+  return () => clearInterval(interval);
+
+}, []);
+
+
+
 useEffect(() => {
   fetch("http://localhost:3000/api/categories")
     .then(res => res.json())
@@ -339,7 +351,7 @@ useEffect(() => {
 </div>
 
       {/* PRODUTOS */}
-      <h2 className="centraliza-titulo" >Produtos</h2>
+      <h2 className="centraliza-titulo"> Produtos </h2>
 
       <div className="produto-grid">
         {produtos.map((produto) => (
