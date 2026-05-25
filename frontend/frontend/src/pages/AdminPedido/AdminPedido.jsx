@@ -90,12 +90,11 @@ function AdminPedido() {
 
                 <div className="card-admin">
                     <h2>Cliente</h2>
-
-                    <p><strong>Nome:</strong> {pedido.username}</p>
+                    
+                    <p><strong>Nome:</strong> {pedido.nome_cliente}</p>
 
                     {pedido.dadosEntrega && (
                         <>
-                            <p><strong>Telefone:</strong> {pedido.dadosEntrega.telefone}</p>
                             <p><strong>Pagamento:</strong> {pedido.dadosEntrega.pagamento}</p>
                         </>
                     )}
