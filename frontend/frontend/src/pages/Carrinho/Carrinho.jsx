@@ -11,7 +11,8 @@ function Carrinho() {
   const token = localStorage.getItem("token");
 
   const [modalAberto, setModalAberto] = useState(false);
-const [tipoPedido, setTipoPedido] = useState("entrega");
+  const [tipoPedido, setTipoPedido] = useState("entrega");
+  const [modalSucesso, setModalSucesso] = useState(false);
 
 const [form, setForm] = useState({
   nome: "",
@@ -22,6 +23,13 @@ const [form, setForm] = useState({
   cpf: "",
   observacao: ""
 });
+
+const isEntregaValida =
+  form.nome.trim() !== "" &&
+  form.endereco.trim() !== "" &&
+  form.numero.trim() !== "" &&
+  form.bairro.trim() !== "" &&
+  form.pagamento.trim() !== "";
 
   useEffect(() => {
 
@@ -152,7 +160,18 @@ const possuiProdutoIndisponivel = carrinho.some(
 
 
 async function finalizarCompra() {
-  console.log("ITEM CARRINHO:", carrinho[0]);
+  // 🔒 validação de segurança (backend-level check no frontend também)
+  if (tipoPedido === "entrega" && !isEntregaValida) {
+    alert("Preencha todos os campos obrigatórios antes de continuar.");
+    return;
+  }
+
+  if (tipoPedido === "retirada") {
+    if (!form.nome.trim() || !form.cpf.trim()) {
+      alert("Preencha nome e CPF");
+      return;
+    }
+  }
 
   // 🚨 Carrinho vazio
   if (carrinho.length === 0) {
@@ -222,10 +241,9 @@ async function finalizarCompra() {
     });
 
     // ✅ Mensagem sucesso
-    alert("Pedido realizado com sucesso!");
+    setModalSucesso(true);
 
-    // ✅ Vai para pedidos
-    navigate("/meus-pedidos");
+    
 
   } catch (error) {
 
@@ -480,14 +498,38 @@ className="btn-mais"
           Cancelar
         </button>
 
-        <button onClick={finalizarCompra}>
-          Confirmar Pedido
-        </button>
+        <button
+  onClick={finalizarCompra}
+  disabled={tipoPedido === "entrega" && !isEntregaValida}
+>
+  Confirmar Pedido
+</button>
 
       </div>
 
     </div>
 
+  </div>
+)}
+
+{modalSucesso && (
+  <div className="modal-overlay">
+    <div className="modal-sucesso">
+
+      <h2>🎉 Pedido enviado com sucesso!</h2>
+
+      <p>Seu pedido foi registrado com sucesso.</p>
+
+      <button
+        onClick={() => {
+          setModalSucesso(false);
+          navigate("/meus-pedidos");
+        }}
+      >
+        Ver meus pedidos
+      </button>
+
+    </div>
   </div>
 )}
 
