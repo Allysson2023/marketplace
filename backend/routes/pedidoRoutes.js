@@ -81,11 +81,14 @@ router.post("/pedidos", authMiddleware, (req, res) => {
                 // =========================
                 const io = getIo();
 
-                io.to(`loja_${loja_id}`).emit("nova_atividade", {
-                    titulo: "🛒 Novo pedido",
-                    descricao: `Pedido #${pedido_id} recebido`,
-                    tempo: "Agora"
-                });
+                io.to(`loja_${loja_id}`).emit("novo_pedido", {
+    id: pedido_id,
+    loja_id,
+    usuario_id,
+    total,
+    status: "AGUARDANDO_CONFIRMACAO",
+    tipo_pedido: tipoPedido
+});
 
                 io.to(`loja_${loja_id}`).emit("dashboard_update", {
                     lojaId: loja_id

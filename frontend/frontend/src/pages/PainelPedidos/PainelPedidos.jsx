@@ -119,7 +119,7 @@ audioRef.current.volume = 1;
         borderRadius: 8,
         cursor: "pointer"
     }}
->
+> 
     💬 Conversas
 </button>
 
