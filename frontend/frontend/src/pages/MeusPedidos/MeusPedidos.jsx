@@ -82,23 +82,52 @@ function MeusPedidos() {
 
                     {pedidos.map(pedido => (
 
-                        <div
-                            key={pedido.id}
-                            className="card-pedido"
-                            onClick={() => navigate(`/pedido/${pedido.id}`)}
-                        >
+  <div
+    key={pedido.id}
+    className="card-pedido"
+    onClick={() => navigate(`/pedido/${pedido.id}`)}
+  >
 
-                            <h3>Pedido #{pedido.id}</h3>
+    <div className="pedido-header">
+      <h3>Pedido #{pedido.id}</h3>
 
-                            <p className={`status ${pedido.status}`}>
-                                {nomesStatus[pedido.status] || pedido.status}
-                            </p>
+      <span className="pedido-total">
+        R$ {Number(pedido.total).toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL"
+        })}
+      </span>
+    </div>
 
-                            <span>R$ {pedido.total}</span>
+    <p className={`status ${pedido.status}`}>
+      {nomesStatus[pedido.status] || pedido.status}
+    </p>
 
-                        </div>
+    {/* 📅 DATA DO PEDIDO */}
+    <p className="data-pedido">
+      📅 Criado em:{" "}
+      {new Date(pedido.created_at).toLocaleDateString("pt-BR")}
+    </p>
 
-                    ))}
+    <p className="data-pedido">
+      ⏰ Hora:{" "}
+      {new Date(pedido.created_at).toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit"
+      })}
+    </p>
+
+    {/* 🔄 ÚLTIMA ATUALIZAÇÃO */}
+    {pedido.updated_at && (
+      <p className="data-pedido">
+        🔄 Atualizado em:{" "}
+        {new Date(pedido.updated_at).toLocaleString("pt-BR")}
+      </p>
+    )}
+
+  </div>
+
+))}
 
                 </div>
 
