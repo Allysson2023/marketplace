@@ -82,6 +82,18 @@ function ProdutoDetalhe(){
 
 }, [id]);
 
+
+useEffect(() => {
+
+  const interval = setInterval(() => {
+    window.location.reload();
+  }, 60000);
+
+  return () => clearInterval(interval);
+
+}, []);
+
+
     if(!produto){
         return <p>Carregando...</p>;
     }

@@ -130,6 +130,19 @@ useEffect(() => {
 
 }, []);
 
+useEffect(() => {
+
+  const interval = setInterval(() => {
+    window.location.reload();
+  }, 60000);
+
+  return () => clearInterval(interval);
+
+}, []);
+
+
+
+
   // =========================
   // ⏳ LOADING
   // =========================
@@ -155,7 +168,10 @@ useEffect(() => {
     );
 
   }
-console.log(resumo);
+
+  
+
+
   return (
 
     <div className="dashboard-container">

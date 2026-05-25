@@ -50,6 +50,18 @@ function Store() {
             });
     }, [id, pagina]);
 
+    useEffect(() => {
+
+  const interval = setInterval(() => {
+    window.location.reload();
+  }, 60000);
+
+  return () => clearInterval(interval);
+
+}, []);
+
+
+
     // =========================
     // CARREGAR LOJA
     // =========================
