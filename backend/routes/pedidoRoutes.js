@@ -256,92 +256,152 @@ router.put("/pedidos/:id/status", authMiddleware, (req, res) => {
         recusado: "Seu pedido foi recusado ❌"
     };
 
-    const sql = `
+    const sqlUpdatePedido = `
         UPDATE pedidos
         SET status = ?
         WHERE id = ?
     `;
 
-    db.query(sql, [status, pedidoId], (err) => {
+    db.query(sqlUpdatePedido, [status, pedidoId], (err) => {
 
         if (err) {
             return res.status(500).json(err);
         }
 
-        // 🔥 BUSCAR DONO DO PEDIDO
-        const sqlBuscarPedido = `
-            SELECT usuario_id
-            FROM pedidos
-            WHERE id = ?
-        `;
+        // =========================
+        // 🔥 ESTOQUE SÓ SE FINALIZAR
+        // =========================
+        if (status === "finalizado") {
 
-        db.query(sqlBuscarPedido, [pedidoId], (err2, result) => {
-
-            if (err2) {
-                return res.status(500).json(err2);
-            }
-
-            const usuarioId = result[0]?.usuario_id;
-
-            // 🔥 SALVAR NOTIFICAÇÃO
-            const sqlNotificacao = `
-                INSERT INTO notifications
-                (user_id, pedido_id, titulo, mensagem)
-                VALUES (?, ?, ?, ?)
+            const sqlItens = `
+                SELECT produto_id, quantidade
+                FROM pedido_itens
+                WHERE pedido_id = ?
             `;
 
-            db.query(
-                sqlNotificacao,
-                [
+            db.query(sqlItens, [pedidoId], (errItens, itens) => {
+
+                if (errItens) {
+                    return res.status(500).json(errItens);
+                }
+
+                let faltando = false;
+                let checkCount = 0;
+
+                if (itens.length === 0) {
+                    return finalizarPedido();
+                }
+
+                itens.forEach((item) => {
+
+                    const sqlCheck = `
+                        SELECT estoque
+                        FROM products
+                        WHERE id = ?
+                    `;
+
+                    db.query(sqlCheck, [item.produto_id], (errCheck, result) => {
+
+                        if (errCheck) {
+                            faltando = true;
+                        }
+
+                        const estoque = result?.[0]?.estoque || 0;
+
+                        if (estoque < item.quantidade) {
+                            faltando = true;
+                        }
+
+                        checkCount++;
+
+                        if (checkCount === itens.length) {
+
+                            // ❌ NÃO TEM ESTOQUE
+                            if (faltando) {
+                                return res.status(400).json({
+                                    message: "Estoque insuficiente para finalizar pedido"
+                                });
+                            }
+
+                            // ✅ BAIXAR ESTOQUE
+                            itens.forEach((item) => {
+
+                                const sqlUpdate = `
+                                    UPDATE products
+                                    SET estoque = estoque - ?
+                                    WHERE id = ?
+                                `;
+
+                                db.query(sqlUpdate, [
+                                    item.quantidade,
+                                    item.produto_id
+                                ]);
+                            });
+
+                            finalizarPedido();
+                        }
+                    });
+                });
+            });
+
+        } else {
+            finalizarPedido();
+        }
+
+        // =========================
+        // 🔥 FUNÇÃO FINAL (NOTIFICAÇÃO + SOCKET)
+        // =========================
+        function finalizarPedido() {
+
+            const sqlUser = `
+                SELECT usuario_id, loja_id
+                FROM pedidos
+                WHERE id = ?
+            `;
+
+            db.query(sqlUser, [pedidoId], (err2, result) => {
+
+                if (err2 || !result.length) {
+                    return res.status(500).json(err2 || { message: "Pedido não encontrado" });
+                }
+
+                const usuarioId = result[0].usuario_id;
+                const lojaId = result[0].loja_id;
+
+                const sqlNotificacao = `
+                    INSERT INTO notifications
+                    (user_id, pedido_id, titulo, mensagem)
+                    VALUES (?, ?, ?, ?)
+                `;
+
+                db.query(sqlNotificacao, [
                     usuarioId,
                     pedidoId,
                     "Atualização do Pedido",
                     mensagemStatus[status]
-                ],
-                (err3) => {
+                ]);
 
-                    if (err3) {
-                        return res.status(500).json(err3);
-                    }
+                const io = getIo();
 
-                    // 🔥 SOCKET REALTIME
-                    const io = getIo();
+                io.to(`user_${usuarioId}`).emit("nova_notificacao", {
+                    pedido_id: pedidoId,
+                    mensagem: mensagemStatus[status],
+                    titulo: "Atualização do Pedido"
+                });
 
-                    io.to(`user_${usuarioId}`).emit("nova_notificacao", {
-                        pedido_id: pedidoId,
-                        mensagem: mensagemStatus[status],
-                        titulo: "Atualização do Pedido"
+                if (status === "finalizado") {
+                    io.emit("dashboard_update", {
+                        lojaId
                     });
-
-                    // 🔥 AQUI O DASHBOARD UPDATE (SE FINALIZADO)
-                    if (status === "finalizado") {
-                        // precisa buscar loja_id primeiro
-                        const sqlLoja = `
-                            SELECT loja_id FROM pedidos WHERE id = ?
-                        `;
-
-                        db.query(sqlLoja, [pedidoId], (err4, r) => {
-
-                            if (!err4 && r.length > 0) {
-
-                                io.emit("dashboard_update", {
-                                    lojaId: r[0].loja_id
-                                });
-                            }
-                        });
-                    }
-
-                    return res.json({
-                        message: "Status atualizado com sucesso!"
-                    });
-
                 }
-            );
 
-        });
+                return res.json({
+                    message: "Status atualizado com sucesso!"
+                });
+            });
+        }
 
     });
-
 });
 
 module.exports = router;
