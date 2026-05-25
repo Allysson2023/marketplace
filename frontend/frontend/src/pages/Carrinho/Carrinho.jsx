@@ -19,7 +19,8 @@ const [form, setForm] = useState({
   numero: "",
   bairro: "",
   pagamento: "",
-  cpf: ""
+  cpf: "",
+  observacao: ""
 });
 
   useEffect(() => {
@@ -432,6 +433,17 @@ className="btn-mais"
   <option value="dinheiro">Dinheiro</option>
   <option value="cartao">Cartão</option>
 </select>
+
+<textarea
+  value={form.observacao}
+  placeholder="Observação do pedido (opcional)"
+  onChange={(e) =>
+    setForm({
+      ...form,
+      observacao: e.target.value
+    })
+  }
+/>
         </>
       )}
 
@@ -449,6 +461,16 @@ className="btn-mais"
             placeholder="CPF (confirmação)"
             onChange={(e) => setForm({...form, cpf: e.target.value})}
           />
+          <textarea
+  value={form.observacao}
+  placeholder="Observação do pedido (opcional)"
+  onChange={(e) =>
+    setForm({
+      ...form,
+      observacao: e.target.value
+    })
+  }
+/>
         </>
       )}
 

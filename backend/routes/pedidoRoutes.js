@@ -27,11 +27,11 @@ router.post("/pedidos", authMiddleware, (req, res) => {
     dados = dados || {};
 
     const sqlPedido = `
-        INSERT INTO pedidos
-        (usuario_id, loja_id, total, status,
-         tipo_pedido, nome_cliente, endereco, numero, bairro, pagamento, cpf)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+    INSERT INTO pedidos
+    (usuario_id, loja_id, total, status,
+     tipo_pedido, nome_cliente, endereco, numero, bairro, pagamento, cpf, observacao)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`;
 
     db.query(
         sqlPedido,
@@ -46,7 +46,8 @@ router.post("/pedidos", authMiddleware, (req, res) => {
             dados.numero || null,
             dados.bairro || null,
             dados.pagamento || null,
-            dados.cpf || null
+            dados.cpf || null,
+    dados.observacao || null
         ],
         (err, result) => {
 
@@ -143,7 +144,8 @@ const p = pedidoResult[0];
                     numero: p.numero,
                     bairro: p.bairro,
                     pagamento: p.pagamento,
-                    cpf: p.cpf
+                    cpf: p.cpf,
+                    observacao: p.observacao
                 }
             };
 
