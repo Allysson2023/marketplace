@@ -68,36 +68,52 @@ function StoreDashboard() {
   // 🔥 SOCKET TEMPO REAL
   // =========================
   useEffect(() => {
-    socket.emit("join_loja", id);
 
-  const handleUpdate = (data) => {
+  socket.emit("join_loja", id);
+
+  // 🔥 Atualiza dashboard em tempo real
+  const handleUpdate = async (data) => {
 
     if (data.lojaId === Number(id)) {
 
-      setPedidosPorDia(data.pedidosPorDia || []);
+      await carregarDashboard();
 
     }
 
   };
 
-  socket.on("pedido_finalizado", (data) => {
+  // 🔥 Pedido finalizado
+  const handlePedidoFinalizado = async (data) => {
 
-  if (data.lojaId === Number(id)) {
+    if (data.lojaId === Number(id)) {
 
-    // 🔥 atualiza tudo
-    carregarDashboard();
+      await carregarDashboard();
 
-  }
+    }
 
-});
+  };
 
-  
+  socket.on(
+    "dashboard_update",
+    handleUpdate
+  );
 
-  socket.on("dashboard_update", handleUpdate);
+  socket.on(
+    "pedido_finalizado",
+    handlePedidoFinalizado
+  );
 
   return () => {
 
-    socket.off("dashboard_update", handleUpdate);
+    socket.off(
+      "dashboard_update",
+      handleUpdate
+    );
+
+    socket.off(
+      "pedido_finalizado",
+      handlePedidoFinalizado
+    );
 
   };
 
@@ -134,7 +150,7 @@ useEffect(() => {
 
   const interval = setInterval(() => {
     window.location.reload();
-  }, 60000);
+  }, 120000);
 
   return () => clearInterval(interval);
 
@@ -571,8 +587,7 @@ useEffect(() => {
       </div>
       </div>
 
-      {/* ÚLTIMO PEDIDO */}
-<div className="section">
+      <div className="section">
 
   <h2>🛒 Último pedido</h2>
 
@@ -601,6 +616,20 @@ useEffect(() => {
 
       <p>
         <strong>Status:</strong> {resumo.ultimoPedido.status}
+      </p>
+
+      {/* 🆕 DATA E HORA */}
+      <p>
+  <strong>📅 Pedido feito em:</strong>{" "}
+  {new Date(resumo.ultimoPedido.created_at).toLocaleString("pt-BR")}
+</p>
+
+      <p>
+        <strong>Hora:</strong>{" "}
+        {new Date(resumo.ultimoPedido.created_at).toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit"
+        })}
       </p>
 
     </div>
