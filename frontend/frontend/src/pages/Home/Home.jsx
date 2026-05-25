@@ -282,9 +282,22 @@ useEffect(() => {
       {/* MENU */}
       {menuAberto && (
   <div className="menu-dropdown" ref={menuRef}>
-          <a href="/meus-pedidos" className="menu-item">📦 Histórico de Pedidos</a>
-          
-        </div>
+    
+    <div
+      className="menu-item"
+      onClick={() => navigate("/meus-pedidos")}
+    >
+      📦 Histórico de Pedidos
+    </div>
+
+    <div
+      className="menu-item"
+      onClick={() => navigate("/mensagens")}
+    >
+      📩 Mensagens
+    </div>
+
+  </div>
       )}
 
       {/* LOJAS */}
