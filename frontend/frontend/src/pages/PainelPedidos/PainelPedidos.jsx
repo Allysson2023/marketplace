@@ -4,7 +4,6 @@ import "./PainelPedidos.css";
 import socket from "../../socket";
 import somPedido from "../../assets/sounds/notification.mp3";
 
-
 function PainelPedidos() {
 
     const navigate = useNavigate();
@@ -12,64 +11,68 @@ function PainelPedidos() {
     const token = localStorage.getItem("token");
 
     const [pedidos, setPedidos] = useState([]);
+
+    // 🔥 MODAL STATE
+    const [modalAberto, setModalAberto] = useState(false);
+    const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
+    const [acao, setAcao] = useState(null);
+
+    // 👇 AQUI ENTRA A FUNÇÃO
+function abrirPedido(id) {
+    navigate(`/admin/pedido/${id}`);
+}
+
     const audioRef = useRef(null);
 
     useEffect(() => {
 
         audioRef.current = new Audio(somPedido);
+        audioRef.current.volume = 1;
 
-audioRef.current.volume = 1;
-
-
-        // 📥 busca inicial
         const fetchPedidos = () => {
             fetch(`http://localhost:3000/api/loja/${storeId}/pedidos`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                headers: { Authorization: `Bearer ${token}` }
             })
             .then(res => res.json())
             .then(data => {
-                if (Array.isArray(data)) {
-                    setPedidos(data);
-                }
+                if (Array.isArray(data)) setPedidos(data);
             });
         };
 
         fetchPedidos();
 
-        // 🏠 entra na sala da loja
         socket.emit("join_loja", storeId);
 
-        // 🔥 escuta pedidos novos
         socket.on("novo_pedido", (data) => {
 
-    console.log("🔥 NOVO PEDIDO CHEGOU:", data);
-    audioRef.current.currentTime = 0;
+            audioRef.current.currentTime = 0;
+            audioRef.current.play().catch(() => {});
 
-    audioRef.current.play().catch(err => {
-    console.log("ERRO AUDIO:", err);
-});
+            fetchPedidos();
+        });
 
-    fetchPedidos();
-
-});
-
-        return () => {
-    socket.off("novo_pedido");
-};
+        return () => socket.off("novo_pedido");
 
     }, [storeId, token]);
 
-    const atualizarStatus = async (id, status) => {
+    // 🔥 ABRIR MODAL
+    function abrirModal(pedido, tipo) {
+        setPedidoSelecionado(pedido);
+        setAcao(tipo);
+        setModalAberto(true);
+    }
+
+    // 🔥 CONFIRMAR AÇÃO
+    const confirmar = async () => {
+
         try {
-            const res = await fetch(`http://localhost:3000/api/pedidos/${id}/status`, {
+            const res = await fetch(`http://localhost:3000/api/pedidos/${pedidoSelecionado.id}/status`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ status })
+                body: JSON.stringify({ status: acao })
             });
 
             const data = await res.json();
@@ -81,50 +84,90 @@ audioRef.current.volume = 1;
 
             setPedidos(prev =>
                 prev.map(p =>
-                    p.id === id ? { ...p, status } : p
+                    p.id === pedidoSelecionado.id
+                        ? { ...p, status: acao }
+                        : p
                 )
             );
+
+            setModalAberto(false);
+            setPedidoSelecionado(null);
+            setAcao(null);
 
         } catch (err) {
             console.log(err);
         }
     };
 
-    function abrirPedido(id) {
-        navigate(`/admin/pedido/${id}`);
-    }
-
     return (
 
         <div className="painel-container">
 
+            {/* 🔥 MODAL */}
+            {modalAberto && (
+                <div className="modal-overlay">
+                    <div className="modal-box">
+
+                        <h2>
+                            {acao === "aceito" ? "Confirmar Aceitação" : "Confirmar Recusa"}
+                        </h2>
+
+                        <p>
+                            Tem certeza que deseja {acao} o pedido #{pedidoSelecionado?.id}?
+                        </p>
+
+                        <div className="modal-actions">
+
+                            <button
+                                className="btn-cancelar"
+                                onClick={() => setModalAberto(false)}
+                            >
+                                Cancelar
+                            </button>
+
+                            <button
+                                className={acao === "aceito" ? "btn-aceitar" : "btn-recusar"}
+                                onClick={confirmar}
+                            >
+                                Confirmar
+                            </button>
+
+                        </div>
+
+                    </div>
+                </div>
+            )}
+
+            {/* TOPO (NÃO MEXIDO) */}
             <div className="topo-painel">
 
-    <button
-        className="btn-voltar"
-        onClick={() => navigate(-1)}
-    >
-        ← Voltar
-    </button>
+                <button
+                    className="btn-voltar"
+                    onClick={() => navigate(-1)}
+                >
+                    ← Voltar
+                </button>
 
-    <h1>Painel de Pedidos</h1>
-    <p>Gerencie os pedidos da sua loja</p>
-    <button
-    onClick={() => navigate("/chats")}
-    style={{
-        padding: "10px 15px",
-        background: "#ff4d4d",
-        color: "#fff",
-        border: "none",
-        borderRadius: 8,
-        cursor: "pointer"
-    }}
-> 
-    💬 Conversas
-</button>
+                <h1>Painel de Pedidos</h1>
+                <p>Gerencie os pedidos da sua loja</p>
 
-</div>
+                <button
+                    onClick={() => navigate("/chats")}
+                    style={{
+                        padding: "10px 15px",
+                        background: "#ff4d4d",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 8,
+                        cursor: "pointer"
+                    }}
+                >
+                    💬 Conversas
+                </button>
 
+            </div>
+
+            {/* CARDS INFO (NÃO MEXIDO) */}
             <div className="cards-info">
 
                 <div className="info-card">
@@ -134,94 +177,94 @@ audioRef.current.volume = 1;
 
                 <div className="info-card">
                     <h2>
-    R$ {
-        pedidos
-            .filter(pedido => pedido.status === "finalizado")
-            .reduce((acc, item) => acc + Number(item.total || 0), 0)
-            .toFixed(2)
-    }
-</h2>
+                        R$ {
+                            pedidos
+                                .filter(p => p.status === "finalizado")
+                                .reduce((acc, item) => acc + Number(item.total || 0), 0)
+                                .toFixed(2)
+                        }
+                    </h2>
                     <span>Faturamento</span>
                 </div>
 
             </div>
 
+            {/* LISTA */}
             <div className="lista-pedidos">
 
                 {pedidos.length === 0 ? (
-
                     <div className="sem-pedidos">
                         <h2>Nenhum pedido encontrado</h2>
                     </div>
-
                 ) : (
 
-                    pedidos.map((pedido) => (
+                    pedidos.map((pedido) => {
 
-                        <div
+                        console.log("STATUS REAL:", pedido.status);
+
+                        const status = (pedido.status || "").toLowerCase().trim();
+const bloqueado = status !== "aguardando_confirmacao";
+
+                        return (
+                            <div
     className="card-pedido"
     key={pedido.id}
     onClick={() => abrirPedido(pedido.id)}
 >
 
-                            <div className="pedido-topo">
+                                <div className="pedido-topo">
 
-                                <div>
-                                    <h2>Pedido #{pedido.id}</h2>
-                                    <p>Cliente: {pedido.username}</p>
+                                    <div>
+                                        <h2>Pedido #{pedido.id}</h2>
+                                        <p>Cliente: {pedido.username}</p>
+                                    </div>
+
+                                    <span className={`status ${status}`}>
+                                        {pedido.status}
+                                    </span>
+
                                 </div>
 
-                                <span className={`status ${pedido.status}`}>
-                                    {pedido.status}
-                                </span>
+                                <div className="pedido-info">
+
+                                    <p>Tipo: <strong>{pedido.tipo_pedido}</strong></p>
+                                    <p>Total: <strong>R$ {pedido.total}</strong></p>
+
+                                </div>
+
+                                <div className="pedido-acoes">
+
+                                    <button
+                                        className="btn-aceitar"
+                                        disabled={bloqueado}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            abrirModal(pedido, "aceito");
+                                        }}
+                                    >
+                                        Aceitar
+                                    </button>
+
+                                    <button
+                                        className="btn-recusar"
+                                        disabled={bloqueado}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            abrirModal(pedido, "recusado");
+                                        }}
+                                    >
+                                        Recusar
+                                    </button>
+
+                                </div>
 
                             </div>
-
-                            <div className="pedido-info">
-
-                                <p>
-                                    Tipo: <strong>{pedido.tipo_pedido}</strong>
-                                </p>
-
-                                <p>
-                                    Total: <strong>R$ {pedido.total}</strong>
-                                </p>
-
-                            </div>
-
-                            <div className="pedido-acoes">
-
-                                <button
-    className="btn-aceitar"
-    onClick={(e) => {
-        e.stopPropagation();
-        atualizarStatus(pedido.id, "aceito");
-    }}
->
-    Aceitar
-</button>
-
-                                <button
-    className="btn-recusar"
-    onClick={(e) => {
-        e.stopPropagation();
-        atualizarStatus(pedido.id, "recusado");
-    }}
->
-    Recusar
-</button>
-
-                            </div>
-
-                        </div>
-
-                    ))
+                        );
+                    })
 
                 )}
 
             </div>
-
-           
 
         </div>
     );
