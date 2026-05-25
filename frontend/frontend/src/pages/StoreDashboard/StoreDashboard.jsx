@@ -74,11 +74,24 @@ function StoreDashboard() {
 
     if (data.lojaId === Number(id)) {
 
-      carregarDashboard();
+      setPedidosPorDia(data.pedidosPorDia || []);
 
     }
 
   };
+
+  socket.on("pedido_finalizado", (data) => {
+
+  if (data.lojaId === Number(id)) {
+
+    // 🔥 atualiza tudo
+    carregarDashboard();
+
+  }
+
+});
+
+  
 
   socket.on("dashboard_update", handleUpdate);
 

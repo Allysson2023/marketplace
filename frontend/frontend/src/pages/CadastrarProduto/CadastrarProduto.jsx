@@ -16,8 +16,8 @@ function CadastrarProduto() {
   const [estoque, setEstoque] = useState("");
   const [imagem, setImagem] = useState(null);
   const [imagem2, setImagem2] = useState(null);
-const [imagem3, setImagem3] = useState(null);
-
+  const [imagem3, setImagem3] = useState(null);
+  const [modalSucesso, setModalSucesso] = useState(false);
   useEffect(() => {
 
     fetch("http://localhost:3000/api/categories")
@@ -26,9 +26,11 @@ const [imagem3, setImagem3] = useState(null);
 
   }, []);
 
-async function cadastrarProduto(e){
+async function cadastrarProduto(e) {
 
-    e.preventDefault();
+  e.preventDefault();
+
+  try {
 
     const formData = new FormData();
 
@@ -39,47 +41,87 @@ async function cadastrarProduto(e){
     formData.append("estoque", estoque);
     formData.append("categoria", categoria);
 
-    if(imagem){
-    formData.append("imagem", imagem);
-}
+    if (imagem) {
+      formData.append("imagem", imagem);
+    }
 
-if(imagem2){
-    formData.append("imagem2", imagem2);
-}
+    if (imagem2) {
+      formData.append("imagem2", imagem2);
+    }
 
-if(imagem3){
-    formData.append("imagem3", imagem3);
-}
+    if (imagem3) {
+      formData.append("imagem3", imagem3);
+    }
 
     const resposta = await fetch(
-        "http://localhost:3000/api/products",
-        {
-            method: "POST",
+      "http://localhost:3000/api/products",
+      {
+        method: "POST",
 
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-            },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
 
-            body: formData
-        }
+        body: formData
+      }
     );
 
     const data = await resposta.json();
 
-    setMensagem(data.message);
+    if (resposta.ok) {
 
-    setNome("");
-    setDescricao("");
-    setPreco("");
-    setPrecoAntigo("");
-    setEstoque("");
-    setCategoria("");
-    setImagem(null);
+      setModalSucesso(true);
 
+      setNome("");
+      setDescricao("");
+      setPreco("");
+      setPrecoAntigo("");
+      setEstoque("");
+      setCategoria("");
+
+      setImagem(null);
+      setImagem2(null);
+      setImagem3(null);
+
+    } else {
+      setMensagem(data.message);
+    }
+
+  } catch (erro) {
+    setMensagem("Erro ao cadastrar produto");
+  }
 }
 
   return (
     <div className="cadastro-produto">
+
+      {modalSucesso && (
+
+  <div className="modal-overlay">
+
+    <div className="modal-sucesso">
+
+      <div className="icone-sucesso">
+        ✓
+      </div>
+
+      <h2>Produto cadastrado!</h2>
+
+      <p>
+        Seu produto foi cadastrado com sucesso.
+      </p>
+
+      <button
+        onClick={() => setModalSucesso(false)}
+      >
+        Fechar
+      </button>
+
+    </div>
+
+  </div>
+
+)}
 
       <form onSubmit={cadastrarProduto} className="form-produto">
 
