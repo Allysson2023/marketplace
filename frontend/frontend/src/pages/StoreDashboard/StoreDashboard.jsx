@@ -16,6 +16,8 @@ import {
 
 import socket from "../../socket";
 
+
+
 function StoreDashboard() {
 
   const { id } = useParams();
@@ -25,19 +27,48 @@ function StoreDashboard() {
   const [pedidosPorDia, setPedidosPorDia] = useState([]);
   const [loading, setLoading] = useState(true);
   const [atividades, setAtividades] = useState([]);
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  useEffect(() => {
+  if (!user) {
+    navigate("/login");
+    return;
+  }
+
+  if (user.tipo === "cliente") {
+    navigate("/");
+    return;
+  }
+
+  // só depois que carregar resumo você valida loja
+}, [user, id]);
+
   // =========================
   // 📦 CARREGAR DASHBOARD
   // =========================
   const carregarDashboard = async () => {
-    
 
+    
+    
     try {
+      const token = localStorage.getItem("token");
 
       const response = await fetch(
-        `http://localhost:3000/api/stores/${id}/dashboard`
-      );
+  `http://localhost:3000/api/stores/${id}/dashboard`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+);
 
-      const data = await response.json();
+if (!response.ok) {
+  console.log("Erro HTTP:", response.status);
+  setLoading(false);
+  return;
+}
+
+const data = await response.json();
 
       setResumo(data);
 
@@ -188,6 +219,10 @@ useEffect(() => {
   
 
 
+
+console.log("ID da loja:", id);
+console.log("User:", user);
+console.log(resumo);
   return (
 
     <div className="dashboard-container">

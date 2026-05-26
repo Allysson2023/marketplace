@@ -101,6 +101,28 @@ function Store() {
         return agora >= abertura && agora <= fechamento;
     };
 
+    const handleDashboard = () => {
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (!user) {
+    navigate("/login-lojista");
+    return;
+  }
+
+  if (user.tipo !== "lojista") {
+    alert("Acesso negado");
+    return;
+  }
+
+  if (user.loja_id !== Number(id)) {
+    alert("Você não é dono desta loja");
+    return;
+  }
+
+  navigate(`/store/${id}/dashboard`);
+};
+
     return (
         <div className="store-page">
 
@@ -124,7 +146,7 @@ function Store() {
 
                     {user?.tipo === "lojista" && menuConfig && (
   <div className="dropdown-config-top">
-    <button onClick={() => navigate(`/store/${id}/dashboard`)}>
+    <button onClick={handleDashboard}>
       📊 Painel da Loja
     </button>
   </div>

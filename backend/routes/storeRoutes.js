@@ -5,6 +5,37 @@ const db = require('../config/db');
 const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadLojas');
 
+
+function checkOwner(req, res, next) {
+  if (!req.user) {
+    return res.status(401).json({ message: "Não autenticado" });
+  }
+
+  const storeId = parseInt(req.params.id);
+
+  if (isNaN(storeId)) {
+    return res.status(400).json({ message: "ID inválido" });
+  }
+
+  const sql = `
+    SELECT id 
+    FROM stores 
+    WHERE id = ? AND user_id = ?
+  `;
+
+  db.query(sql, [storeId, req.user.id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: "Erro no servidor" });
+    }
+
+    if (result.length === 0) {
+      return res.status(403).json({ message: "Você não é dono desta loja" });
+    }
+
+    next();
+  });
+}
+
 // ===============================
 // ATUALIZAR IMAGEM DA LOJA
 // ===============================
@@ -274,9 +305,10 @@ router.put('/stores/:id', authMiddleware, (req, res) => {
 // ===============================
 // DASHBOARD DA LOJA
 // ===============================
-router.get('/stores/:id/dashboard', (req, res) => {
+router.get('/stores/:id/dashboard', authMiddleware, checkOwner,(req, res) => {
 
-  const storeId = req.params.id;
+  const storeId = parseInt(req.params.id);
+
 
   console.log('ENTROU NO DASHBOARD:', storeId);
 
@@ -547,7 +579,7 @@ const sqlUltimoPedido = `
 
 });
 
-router.get('/stores/:id/estoque', (req, res) => {
+router.get('/stores/:id/estoque', authMiddleware, checkOwner, (req, res) => {
 
   const storeId = req.params.id;
 
@@ -570,7 +602,7 @@ router.get('/stores/:id/estoque', (req, res) => {
 
 });
 
-router.get('/stores/:id/mais-vendidos', (req, res) => {
+router.get('/stores/:id/mais-vendidos', authMiddleware, checkOwner, (req, res) => {
 
   const storeId = req.params.id;
 
@@ -600,7 +632,7 @@ router.get('/stores/:id/mais-vendidos', (req, res) => {
 
 });
 
-router.get('/stores/:id/financeiro', (req, res) => {
+router.get('/stores/:id/financeiro', authMiddleware, checkOwner, (req, res) => {
 
   const storeId = req.params.id;
 
@@ -627,7 +659,7 @@ router.get('/stores/:id/financeiro', (req, res) => {
 
 });
 
-router.get('/stores/:id/clientes', (req, res) => {
+router.get('/stores/:id/clientes', authMiddleware, checkOwner, (req, res) => {
 
   const storeId = req.params.id;
 
