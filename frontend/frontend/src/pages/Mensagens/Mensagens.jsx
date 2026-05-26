@@ -9,11 +9,11 @@ function Mensagens() {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/conversas", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+    fetch("http://localhost:3000/api/chat/cliente", {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+})
       .then(res => res.json())
       .then(data => setConversas(data))
       .catch(err => console.log(err));
@@ -28,9 +28,9 @@ function Mensagens() {
       ) : (
         conversas.map((c) => (
           <div
-            key={c.id}
+            key={c.chatId}
             className="chat-card"
-            onClick={() => navigate(`/chat/${c.lojaId}`)}
+            onClick={() => navigate(`/chat/${c.chatId}`)}
           >
             <h3>{c.nomeLoja}</h3>
             <p>{c.ultimaMensagem}</p>

@@ -312,4 +312,47 @@ router.put("/visualizar/:chatId", authMiddleware, (req, res) => {
 });
 
 
+router.get("/cliente", authMiddleware, (req, res) => {
+
+    const clienteId = req.user.id;
+
+    const sql = `
+        SELECT 
+            c.id AS chatId,
+            c.loja_id,
+            c.atualizado_em,
+
+            (
+                SELECT mensagem
+                FROM mensagens m
+                WHERE m.chat_id = c.id
+                ORDER BY m.id DESC
+                LIMIT 1
+            ) AS ultimaMensagem,
+
+            l.nome AS nomeLoja
+
+        FROM chats c
+
+        INNER JOIN lojas l ON l.id = c.loja_id
+
+        WHERE c.cliente_id = ?
+
+        ORDER BY c.atualizado_em DESC
+    `;
+
+    db.query(sql, [clienteId], (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+
+        res.json(result);
+
+    });
+
+});
+
+
 module.exports = router;

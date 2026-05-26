@@ -4,8 +4,10 @@ import "./Store.css";
 
 function Store() {
 
+    
     const { id } = useParams();
     const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem("user"));
 
     const [produtos, setProdutos] = useState([]);
     const [pagina, setPagina] = useState(1);
@@ -54,7 +56,7 @@ function Store() {
 
   const interval = setInterval(() => {
     window.location.reload();
-  }, 60000);
+  }, 120000);
 
   return () => clearInterval(interval);
 
@@ -111,24 +113,22 @@ function Store() {
 
                 <div className="top-actions" ref={menuRef}>
 
-                    <button
-  className="btn-mais"
-  onClick={() => setMenuConfig(prev => !prev)}
->
-  +
-</button>
+                   {user?.tipo === "lojista" && (
+  <button
+    className="btn-mais"
+    onClick={() => setMenuConfig(prev => !prev)}
+  >
+    +
+  </button>
+)}
 
-                    {menuConfig && (
-                         <div className="dropdown-config-top" ref={menuRef}>
-
-   
-
+                    {user?.tipo === "lojista" && menuConfig && (
+  <div className="dropdown-config-top">
     <button onClick={() => navigate(`/store/${id}/dashboard`)}>
-        📊 Painel da Loja
+      📊 Painel da Loja
     </button>
-
   </div>
-                    )}
+)}
 
                 </div>
             </div>
