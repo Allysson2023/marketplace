@@ -9,6 +9,7 @@ function AdminPedido() {
 
     const [pedido, setPedido] = useState(null);
     const [itens, setItens] = useState([]);
+    const [erro, setErro] = useState("");
 
     const token = localStorage.getItem("token");
 
@@ -21,9 +22,26 @@ function AdminPedido() {
         })
             .then(res => res.json())
             .then(data => {
-                setPedido(data.pedido);
-                setItens(data.itens);
-            })
+
+    if (!data.pedido) {
+        setErro(data.message || "Pedido não encontrado");
+        return;
+    }
+
+    const pedidoFormatado = data.pedido;
+
+    if (
+        pedidoFormatado.dadosEntrega &&
+        typeof pedidoFormatado.dadosEntrega === "string"
+    ) {
+        pedidoFormatado.dadosEntrega = JSON.parse(
+            pedidoFormatado.dadosEntrega
+        );
+    }
+
+    setPedido(pedidoFormatado);
+    setItens(data.itens || []);
+})
             .catch(err => console.log(err));
 
     }, [id, token]);
@@ -55,8 +73,13 @@ function AdminPedido() {
 
         } catch (err) {
             console.log(err);
+            setErro("Erro ao carregar pedido");
         }
     }
+
+    if (erro) {
+    return <h1>{erro}</h1>;
+}
 
     if (!pedido) {
         return <h1>Carregando...</h1>;
@@ -143,7 +166,12 @@ function AdminPedido() {
                         <div>
                             <h3>{item.nome}</h3>
                             <p>Quantidade: {item.quantidade}</p>
-                            <span>R$ {item.preco}</span>
+                            <span>
+    {Number(item.preco).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    })}
+</span>
                         </div>
 
                     </div>
@@ -196,7 +224,11 @@ function AdminPedido() {
                 <button
     className="btn-status cancelar"
     onClick={() => atualizarStatus("cancelado")}
-    disabled={status === "finalizado" || status === "cancelado"}
+    disabled={
+    status === "finalizado" ||
+    status === "cancelado" ||
+    status === "recusado"
+}
 >
     Cancelar
 </button>

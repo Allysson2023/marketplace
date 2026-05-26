@@ -109,11 +109,16 @@ router.post("/pedidos", authMiddleware, (req, res) => {
 router.get("/pedidos/:id", authMiddleware, (req, res) => {
 
     const { id } = req.params;
+    const userId = req.user.id;
 
     const sqlPedido = `
-    SELECT * FROM pedidos 
-    WHERE id = ? AND usuario_id = ?
-`;
+        SELECT 
+            pedidos.*,
+            stores.user_id AS dono_loja
+        FROM pedidos
+        JOIN stores ON stores.id = pedidos.loja_id
+        WHERE pedidos.id = ?
+    `;
 
     const sqlItens = `
         SELECT 
@@ -121,40 +126,59 @@ router.get("/pedidos/:id", authMiddleware, (req, res) => {
             products.nome,
             products.imagem
         FROM pedido_itens
-        JOIN products ON products.id = pedido_itens.produto_id
+        JOIN products 
+            ON products.id = pedido_itens.produto_id
         WHERE pedido_itens.pedido_id = ?
     `;
 
-    db.query(sqlPedido, [id, req.user.id], (err, pedidoResult) => {
+    db.query(sqlPedido, [id], (err, pedidoResult) => {
 
-        if (err) return res.status(500).json(err);
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        if (!pedidoResult.length) {
+            return res.status(404).json({
+                message: "Pedido não encontrado"
+            });
+        }
+
+        const pedido = pedidoResult[0];
+
+        // ✅ CLIENTE OU DONO DA LOJA
+        const podeAcessar =
+            pedido.usuario_id === userId ||
+            pedido.dono_loja === userId;
+
+        if (!podeAcessar) {
+            return res.status(403).json({
+                message: "Sem permissão"
+            });
+        }
 
         db.query(sqlItens, [id], (err2, itensResult) => {
 
-            if (err2) return res.status(500).json(err2);
-
-            if (!pedidoResult.length) {
-    return res.status(404).json({ message: "Pedido não encontrado" });
-}
-
-const p = pedidoResult[0];
+            if (err2) {
+                return res.status(500).json(err2);
+            }
 
             const pedidoFormatado = {
-                ...p,
+                ...pedido,
+
                 dadosEntrega: {
-                    nome: p.nome_cliente,
-                    endereco: p.endereco,
-                    numero: p.numero,
-                    bairro: p.bairro,
-                    pagamento: p.pagamento,
-                    cpf: p.cpf,
-                    observacao: p.observacao
+                    nome: pedido.nome_cliente,
+                    endereco: pedido.endereco,
+                    numero: pedido.numero,
+                    bairro: pedido.bairro,
+                    pagamento: pedido.pagamento,
+                    cpf: pedido.cpf,
+                    observacao: pedido.observacao
                 }
             };
 
             res.json({
                 pedido: pedidoFormatado,
-                itens: itensResult
+                itens: itensResult || []
             });
 
         });
@@ -162,6 +186,8 @@ const p = pedidoResult[0];
     });
 
 });
+
+
 router.get("/meus-pedidos", authMiddleware, (req, res) => {
 
     const usuario_id = req.user.id;
