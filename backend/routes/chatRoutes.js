@@ -260,16 +260,19 @@ router.post("/mensagem", authMiddleware, (req, res) => {
                         // ==========================================
                         // NOTIFICAÇÃO LOJA
                         // ==========================================
-                        if (lojaId) {
+                        if (
+    lojaId &&
+    remetente_tipo === "cliente"
+) {
 
-                            io.to(`loja_${lojaId}`).emit(
-                                "nova_mensagem_loja",
-                                {
-                                    ...novaMensagem,
-                                    pedido_id: chat_id
-                                }
-                            );
-                        }
+    io.to(`loja_${lojaId}`).emit(
+        "nova_mensagem_loja",
+        {
+            ...novaMensagem,
+            pedido_id: chat_id
+        }
+    );
+}
 
                         return res.json(novaMensagem);
 
@@ -334,7 +337,7 @@ router.get("/cliente", authMiddleware, (req, res) => {
 
         FROM chats c
 
-        INNER JOIN lojas l ON l.id = c.loja_id
+        INNER JOIN stores l ON l.id = c.loja_id
 
         WHERE c.cliente_id = ?
 
