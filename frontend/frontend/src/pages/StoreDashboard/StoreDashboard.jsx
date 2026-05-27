@@ -422,13 +422,7 @@ console.log(resumo);
   <h3>Clientes</h3>
 </div>
 
-        <div
-          className="quick-card"
-          onClick={() => navigate("/chats")}
-        >
-          <span>💬</span>
-          <h3>Chats</h3>
-        </div>
+        
         
         <div
           className="quick-card"
