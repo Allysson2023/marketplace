@@ -9,11 +9,40 @@ function Financeiro() {
 
   const [dados, setDados] = useState([]);
 
-  useEffect(() => {
-    fetch(`http://localhost:3000/api/stores/${id}/financeiro`)
-      .then(r => r.json())
-      .then(setDados);
-  }, []);
+useEffect(() => {
+
+  const carregarFinanceiro = async () => {
+
+    try {
+
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        `http://localhost:3000/api/stores/${id}/financeiro`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      const data = await res.json();
+
+      console.log(data);
+
+      setDados(Array.isArray(data) ? data : []);
+
+    } catch (err) {
+
+      console.log(err);
+
+    }
+
+  };
+
+  carregarFinanceiro();
+
+}, [id]);
 
   const total = dados.reduce((acc, item) => {
     return acc + Number(item.total);

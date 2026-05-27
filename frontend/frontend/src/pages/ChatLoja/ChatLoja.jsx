@@ -103,27 +103,33 @@ function ChatLoja() {
     // ===============================
     useEffect(() => {
 
-        const handle = (msg) => {
+    const handle = (msg) => {
 
-            if (String(msg.chat_id) === String(chatId)) {
+        if (String(msg.chat_id) === String(chatId)) {
 
-                setMensagens(prev => {
+            setMensagens(prev => {
 
-                    const exists = prev.some(m => m.id === msg.id);
+                const exists = prev.some(
+                    m => String(m.id) === String(msg.id)
+                );
 
-                    if (exists) return prev;
+                if (exists) return prev;
 
-                    return [...prev, msg];
-                });
+                return [...prev, msg];
+            });
 
-            }
-        };
+        }
+    };
 
-        socket.on("nova_mensagem", handle);
+    // 🔥 ESCUTAR EVENTO
+    socket.on("nova_mensagem", handle);
 
-        return () => socket.off("nova_mensagem", handle);
+    // 🔥 LIMPAR
+    return () => {
+        socket.off("nova_mensagem", handle);
+    };
 
-    }, [chatId]);
+}, [chatId]);
 
     // ===============================
     // AUTO SCROLL

@@ -31,7 +31,18 @@ function Mensagens() {
   return (
     <div className="mensagens-container">
 
-      <h2>📩 Minhas Conversas</h2>
+      <div className="topo-mensagens">
+
+    <button
+        className="btn-voltar"
+        onClick={() => navigate(-1)}
+    >
+        ← Voltar
+    </button>
+
+    <h2>📩 Minhas Conversas</h2>
+
+</div>
 
       {conversas.length === 0 ? (
         <p>Nenhuma conversa ainda</p>
@@ -42,7 +53,7 @@ function Mensagens() {
             key={c.chatId}
             className="chat-card"
             onClick={() =>
-              navigate(`/chat/${c.chatId}/cliente`)
+              navigate(`/chat/${c.chatId}`)
             }
           >
 

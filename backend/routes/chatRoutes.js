@@ -260,18 +260,18 @@ router.post("/mensagem", authMiddleware, (req, res) => {
                         // ==========================================
                         // NOTIFICAÇÃO LOJA
                         // ==========================================
-                        if (
-    lojaId &&
-    remetente_tipo === "cliente"
-) {
+                        if (lojaId && remetente_tipo === "cliente") {
 
     io.to(`loja_${lojaId}`).emit(
-        "nova_mensagem_loja",
-        {
-            ...novaMensagem,
-            pedido_id: chat_id
-        }
-    );
+    "nova_mensagem_loja",
+    {
+        ...novaMensagem,
+        pedido_id: chat_id,
+        remetente_id,
+        remetente_tipo,
+        loja_id: lojaId
+    }
+);
 }
 
                         return res.json(novaMensagem);

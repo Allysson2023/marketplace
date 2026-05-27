@@ -14,25 +14,37 @@ function Estoque() {
     carregarEstoque();
   }, []);
 
-  const carregarEstoque = async () => {
+ const carregarEstoque = async () => {
 
-    try {
+  try {
 
-      const res = await fetch(
-        `http://localhost:3000/api/stores/${id}/estoque`
-      );
+    const token = localStorage.getItem("token");
 
-      const data = await res.json();
+    const res = await fetch(
+      `http://localhost:3000/api/stores/${id}/estoque`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
 
-      setProdutos(data);
-      setLoading(false);
+    const data = await res.json();
 
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    }
+    console.log(data);
 
-  };
+    setProdutos(Array.isArray(data) ? data : []);
+
+    setLoading(false);
+
+  } catch (error) {
+
+    console.log(error);
+
+    setLoading(false);
+  }
+
+};
 
   if (loading) {
     return <h2>Carregando estoque...</h2>;
