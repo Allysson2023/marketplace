@@ -1,12 +1,14 @@
 .pagina-pedido {
   width: 100%;
   min-height: 100vh;
-  background: #f5f6fa;
+  background: #f4f6f9;
   padding: 20px;
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* TOPO */
+/* =========================
+   TOPO
+========================= */
 .topo-pedido {
   display: flex;
   align-items: center;
@@ -15,14 +17,15 @@
 }
 
 .topo-pedido h1 {
-  font-size: 22px;
+  font-size: 20px;
   color: #222;
+  font-weight: bold;
 }
 
 .topo-pedido button {
   padding: 10px 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #111;
   color: #fff;
   cursor: pointer;
@@ -33,22 +36,82 @@
   background: #333;
 }
 
-/* STATUS */
+/* =========================
+   STATUS + AÇÃO
+========================= */
 .status-pedido {
   background: #fff;
-  padding: 15px;
-  border-radius: 12px;
+  padding: 18px;
+  border-radius: 16px;
   margin-bottom: 20px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .status-pedido h2 {
   font-size: 18px;
   color: #ff9800;
+  margin: 0;
 }
 
-/* LISTA DE PRODUTOS */
+/* =========================
+   BOTÃO WHATSAPP
+========================= */
+.btn-chat-loja {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+
+  background: linear-gradient(135deg, #25D366, #1ebe5d);
+  color: white;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+  text-decoration: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  transition: 0.2s ease;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+}
+
+.btn-chat-loja:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.35);
+}
+
+/* =========================
+   INFO ENTREGA
+========================= */
+.info-entrega {
+  margin: 20px 0;
+  padding: 18px;
+  background: #fff;
+  border-radius: 16px;
+
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.card-entrega p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+/* =========================
+   LISTA DE PRODUTOS
+========================= */
 .lista-produtos {
   display: flex;
   flex-direction: column;
@@ -59,16 +122,19 @@
 .card-produto-pedido {
   display: flex;
   gap: 15px;
+
   background: #fff;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 14px;
+  border-radius: 14px;
+
   align-items: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
   transition: 0.2s;
 }
 
 .card-produto-pedido:hover {
-  transform: scale(1.01);
+  transform: translateY(-2px);
 }
 
 .card-produto-pedido img {
@@ -79,13 +145,13 @@
 }
 
 .card-produto-pedido h3 {
-  font-size: 16px;
-  margin-bottom: 5px;
+  font-size: 15px;
+  margin-bottom: 4px;
   color: #222;
 }
 
 .card-produto-pedido p {
-  font-size: 14px;
+  font-size: 13px;
   color: #666;
 }
 
@@ -94,13 +160,16 @@
   color: #2ecc71;
 }
 
-/* FOOTER */
+/* =========================
+   FOOTER TOTAL
+========================= */
 .footer-pedido {
   background: #fff;
   padding: 18px;
-  border-radius: 12px;
+  border-radius: 16px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
 }
 
 .footer-pedido h2 {
@@ -108,89 +177,21 @@
   color: #111;
 }
 
-.status {
-  font-weight: bold;
-}
-
+/* =========================
+   STATUS CORES (OPCIONAL)
+========================= */
 .status.AGUARDANDO {
   color: orange;
 }
 
 .status.CONFIRMADO {
-  color: blue;
+  color: #1976d2;
 }
 
 .status.ENTREGUE {
-  color: green;
+  color: #2ecc71;
 }
 
 .status.CANCELADO {
   color: red;
-}
-
-.topo-pedidos {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-/* botão voltar padrão */
-.btn-voltar {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 8px;
-  background: #111;
-  color: #fff;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.btn-voltar:hover {
-  background: #333;
-}
-
-.info-entrega {
-    margin: 20px 0;
-    padding: 15px;
-    background: #fff;
-    border-radius: 10px;
-}
-
-.card-entrega p {
-    margin: 5px 0;
-}
-
-.btn-chat-loja {
-    margin-top: 20px;
-
-    width: 100%;
-
-    border: none;
-
-    background: #585858;
-
-    color: white;
-
-    padding: 15px;
-
-    border-radius: 14px;
-
-    font-size: 16px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    transition: 0.2s;
-}
-
-
-
-
-.btn-chat-loja:hover {
-
-    background: #000000;
-
-    transform: scale(1.02);
 }

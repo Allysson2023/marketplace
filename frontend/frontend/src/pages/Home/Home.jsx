@@ -290,12 +290,7 @@ useEffect(() => {
       📦 Histórico de Pedidos
     </div>
 
-    <div
-      className="menu-item"
-      onClick={() => navigate("/mensagens")}
-    >
-      📩 Mensagens
-    </div>
+    
 
   </div>
       )}

@@ -88,14 +88,18 @@ router.post(
   upload.single('imagem'),
   (req, res) => {
 
-    const { nome, categoria } = req.body;
+    // AGORA TEM whatsapp
+    const { nome, categoria, whatsapp } = req.body;
 
     const imagem = req.file ? req.file.filename : null;
 
-    if (!nome || !categoria) {
+    // VALIDAÇÃO
+    if (!nome || !categoria || !whatsapp) {
+
       return res.status(400).json({
-        message: 'Nome e categoria são obrigatórios'
+        message: 'Nome, categoria e WhatsApp são obrigatórios'
       });
+
     }
 
     const sql = `
@@ -103,22 +107,31 @@ router.post(
         nome,
         categoria,
         imagem,
+        whatsapp,
         user_id
       )
-      VALUES (?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?)
     `;
 
     db.query(
       sql,
-      [nome, categoria, imagem, req.user.id],
+      [
+        nome,
+        categoria,
+        imagem,
+        whatsapp,
+        req.user.id
+      ],
       (err, result) => {
 
         if (err) {
+
           console.log(err);
 
           return res.status(500).json({
             message: 'Erro ao criar loja'
           });
+
         }
 
         res.json({
@@ -131,7 +144,6 @@ router.post(
 
   }
 );
-
 // ===============================
 // VERIFICAR SE USUÁRIO TEM LOJA
 // ===============================

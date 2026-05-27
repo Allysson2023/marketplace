@@ -44,11 +44,11 @@ function PedidoStatus() {
     // ===============================
     // ABRIR CHAT (SEM MENSAGEM AUTOMÁTICA)
     // ===============================
-    function abrirChat() {
+    //function abrirChat() {
 
         // apenas abre o chat
-        navigate(`/chat/${pedido.id}`);
-    }
+    //    navigate(`/chat/${pedido.id}`);
+    //}
 
 
 
@@ -72,14 +72,16 @@ function PedidoStatus() {
 
                 <h2>⏳ {pedido.status}</h2>
 
+                <a
+    className="btn-chat-loja"
+    href={`https://wa.me/${pedido.whatsapp_loja}?text=Olá,%20tenho%20uma%20dúvida%20sobre%20o%20pedido%20%23${pedido.id}`}
+    target="_blank"
+    rel="noreferrer"
+>
+    💬 Falar com Loja
+</a>
 
-
-                <button
-                    className="btn-chat-loja"
-                    onClick={abrirChat}
-                >
-                    💬 Falar com Loja
-                </button>
+                
 
             </div>
 
