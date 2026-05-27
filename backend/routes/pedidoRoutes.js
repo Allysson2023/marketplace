@@ -113,11 +113,12 @@ router.get("/pedidos/:id", authMiddleware, (req, res) => {
 
     const sqlPedido = `
         SELECT 
-            pedidos.*,
-            stores.user_id AS dono_loja
-        FROM pedidos
-        JOIN stores ON stores.id = pedidos.loja_id
-        WHERE pedidos.id = ?
+    pedidos.*,
+    stores.nome AS loja_nome,
+    stores.whatsapp AS whatsapp_loja
+FROM pedidos
+JOIN stores ON stores.id = pedidos.loja_id
+WHERE pedidos.id = ?
     `;
 
     const sqlItens = `

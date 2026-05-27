@@ -64,6 +64,7 @@ function PedidoStatus() {
 
                 <h1>Pedido #{pedido.id}</h1>
 
+                <h2>🏪 {pedido.loja_nome}</h2>
             </div>
 
 
@@ -72,14 +73,20 @@ function PedidoStatus() {
 
                 <h2>⏳ {pedido.status}</h2>
 
-                <a
+                {pedido.whatsapp_loja ? (
+  <a
     className="btn-chat-loja"
-    href={`https://wa.me/${pedido.whatsapp_loja}?text=Olá,%20tenho%20uma%20dúvida%20sobre%20o%20pedido%20%23${pedido.id}`}
+    href={`https://wa.me/${pedido.whatsapp_loja.replace(/\D/g, "")}?text=Olá,%20tenho%20uma%20dúvida%20sobre%20o%20pedido%20%23${pedido.id}`}
     target="_blank"
     rel="noreferrer"
->
+  >
     💬 Falar com Loja
-</a>
+  </a>
+) : (
+  <p style={{ color: "gray", marginTop: "10px" }}>
+    Loja sem WhatsApp cadastrado
+  </p>
+)}
 
                 
 
