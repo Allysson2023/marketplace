@@ -694,6 +694,20 @@ PAGINAÇÃO
 }
 
 
+.btn-notificacao {
+    font-size: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-notificacao:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
 
 @media(max-width: 768px){
 

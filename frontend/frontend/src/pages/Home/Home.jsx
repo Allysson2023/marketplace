@@ -263,6 +263,7 @@ const estaLogado = !!token;
           <button
     className="btn-notificacao"
     onClick={() => navigate("/notificacoes")}
+    disabled={!estaLogado}
 >
     🔔
 </button>
