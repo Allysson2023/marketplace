@@ -11,63 +11,48 @@ function CadastroCliente() {
 
     const [loading, setLoading] = useState(false);
 
+    const [erro, setErro] = useState("");
+const [sucesso, setSucesso] = useState("");
+
     const cadastrar = async (e) => {
+    e.preventDefault();
 
-        e.preventDefault();
+    setErro("");
+    setSucesso("");
 
-        if (!username || !password) {
+    if (!username || !password) {
+        setErro("Preencha todos os campos");
+        return;
+    }
 
-            alert("Preencha todos os campos");
+    try {
+        setLoading(true);
 
+        const res = await fetch("http://localhost:3000/api/users", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            setErro(data.error || "Erro ao criar conta");
             return;
-
         }
 
-        try {
+        setSucesso("Conta criada com sucesso!");
 
-            setLoading(true);
-
-            const res = await fetch(
-                "http://localhost:3000/api/users",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        username,
-                        password
-                    })
-                }
-            );
-
-            const data = await res.json();
-
-            if (!res.ok) {
-
-                alert(data.error || "Erro ao criar conta");
-
-                return;
-
-            }
-
-            alert("Conta criada com sucesso!");
-
+        setTimeout(() => {
             navigate("/login");
+        }, 1200);
 
-        } catch (err) {
-
-            console.log(err);
-
-            alert("Erro no servidor");
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
+    } catch (err) {
+        setErro("Erro no servidor");
+    } finally {
+        setLoading(false);
+    }
+};
 
     return (
 
@@ -76,7 +61,7 @@ function CadastroCliente() {
             <form
                 className="cadastro-form"
                 onSubmit={cadastrar}
-            >
+            > 
 
                 <h2>Criar Conta</h2>
 
@@ -97,6 +82,9 @@ function CadastroCliente() {
                         setPassword(e.target.value)
                     }
                 />
+                
+                {erro && <div className="msg-erro">{erro}</div>}
+{sucesso && <div className="msg-sucesso">{sucesso}</div>}
 
                 <button type="submit">
 
