@@ -1,7 +1,9 @@
-import {useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./AtualizarPerfil.css";
 
 function AtualizarPerfil(){
+    const navigate = useNavigate();
 
     const [username, setUsername] = useState("");
     const [nomeLoja, setNomeLoja] = useState("");
@@ -156,17 +158,18 @@ useEffect(() => {
                 <div className="botoes">
 
         <button
-            type="button"
-            className="btn-voltar"
-            onClick={() => window.location.href = "/"} >
-            Voltar
-        </button>
+    type="button"
+    className="btn-voltar"
+    onClick={() => navigate(-1)}
+>
+    Voltar
+</button>
 
         <button type="submit">
             Atualizar
         </button>
 
-
+  
 </div>
                 <p>{mensagem}</p>
             </form>
