@@ -244,80 +244,139 @@ router.put(
   (req, res) => {
 
     const productId = req.params.id;
+    const userId = req.user.id;
 
-    const {
-      nome,
-      descricao,
-      preco,
-      preco_antigo,
-      estoque,
-      categoria
-    } = req.body;
-
-    const clean = (value) => {
-      if (
-        value === "" ||
-        value === "null" ||
-        value === undefined
-      ) {
-        return null;
-      }
-      return value;
-    };
-
-    const imagem = req.files?.imagem
-      ? req.files.imagem[0].filename
-      : null;
-
-    const imagem2 = req.files?.imagem2
-      ? req.files.imagem2[0].filename
-      : null;
-
-    const imagem3 = req.files?.imagem3
-      ? req.files.imagem3[0].filename
-      : null;
-
-    const sql = `
-      UPDATE products
-      SET
-        nome = ?,
-        descricao = ?,
-        preco = ?,
-        preco_antigo = ?,
-        estoque = ?,
-        categoria = ?,
-        imagem = COALESCE(?, imagem),
-        imagem2 = COALESCE(?, imagem2),
-        imagem3 = COALESCE(?, imagem3)
+    // 1. buscar produto + loja dele
+    const sqlCheck = `
+      SELECT store_id
+      FROM products
       WHERE id = ?
     `;
 
-    db.query(
-      sql,
-      [
-        nome,
-        descricao,
-        preco,
-        clean(preco_antigo),
-        estoque,
-        clean(categoria),
-        imagem,
-        imagem2,
-        imagem3,
-        productId
-      ],
-      (err, result) => {
+    db.query(sqlCheck, [productId], (err, result) => {
 
-        if (err) {
-          return res.status(500).json(err);
+      if (err) {
+        return res.status(500).json(err);
+      }
+
+      if (result.length === 0) {
+        return res.status(404).json({
+          message: "Produto não encontrado"
+        });
+      }
+
+      const storeId = result[0].store_id;
+
+      // 2. verificar dono da loja
+      const sqlOwner = `
+        SELECT user_id
+        FROM stores
+        WHERE id = ?
+      `;
+
+      db.query(sqlOwner, [storeId], (err2, storeResult) => {
+
+        if (err2) {
+          return res.status(500).json(err2);
         }
 
-        return res.json({
-          message: "Produto atualizado com sucesso!"
-        });
+        if (storeResult.length === 0) {
+          return res.status(404).json({
+            message: "Loja não encontrada"
+          });
+        }
 
-      }
-    );
+        const ownerId = storeResult[0].user_id;
+
+        // 3. BLOQUEIO DE SEGURANÇA
+        if (ownerId !== userId) {
+          return res.status(403).json({
+            message: "Você não tem permissão para editar este produto"
+          });
+        }
+
+        // =========================
+        // 4. SE PASSOU → ATUALIZA
+        // =========================
+
+        const {
+          nome,
+          descricao,
+          preco,
+          preco_antigo,
+          estoque,
+          categoria
+        } = req.body;
+
+        const clean = (value) => {
+          if (
+            value === "" ||
+            value === "null" ||
+            value === undefined
+          ) {
+            return null;
+          }
+          return value;
+        };
+
+        const imagem = req.files?.imagem
+          ? req.files.imagem[0].filename
+          : null;
+
+        const imagem2 = req.files?.imagem2
+          ? req.files.imagem2[0].filename
+          : null;
+
+        const imagem3 = req.files?.imagem3
+          ? req.files.imagem3[0].filename
+          : null;
+
+        const sqlUpdate = `
+          UPDATE products
+          SET
+            nome = ?,
+            descricao = ?,
+            preco = ?,
+            preco_antigo = ?,
+            estoque = ?,
+            categoria = ?,
+            imagem = COALESCE(?, imagem),
+            imagem2 = COALESCE(?, imagem2),
+            imagem3 = COALESCE(?, imagem3)
+          WHERE id = ?
+        `;
+
+        db.query(
+          sqlUpdate,
+          [
+            nome,
+            descricao,
+            preco,
+            clean(preco_antigo),
+            estoque,
+            clean(categoria),
+            imagem,
+            imagem2,
+            imagem3,
+            productId
+          ],
+          (err3) => {
+
+            if (err3) {
+              return res.status(500).json(err3);
+            }
+
+            return res.json({
+              message: "Produto atualizado com sucesso!"
+            });
+
+          }
+        );
+
+      });
+
+    });
+
   }
 );
 

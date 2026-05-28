@@ -85,7 +85,7 @@ router.post('/login', (req, res) => {
         const token = jwt.sign(
             { id: user.id },
             SECRET,
-            { expiresIn: "1h" }
+            { expiresIn: "23h" }
         );
 
         res.json({
@@ -107,7 +107,7 @@ router.post('/login', (req, res) => {
 // ===============================
 // LISTAR USUÁRIOS
 // ===============================
-router.get('/users', (req, res) => {
+router.get('/users', authMiddleware,  (req, res) => {
 
     db.query("SELECT * FROM users", (err, result) => {
 

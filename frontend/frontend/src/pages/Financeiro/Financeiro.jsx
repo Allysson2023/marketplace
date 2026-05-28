@@ -9,59 +9,69 @@ function Financeiro() {
 
   const [dados, setDados] = useState([]);
 
-useEffect(() => {
+  useEffect(() => {
 
-  const carregarFinanceiro = async () => {
+    const carregarFinanceiro = async () => {
 
-    try {
+      try {
 
-      const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
 
-      const res = await fetch(
-        `http://localhost:3000/api/stores/${id}/financeiro`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
+        const res = await fetch(
+          `http://localhost:3000/api/stores/${id}/financeiro`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
           }
-        }
-      );
+        );
 
-      const data = await res.json();
+        const data = await res.json();
 
-      console.log(data);
+        console.log(data);
 
-      setDados(Array.isArray(data) ? data : []);
+        // garante array sempre
+        setDados(Array.isArray(data) ? data : []);
 
-    } catch (err) {
+      } catch (err) {
+        console.log(err);
+        setDados([]);
+      }
 
-      console.log(err);
+    };
 
-    }
+    carregarFinanceiro();
 
-  };
+  }, [id]);
 
-  carregarFinanceiro();
-
-}, [id]);
+  // =========================
+  // CÁLCULOS
+  // =========================
 
   const total = dados.reduce((acc, item) => {
-    return acc + Number(item.total);
+    return acc + Number(item.total || 0);
   }, 0);
 
-  const media = dados.length
-    ? total / dados.length
-    : 0;
+  const media = dados.length ? total / dados.length : 0;
 
-    const movimentacoesOrdenadas = [...dados].sort(
-  (a, b) => new Date(b.data) - new Date(a.data)
-);
-
-const formatarMoeda = (valor) => {
-  return Number(valor).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
+  // ordenação correta (mais recente primeiro)
+  const movimentacoesOrdenadas = [...dados].sort((a, b) => {
+    return new Date(b.data || 0) - new Date(a.data || 0);
   });
-};
+
+  // =========================
+  // FORMATADOR
+  // =========================
+  const formatarMoeda = (valor) => {
+    return Number(valor || 0).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+  };
+
+  // =========================
+  // RENDER
+  // =========================
   return (
     <div className="financeiro-container">
 
@@ -90,13 +100,12 @@ const formatarMoeda = (valor) => {
         ⬅ Voltar
       </button>
 
+      {/* ================= CARDS ================= */}
       <div className="cards-financeiro">
 
         <div className="card-financeiro">
           <span>Total Faturado</span>
-          <h2>
-            {formatarMoeda(total)}
-          </h2>
+          <h2>{formatarMoeda(total)}</h2>
         </div>
 
         <div className="card-financeiro">
@@ -106,47 +115,36 @@ const formatarMoeda = (valor) => {
 
         <div className="card-financeiro">
           <span>Média por Venda</span>
-          <h2>
-            {formatarMoeda(media)}
-          </h2>
+          <h2>{formatarMoeda(media)}</h2>
         </div>
 
       </div>
 
+      {/* ================= LISTA ================= */}
       <div className="financeiro-lista">
 
         <h3>Últimas Movimentações</h3>
 
         {dados.length === 0 ? (
-          <div className="financeiro-item" key={i}>
-
-  <div className="financeiro-info">
-
-  <div className="financeiro-data">
-    📅 {new Date(d.data).toLocaleString("pt-BR")}
-  </div>
-
-  <div className="financeiro-status">
-    Pedido finalizado
-  </div>
-
-</div>
-
-  <div className="financeiro-valor">
-    {formatarMoeda(d.total)}
-  </div>
-
-</div>
+          <div className="financeiro-vazio">
+            Nenhuma movimentação encontrada.
+          </div>
         ) : (
 
           movimentacoesOrdenadas.map((d, i) => (
 
             <div className="financeiro-item" key={i}>
 
-              <div>
+              <div className="financeiro-info">
+
                 <div className="financeiro-data">
                   📅 {new Date(d.data).toLocaleString("pt-BR")}
                 </div>
+
+                <div className="financeiro-status">
+                  Pedido finalizado
+                </div>
+
               </div>
 
               <div className="financeiro-valor">
