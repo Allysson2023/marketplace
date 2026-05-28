@@ -73,10 +73,10 @@ function PedidoStatus() {
 
                 <h2>⏳ {pedido.status}</h2>
 
-                {pedido.whatsapp_loja ? (
+                {pedido.whatsapp ? (
   <a
     className="btn-chat-loja"
-    href={`https://wa.me/${pedido.whatsapp_loja.replace(/\D/g, "")}?text=Olá,%20tenho%20uma%20dúvida%20sobre%20o%20pedido%20%23${pedido.id}`}
+    href={`https://wa.me/${pedido.whatsapp.replace(/\D/g, "")}?text=Olá,%20tenho%20uma%20dúvida%20sobre%20o%20pedido%20%23${pedido.id}`}
     target="_blank"
     rel="noreferrer"
   >
