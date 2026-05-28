@@ -214,13 +214,52 @@ const [produtos, setProdutos] = useState([]);
                         {/* =========================
                             STATS (VOLTOU)
                         ========================= */}
-                        <div className="store-stats">
+                        {/* =========================
+    REDES SOCIAIS (NOVO BLOCO)
+========================= */}
+{(store?.facebook || store?.instagram) && (
+    <div className="store-social">
 
-                            <span>{produtos.length} Produtos</span>
+        {store?.facebook && (
+            <a
+                href={store.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-btn facebook"
+            >
+                <img
+                    src="https://cdn-icons-png.flaticon.com/512/733/733547.png"
+                    alt="Facebook"
+                />
+                Facebook
+            </a>
+        )}
 
-                            <span>Marketplace Premium</span>
+        {store?.instagram && (
+            <a
+                href={store.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-btn instagram"
+            >
+                <img
+                    src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png"
+                    alt="Instagram"
+                />
+                Instagram
+            </a>
+        )}
 
-                        </div>
+{/* =========================
+    STATS (AGORA LIMPO)
+========================= */}
+<div className="store-stats">
+    <span>{produtos.length} Produtos</span>
+    <span>Marketplace Premium</span>
+</div>
+    </div>
+)}
+
 
                     </div>
                 </div>
