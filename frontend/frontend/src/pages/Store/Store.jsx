@@ -49,7 +49,7 @@ const [produtos, setProdutos] = useState([]);
     // CARREGAR PRODUTOS
     // =========================
     useEffect(() => {
-        fetch(`http://localhost:3000/api/stores/${id}/products?pagina=${pagina}`)
+        fetch(`http://localhost:3000/api/stores/${id}/public/products?pagina=${pagina}`)
             .then(res => res.json())
             .then(data => {
 
@@ -73,7 +73,7 @@ const [produtos, setProdutos] = useState([]);
     // CARREGAR LOJA
     // =========================
     useEffect(() => {
-    fetch(`http://localhost:3000/api/stores/${id}`)
+    fetch(`http://localhost:3000/api/stores/${id}/public`)
         .then(res => res.json())
         .then(data => setStore(data))
         .catch(err => console.log(err));

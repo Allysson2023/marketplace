@@ -18,9 +18,10 @@ function checkOwner(req, res, next) {
   }
 
   const sql = `
-    SELECT id 
-    FROM stores 
+    SELECT id
+    FROM stores
     WHERE id = ? AND user_id = ?
+    LIMIT 1
   `;
 
   db.query(sql, [storeId, req.user.id], (err, result) => {
@@ -29,15 +30,16 @@ function checkOwner(req, res, next) {
     }
 
     if (result.length === 0) {
-      return res.status(403).json({ message: "Você não é dono desta loja" });
+      return res.status(403).json({ message: "Acesso negado" });
     }
 
+    req.storeId = storeId;
     next();
   });
 }
 
 // ===============================
-// ATUALIZAR IMAGEM DA LOJA
+// IMAGEM DA LOJA
 // ===============================
 router.put(
   '/stores/imagem',
@@ -49,9 +51,7 @@ router.put(
     const imagem = req.file ? req.file.filename : null;
 
     if (!imagem) {
-      return res.status(400).json({
-        message: 'Nenhuma imagem enviada'
-      });
+      return res.status(400).json({ message: 'Nenhuma imagem enviada' });
     }
 
     const sql = `
@@ -60,24 +60,16 @@ router.put(
       WHERE user_id = ?
     `;
 
-    db.query(sql, [imagem, userId], (err, result) => {
-
+    db.query(sql, [imagem, userId], (err) => {
       if (err) {
-        console.log(err);
-
-        return res.status(500).json({
-          message: 'Erro ao atualizar imagem'
-        });
+        return res.status(500).json({ message: 'Erro ao atualizar imagem' });
       }
 
-      res.json({
-        message: 'Imagem atualizada com sucesso'
-      });
-
+      res.json({ message: 'Imagem atualizada com sucesso' });
     });
-
   }
 );
+
 
 // ===============================
 // CRIAR LOJA
@@ -88,136 +80,190 @@ router.post(
   upload.single('imagem'),
   (req, res) => {
 
-    // AGORA TEM whatsapp
     const { nome, categoria, whatsapp } = req.body;
-
     const imagem = req.file ? req.file.filename : null;
 
-    // VALIDAÇÃO
     if (!nome || !categoria || !whatsapp) {
-
       return res.status(400).json({
         message: 'Nome, categoria e WhatsApp são obrigatórios'
       });
-
     }
 
     const sql = `
-      INSERT INTO stores (
-        nome,
-        categoria,
-        imagem,
-        whatsapp,
-        user_id
-      )
+      INSERT INTO stores (nome, categoria, imagem, whatsapp, user_id)
       VALUES (?, ?, ?, ?, ?)
     `;
 
-    db.query(
-      sql,
-      [
-        nome,
-        categoria,
-        imagem,
-        whatsapp,
-        req.user.id
-      ],
+    db.query(sql,
+      [nome, categoria, imagem, whatsapp, req.user.id],
       (err, result) => {
-
         if (err) {
-
-          console.log(err);
-
-          return res.status(500).json({
-            message: 'Erro ao criar loja'
-          });
-
+          return res.status(500).json({ message: 'Erro ao criar loja' });
         }
 
         res.json({
           message: 'Loja criada com sucesso',
           storeId: result.insertId
         });
-
       }
     );
-
   }
 );
+
+
 // ===============================
-// VERIFICAR SE USUÁRIO TEM LOJA
+// MINHA LOJA
 // ===============================
 router.get('/minha-loja', authMiddleware, (req, res) => {
-
-  const userId = req.user.id;
 
   const sql = `
     SELECT * FROM stores
     WHERE user_id = ?
   `;
 
-  db.query(sql, [userId], (err, result) => {
+  db.query(sql, [req.user.id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: 'Erro no servidor' });
+    }
+
+    if (result.length > 0) {
+      return res.json({ existe: true, loja: result[0] });
+    }
+
+    res.json({ existe: false });
+  });
+});
+
+
+
+// ===============================
+// LISTAR LOJAS (PÚBLICO)
+// ===============================
+router.get('/stores', (req, res) => {
+
+  const { busca } = req.query;
+
+  let sql = `SELECT * FROM stores`;
+  let values = [];
+
+  if (busca) {
+    sql += ` WHERE nome LIKE ?`;
+    values.push(`%${busca}%`);
+  }
+
+  sql += ` ORDER BY id DESC`;
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: 'Erro ao buscar lojas' });
+    }
+
+    res.json(result);
+  });
+});
+
+
+
+
+
+// ===============================
+// LOJA PÚBLICA (CLIENTE)
+// ===============================
+router.get('/stores/:id/public', (req, res) => {
+
+  const sql = `
+    SELECT 
+      id,
+      nome,
+      descricao,
+      imagem,
+      categoria,
+      whatsapp,
+      facebook,
+      instagram,
+      horario_abertura,
+      horario_fechamento
+    FROM stores
+    WHERE id = ?
+  `;
+
+  db.query(sql, [req.params.id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: "Erro no servidor" });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Loja não encontrada" });
+    }
+
+    res.json(result[0]);
+  });
+});
+
+// ===============================
+// BUSCAR LOJA DO DONO
+// ===============================
+router.get('/stores/:id', authMiddleware, checkOwner, (req, res) => {
+
+  const sql = `
+    SELECT *
+    FROM stores
+    WHERE id = ? AND user_id = ?
+    LIMIT 1
+  `;
+
+  db.query(sql, [req.storeId, req.user.id], (err, result) => {
 
     if (err) {
-      console.log(err);
-
       return res.status(500).json({
         message: 'Erro no servidor'
       });
     }
 
-    if (result.length > 0) {
-
-      return res.json({
-        existe: true,
-        loja: result[0]
+    if (result.length === 0) {
+      return res.status(404).json({
+        message: 'Loja não encontrada'
       });
-
     }
 
-    res.json({
-      existe: false
-    });
+    res.json(result[0]);
 
   });
 
 });
 
 // ===============================
-// LISTAR LOJAS
+// PRODUTOS PÚBLICOS DA LOJA
 // ===============================
-router.get('/stores', (req, res) => {
+router.get('/stores/:id/public/products', (req, res) => {
 
-  const { busca } = req.query;
+  const storeId = req.params.id;
 
-  let sql = `
-    SELECT *
-    FROM stores
-  `;
+  const pagina = parseInt(req.query.pagina) || 1;
 
-  let values = [];
+  const limite = 20;
 
-  if (busca) {
+  const offset = (pagina - 1) * limite;
 
-    sql += `
-      WHERE nome LIKE ?
-    `;
-
-    values.push(`%${busca}%`);
-
-  }
-
-  sql += `
+  const sql = `
+    SELECT
+      id,
+      nome,
+      preco,
+      imagem
+    FROM products
+    WHERE store_id = ?
     ORDER BY id DESC
+    LIMIT ? OFFSET ?
   `;
 
-  db.query(sql, values, (err, result) => {
+  db.query(sql, [storeId, limite, offset], (err, result) => {
 
     if (err) {
       console.log(err);
 
       return res.status(500).json({
-        message: 'Erro ao buscar lojas'
+        message: 'Erro ao buscar produtos'
       });
     }
 
@@ -227,83 +273,44 @@ router.get('/stores', (req, res) => {
 
 });
 
-// ===============================
-// BUSCAR LOJA POR ID
-// ===============================
-router.get('/stores/:id',(req, res) => {
-
-  const storeId = req.params.id;
-
-  const sql = `
-    SELECT *
-    FROM stores
-    WHERE id = ?
-  `;
-
-  db.query(sql, [storeId], (err, result) => {
-
-    if (err) return res.status(500).json(err);
-
-    if (result.length === 0) {
-      return res.status(404).json({ message: "Loja não encontrada" });
-    }
-
-   
-
-    res.json(result[0]);
-  });
-});
 
 // ===============================
-// ATUALIZAR DADOS DA LOJA
+// ATUALIZAR LOJA (SEGURA)
 // ===============================
-router.put('/stores/:id', authMiddleware,  checkOwner, (req, res) => {
-
-  const storeId = req.params.id;
+router.put('/stores/:id', authMiddleware, checkOwner, (req, res) => {
 
   const {
     nome,
     descricao,
     horario_abertura,
-    horario_fechamento
+    horario_fechamento,
+    facebook,
+    instagram
   } = req.body;
 
   const sql = `
     UPDATE stores
-    SET
-      nome = ?,
-      descricao = ?,
-      horario_abertura = ?,
-      horario_fechamento = ?
-    WHERE id = ?
+    SET nome = ?, descricao = ?, horario_abertura = ?, horario_fechamento = ?, facebook = ?, instagram = ?
+    WHERE id = ? AND user_id = ?
   `;
 
-  db.query(
-    sql,
-    [
-      nome,
-      descricao,
-      horario_abertura,
-      horario_fechamento,
-      storeId
-    ],
-    (err) => {
+  db.query(sql, [
+    nome,
+    descricao,
+    horario_abertura,
+    horario_fechamento,
+    facebook,
+    instagram,
+    req.storeId,
+    req.user.id
+  ], (err) => {
 
-      if (err) {
-        console.log(err);
-
-        return res.status(500).json({
-          message: 'Erro ao atualizar loja'
-        });
-      }
-
-      res.json({
-        message: 'Loja atualizada com sucesso'
-      });
-
+    if (err) {
+      return res.status(500).json({ message: 'Erro ao atualizar loja' });
     }
-  );
 
+    res.json({ message: 'Loja atualizada com sucesso' });
+  });
 });
 
 // ===============================

@@ -49,29 +49,31 @@ function EditarLoja(){
     }
 
     const confirmarAtualizacao = async () => {
+  const token = localStorage.getItem("token");
 
-        const token = localStorage.getItem("token");
+  const payload = {
+    nome: loja.nome,
+    descricao: loja.descricao,
+    horario_abertura: loja.horario_abertura,
+    horario_fechamento: loja.horario_fechamento,
+    facebook: loja.facebook,
+    instagram: loja.instagram
+  };
 
-        const res = await fetch(
-            `http://localhost:3000/api/stores/${id}`,
-            {
-                method: "PUT",
+  const res = await fetch(`http://localhost:3000/api/stores/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  });
 
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-
-                body: JSON.stringify(loja)
-            }
-        );
-
-        if(!res.ok){
-            alert("Erro ao salvar");
-            return;
-        }
-
-    };
+  if (!res.ok) {
+    alert("Erro ao salvar");
+    return;
+  }
+};
 
     return(
 
@@ -153,6 +155,33 @@ function EditarLoja(){
                     />
 
                 </div>
+                <div className="form-group">
+  <label>Facebook (link)</label>
+  <input
+    value={loja.facebook || ""}
+    onChange={(e) =>
+      setLoja({
+        ...loja,
+        facebook: e.target.value
+      })
+    }
+    placeholder="https://facebook.com/sua-loja"
+  />
+</div>
+
+<div className="form-group">
+  <label>Instagram (link)</label>
+  <input
+    value={loja.instagram || ""}
+    onChange={(e) =>
+      setLoja({
+        ...loja,
+        instagram: e.target.value
+      })
+    }
+    placeholder="https://instagram.com/sua-loja"
+  />
+</div>
 
                 <button onClick={() => setShowModal(true)}>
   Atualizar Loja
