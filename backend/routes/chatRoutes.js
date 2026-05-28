@@ -4,12 +4,157 @@ const router = express.Router();
 const db = require("../config/db");
 const authMiddleware = require("../middlewares/authMiddleware");
 const { getIo } = require("../utils/socket");
+function checkStoreOwner(req, res, next) {
 
+    const lojaId = req.params.lojaId;
+
+    const sql = `
+        SELECT id
+        FROM stores
+        WHERE id = ?
+        AND user_id = ?
+        LIMIT 1
+    `;
+
+    db.query(
+        sql,
+        [lojaId, req.user.id],
+        (err, result) => {
+
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            if (result.length === 0) {
+                return res.status(403).json({
+                    message: "Acesso negado"
+                });
+            }
+
+            next();
+
+        }
+    );
+
+}
+function checkChatAccess(req, res, next) {
+
+    const { chatId } = req.params;
+
+    const sql = `
+        SELECT
+            c.*,
+            s.user_id as dono_loja
+        FROM chats c
+
+        INNER JOIN stores s
+            ON s.id = c.loja_id
+
+        WHERE c.id = ?
+        LIMIT 1
+    `;
+
+    db.query(sql, [chatId], (err, result) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: "Chat não encontrado"
+            });
+        }
+
+        const chat = result[0];
+
+        const usuarioEhCliente =
+            chat.cliente_id === req.user.id;
+
+        const usuarioEhDonoLoja =
+            chat.dono_loja === req.user.id;
+
+        if (!usuarioEhCliente && !usuarioEhDonoLoja) {
+
+            return res.status(403).json({
+                message: "Acesso negado"
+            });
+
+        }
+
+        next();
+
+    });
+
+}
+function checkChatMessageAccess(req, res, next) {
+
+    const { chat_id } = req.body;
+
+    // ==========================================
+    // CHAT AINDA NÃO EXISTE
+    // ==========================================
+    // permite criar automaticamente
+    if (!chat_id) {
+        return res.status(400).json({
+            message: "chat_id obrigatório"
+        });
+    }
+
+    const sql = `
+        SELECT
+            c.*,
+            s.user_id as dono_loja
+        FROM chats c
+
+        INNER JOIN stores s
+            ON s.id = c.loja_id
+
+        WHERE c.id = ?
+        LIMIT 1
+    `;
+
+    db.query(sql, [chat_id], (err, result) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        // ==========================================
+        // CHAT NÃO EXISTE
+        // ==========================================
+        // deixa criar automaticamente
+        if (result.length === 0) {
+            return next();
+        }
+
+        const chat = result[0];
+
+        const usuarioEhCliente =
+            chat.cliente_id === req.user.id;
+
+        const usuarioEhDonoLoja =
+            chat.dono_loja === req.user.id;
+
+        if (!usuarioEhCliente && !usuarioEhDonoLoja) {
+
+            return res.status(403).json({
+                message: "Acesso negado"
+            });
+
+        }
+
+        next();
+
+    });
+
+}
 
 // ==========================================
 // LISTAR CHATS DA LOJA (INBOX)
 // ==========================================
-router.get("/loja/:lojaId", authMiddleware, (req, res) => {
+router.get("/loja/:lojaId", authMiddleware,
+    checkStoreOwner, (req, res) => {
 
     const { lojaId } = req.params;
 
@@ -55,7 +200,8 @@ router.get("/loja/:lojaId", authMiddleware, (req, res) => {
 // ==========================================
 // LISTAR MENSAGENS DO CHAT
 // ==========================================
-router.get("/:chatId/mensagens", authMiddleware, (req, res) => {
+router.get("/:chatId/mensagens", authMiddleware,
+    checkChatAccess, (req, res) => {
 
     const { chatId } = req.params;
 
@@ -83,7 +229,8 @@ router.get("/:chatId/mensagens", authMiddleware, (req, res) => {
 // ==========================================
 // ENVIAR MENSAGEM
 // ==========================================
-router.post("/mensagem", authMiddleware, (req, res) => {
+router.post("/mensagem", authMiddleware,
+    checkChatMessageAccess,(req, res) => {
 
     const {
         chat_id,
@@ -130,6 +277,12 @@ router.post("/mensagem", authMiddleware, (req, res) => {
                         console.log(err2);
                         return res.status(500).json(err2);
                     }
+                    
+                    if (pedidoResult.length === 0) {
+    return res.status(404).json({
+        message: "Pedido não encontrado"
+    });
+}
 
                     const lojaId = pedidoResult[0]?.loja_id;
 
@@ -151,9 +304,7 @@ router.post("/mensagem", authMiddleware, (req, res) => {
                         [
                             chat_id,
                             chat_id,
-                            remetente_tipo === "cliente"
-                                ? remetente_id
-                                : null,
+                            remetente_id,
                             lojaId
                         ],
                         (err3) => {
@@ -289,7 +440,8 @@ router.post("/mensagem", authMiddleware, (req, res) => {
 // ==========================================
 // MARCAR CHAT COMO VISUALIZADO
 // ==========================================
-router.put("/visualizar/:chatId", authMiddleware, (req, res) => {
+router.put("/visualizar/:chatId", authMiddleware,
+    checkChatAccess, (req, res) => {
 
     const { chatId } = req.params;
 
