@@ -52,6 +52,16 @@ useEffect(() => {
     ? total / dados.length
     : 0;
 
+    const movimentacoesOrdenadas = [...dados].sort(
+  (a, b) => new Date(b.data) - new Date(a.data)
+);
+
+const formatarMoeda = (valor) => {
+  return Number(valor).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
+};
   return (
     <div className="financeiro-container">
 
@@ -85,7 +95,7 @@ useEffect(() => {
         <div className="card-financeiro">
           <span>Total Faturado</span>
           <h2>
-            R$ {total.toFixed(2)}
+            {formatarMoeda(total)}
           </h2>
         </div>
 
@@ -97,7 +107,7 @@ useEffect(() => {
         <div className="card-financeiro">
           <span>Média por Venda</span>
           <h2>
-            R$ {media.toFixed(2)}
+            {formatarMoeda(media)}
           </h2>
         </div>
 
@@ -108,23 +118,39 @@ useEffect(() => {
         <h3>Últimas Movimentações</h3>
 
         {dados.length === 0 ? (
-          <div className="financeiro-vazio">
-            Nenhuma movimentação encontrada.
-          </div>
+          <div className="financeiro-item" key={i}>
+
+  <div className="financeiro-info">
+
+  <div className="financeiro-data">
+    📅 {new Date(d.data).toLocaleString("pt-BR")}
+  </div>
+
+  <div className="financeiro-status">
+    Pedido finalizado
+  </div>
+
+</div>
+
+  <div className="financeiro-valor">
+    {formatarMoeda(d.total)}
+  </div>
+
+</div>
         ) : (
 
-          dados.map((d, i) => (
+          movimentacoesOrdenadas.map((d, i) => (
 
             <div className="financeiro-item" key={i}>
 
               <div>
                 <div className="financeiro-data">
-                  📅 {new Date(d.data).toLocaleDateString("pt-BR")}
+                  📅 {new Date(d.data).toLocaleString("pt-BR")}
                 </div>
               </div>
 
               <div className="financeiro-valor">
-                R$ {Number(d.total).toFixed(2)}
+                {formatarMoeda(d.total)}
               </div>
 
             </div>
