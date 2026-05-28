@@ -13,22 +13,40 @@ function MaisVendidos() {
     carregar();
   }, []);
 
-  const carregar = async () => {
+ const carregar = async () => {
 
-    try {
+  try {
 
-      const res = await fetch(
-        `http://localhost:3000/api/stores/${id}/mais-vendidos`
-      );
+    const token = localStorage.getItem("token");
 
-      const data = await res.json();
+    const res = await fetch(
+      `http://localhost:3000/api/stores/${id}/mais-vendidos`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await res.json();
+
+    console.log(data);
+
+    // evita quebrar o .map()
+    if (Array.isArray(data)) {
       setProdutos(data);
-
-    } catch (err) {
-      console.log(err);
+    } else {
+      setProdutos([]);
     }
 
-  };
+  } catch (err) {
+
+    console.log(err);
+    setProdutos([]);
+
+  }
+
+};
 
   return (
     <div className="mv-container">
@@ -68,7 +86,9 @@ function MaisVendidos() {
 
                 <div>
                   <p className="mv-name">{p.nome}</p>
-                  <small>{p.total_vendido} vendas</small>
+                  <small>{p.total_vendido}  {
+    p.total_vendido > 1 ? "vendas" : "venda"
+  }</small>
                 </div>
 
               </div>

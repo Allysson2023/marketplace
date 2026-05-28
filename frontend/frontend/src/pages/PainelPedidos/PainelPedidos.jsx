@@ -175,6 +175,7 @@ function abrirPedido(id) {
                 </div>
 
             </div>
+            
 
             {/* LISTA */}
             <div className="lista-pedidos">

@@ -480,4 +480,72 @@ const mensagemStatus = {
 
 });
 
+router.get(
+    "/stores/:id/mais-vendidos",
+    authMiddleware,
+    (req, res) => {
+
+        const storeId = req.params.id;
+        const userId = req.user.id;
+
+        // 🔒 validar se a loja pertence ao usuário
+        const sqlLoja = `
+            SELECT *
+            FROM stores
+            WHERE id = ?
+            AND user_id = ?
+        `;
+
+        db.query(sqlLoja, [storeId, userId], (errLoja, lojaResult) => {
+
+            if (errLoja) {
+                return res.status(500).json(errLoja);
+            }
+
+            if (lojaResult.length === 0) {
+                return res.status(403).json({
+                    message: "Sem permissão"
+                });
+            }
+
+            // 🔥 ranking produtos mais vendidos
+            const sql = `
+                SELECT
+                    products.id,
+                    products.nome,
+                    products.imagem,
+
+                    SUM(pedido_itens.quantidade) AS total_vendido
+
+                FROM pedido_itens
+
+                JOIN products
+                    ON products.id = pedido_itens.produto_id
+
+                JOIN pedidos
+                    ON pedidos.id = pedido_itens.pedido_id
+
+                WHERE pedidos.loja_id = ?
+                AND pedidos.status = 'finalizado'
+
+                GROUP BY products.id
+
+                ORDER BY total_vendido DESC
+            `;
+
+            db.query(sql, [storeId], (err, result) => {
+
+                if (err) {
+                    return res.status(500).json(err);
+                }
+
+                return res.json(result);
+
+            });
+
+        });
+
+    }
+);
+
 module.exports = router;
