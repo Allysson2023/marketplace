@@ -10,6 +10,11 @@ function Carrinho() {
 
   const token = localStorage.getItem("token");
 
+  const getHeaders = () => {
+  if (!token) return {};
+  return { Authorization: `Bearer ${token}` };
+};
+
   const [modalAberto, setModalAberto] = useState(false);
   const [tipoPedido, setTipoPedido] = useState("entrega");
   const [modalSucesso, setModalSucesso] = useState(false);
@@ -34,10 +39,8 @@ const isEntregaValida =
   useEffect(() => {
 
     fetch("http://localhost:3000/api/cart", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+  headers: getHeaders()
+})
       .then(res => res.json())
       .then(data => {
 

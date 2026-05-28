@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
-
-require('./config/db');
+const db = require("./config/db");
 
 const cors = require('cors');
 app.use(cors());
@@ -58,10 +57,25 @@ io.on("connection", (socket) => {
     });
 
     // loja geral
-    socket.on("join_loja", (lojaId) => {
-        console.log("🏪 Loja entrou na sala:", lojaId);
-        socket.join(`loja_${lojaId}`);
-    });
+    socket.on("join_loja", (userId) => {
+
+    db.query(
+        "SELECT id FROM stores WHERE user_id = ?",
+        [userId],
+        (err, result) => {
+
+            if (err) return;
+
+            if (result.length > 0) {
+                const lojaId = result[0].id;
+
+                socket.join(`loja_${lojaId}`);
+
+                console.log("Entrou na loja:", lojaId);
+            }
+        }
+    );
+});
 
     // chat específico (CLIENTE + LOJA)
     socket.on("entrar_chat", (chatId) => {

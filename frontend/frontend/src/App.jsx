@@ -29,6 +29,7 @@ import Estoque from "./pages/Estoque/Estoque";
 import Financeiro from "./pages/Financeiro/Financeiro";
 import Clientes from "./pages/Clientes/Clientes";
 import Mensagens from "./pages/Mensagens/Mensagens";
+import CadastroCliente from "./pages/CadastroCliente/CadastroCliente";
 
 function App() {
 
@@ -103,7 +104,9 @@ function App() {
         <Route path="/store/:id/financeiro" element={<Financeiro />}/>
         <Route path="/store/:id/clientes" element={<Clientes />}/>
         <Route path="/mensagens" element={<Mensagens />} />
+        <Route path="/cadastro" element={<CadastroCliente />}/>
       </Routes>
+
     </BrowserRouter>
   );
 }

@@ -9,8 +9,21 @@ function ProdutoDetalhe(){
     const [modalSucesso, setModalSucesso] = useState(false);
     const [produto, setProduto] = useState(null);
     const [imagemPrincipal, setImagemPrincipal] = useState("");
+const [modalLogin, setModalLogin] =
+useState(false);
+
 
    const adicionarAoCarrinho = async () => {
+
+       const token = localStorage.getItem("token");
+
+    if (!token) {
+
+    setModalLogin(true);
+
+    return;
+
+}
 
     if(produto.estoque <= 0){
 
@@ -21,9 +34,11 @@ function ProdutoDetalhe(){
         return;
     }
 
+    
+
+
     try {
 
-        const token = localStorage.getItem("token");
 
         const response = await fetch(
             "http://localhost:3000/api/cart",
@@ -87,7 +102,7 @@ useEffect(() => {
 
   const interval = setInterval(() => {
     window.location.reload();
-  }, 60000);
+  }, 120000);
 
   return () => clearInterval(interval);
 
@@ -263,6 +278,57 @@ useEffect(() => {
   </div>
 
 )}
+
+{modalLogin && (
+
+  <div className="modal-overlay">
+
+    <div className="modal-login">
+
+      <h3>
+        Faça login para continuar
+      </h3>
+
+      <p>
+        Crie sua conta para
+        adicionar produtos
+        ao carrinho.
+      </p>
+
+      <div className="modal-botoes">
+
+        <button
+          className="btn-login"
+          onClick={() => navigate("/login")}
+        >
+          Entrar
+        </button>
+
+        <button
+          className="btn-cadastro"
+          onClick={() => navigate("/cadastro")}
+        >
+          Criar Conta
+        </button>
+
+      </div>
+
+      <button
+        className="btn-fechar"
+        onClick={() =>
+          setModalLogin(false)
+        }
+      >
+        Fechar
+      </button>
+
+    </div>
+
+  </div>
+
+)}
+
+
 
     </div>
 

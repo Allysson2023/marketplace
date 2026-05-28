@@ -14,11 +14,35 @@ function EditarLoja(){
 
     useEffect(() => {
 
-        fetch(`http://localhost:3000/api/stores/${id}`)
-        .then(res => res.json())
-        .then(data => setLoja(data));
+    const token = localStorage.getItem("token");
 
-    }, [id]);
+    fetch(`http://localhost:3000/api/stores/${id}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    .then(res => {
+
+        if (!res.ok) {
+            throw new Error("Erro ao buscar loja");
+        }
+
+        return res.json();
+    })
+    .then(data => {
+
+        console.log(data);
+
+        setLoja(data);
+
+    })
+    .catch(err => {
+
+        console.log(err);
+
+    });
+
+}, [id]);
 
     if(!loja){
         return <p>Carregando...</p>;

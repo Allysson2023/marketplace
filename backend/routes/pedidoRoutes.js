@@ -112,14 +112,15 @@ router.get("/pedidos/:id", authMiddleware, (req, res) => {
     const userId = req.user.id;
 
     const sqlPedido = `
-        SELECT 
-    pedidos.*,
-    stores.nome AS loja_nome,
-    stores.whatsapp AS whatsapp_loja
-FROM pedidos
-JOIN stores ON stores.id = pedidos.loja_id
-WHERE pedidos.id = ?
-    `;
+    SELECT 
+        pedidos.*,
+        stores.user_id AS dono_loja,
+        stores.nome AS loja_nome
+    FROM pedidos
+    JOIN stores ON stores.id = pedidos.loja_id
+    WHERE pedidos.id = ?
+    LIMIT 1
+`;
 
     const sqlItens = `
         SELECT 
@@ -147,15 +148,14 @@ WHERE pedidos.id = ?
         const pedido = pedidoResult[0];
 
         // ✅ CLIENTE OU DONO DA LOJA
-        const podeAcessar =
-            pedido.usuario_id === userId ||
-            pedido.dono_loja === userId;
+       const ehDonoLoja = Number(pedido.dono_loja) === Number(userId);
+const ehCliente = Number(pedido.usuario_id) === Number(userId);
 
-        if (!podeAcessar) {
-            return res.status(403).json({
-                message: "Sem permissão"
-            });
-        }
+if (!ehCliente && !ehDonoLoja) {
+    return res.status(403).json({
+        message: "Sem permissão"
+    });
+}
 
         db.query(sqlItens, [id], (err2, itensResult) => {
 
@@ -244,27 +244,45 @@ router.get("/loja/pedidos", authMiddleware, (req, res) => {
 router.get("/loja/:id/pedidos", authMiddleware, (req, res) => {
 
     const storeId = req.params.id;
+    const userId = req.user.id;
 
-    const sql = `
-        SELECT 
-            pedidos.id,
-            pedidos.total,
-            pedidos.status,
-            pedidos.tipo_pedido,
-            users.username
-        FROM pedidos
-        JOIN users ON users.id = pedidos.usuario_id
-        WHERE pedidos.loja_id = ?
-        ORDER BY pedidos.id DESC
+    // 🔥 1. primeiro valida se essa loja pertence ao usuário logado
+    const sqlLoja = `
+        SELECT * FROM stores
+        WHERE id = ? AND user_id = ?
     `;
 
-    db.query(sql, [storeId], (err, result) => {
+    db.query(sqlLoja, [storeId, userId], (err, loja) => {
 
-        if (err) {
-            return res.status(500).json(err);
+        if (err) return res.status(500).json(err);
+
+        // ❌ não é dono da loja
+        if (loja.length === 0) {
+            return res.status(403).json({
+                message: "Você não tem acesso a essa loja"
+            });
         }
 
-        res.json(result);
+        // ✅ agora sim busca pedidos
+        const sqlPedidos = `
+            SELECT 
+                pedidos.id,
+                pedidos.total,
+                pedidos.status,
+                pedidos.tipo_pedido,
+                users.username
+            FROM pedidos
+            JOIN users ON users.id = pedidos.usuario_id
+            WHERE pedidos.loja_id = ?
+            ORDER BY pedidos.id DESC
+        `;
+
+        db.query(sqlPedidos, [storeId], (err2, result) => {
+
+            if (err2) return res.status(500).json(err2);
+
+            return res.json(result);
+        });
 
     });
 
@@ -275,7 +293,35 @@ router.put("/pedidos/:id/status", authMiddleware, (req, res) => {
     const pedidoId = req.params.id;
     const { status } = req.body;
 
-    const mensagemStatus = {
+    const userId = req.user.id;
+
+const sqlPermissao = `
+    SELECT pedidos.id
+    FROM pedidos
+    JOIN stores 
+        ON stores.id = pedidos.loja_id
+    WHERE pedidos.id = ?
+    AND stores.user_id = ?
+`;
+
+db.query(sqlPermissao, [pedidoId, userId], (errPerm, resultPerm) => {
+
+    if (errPerm) {
+        return res.status(500).json(errPerm);
+    }
+
+    // ❌ não é dono da loja
+    if (resultPerm.length === 0) {
+        return res.status(403).json({
+            message: "Sem permissão para alterar este pedido"
+        });
+    }
+
+    continuarAtualizacao();
+});
+function continuarAtualizacao() {
+
+const mensagemStatus = {
         aceito: "Seu pedido foi aceito pela loja ✅",
         separacao: "Seu pedido está em separação 📦",
         rota: "Seu pedido saiu para entrega 🛵",
@@ -429,6 +475,8 @@ router.put("/pedidos/:id/status", authMiddleware, (req, res) => {
         }
 
     });
+}
+
 });
 
 module.exports = router;

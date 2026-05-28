@@ -230,7 +230,7 @@ router.get('/stores', (req, res) => {
 // ===============================
 // BUSCAR LOJA POR ID
 // ===============================
-router.get('/stores/:id', (req, res) => {
+router.get('/stores/:id',(req, res) => {
 
   const storeId = req.params.id;
 
@@ -242,30 +242,22 @@ router.get('/stores/:id', (req, res) => {
 
   db.query(sql, [storeId], (err, result) => {
 
-    if (err) {
-      console.log(err);
-
-      return res.status(500).json({
-        message: 'Erro ao buscar loja'
-      });
-    }
+    if (err) return res.status(500).json(err);
 
     if (result.length === 0) {
-      return res.status(404).json({
-        message: 'Loja não encontrada'
-      });
+      return res.status(404).json({ message: "Loja não encontrada" });
     }
 
+   
+
     res.json(result[0]);
-
   });
-
 });
 
 // ===============================
 // ATUALIZAR DADOS DA LOJA
 // ===============================
-router.put('/stores/:id', authMiddleware, (req, res) => {
+router.put('/stores/:id', authMiddleware,  checkOwner, (req, res) => {
 
   const storeId = req.params.id;
 

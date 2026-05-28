@@ -35,27 +35,35 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(dados.user));
       localStorage.setItem("lojaId", dados.user.loja_id);
 
-      fetch("http://localhost:3000/api/minha-loja", {
+      if (dados.user.tipo === "cliente") {
 
-        headers: {
-          Authorization: `Bearer ${dados.token}`
-        }
+  window.location.href = "/";
 
-      })
-      .then(res => res.json())
-      .then(loja => {
+} else {
 
-        if(loja.existe){
+  fetch("http://localhost:3000/api/minha-loja", {
 
-          window.location.href = "/";
+    headers: {
+      Authorization: `Bearer ${dados.token}`
+    }
 
-        } else {
+  })
+  .then(res => res.json())
+  .then(loja => {
 
-          window.location.href = "/cadastrar-loja";
+    if (loja.existe) {
 
-        }
+      window.location.href = "/";
 
-      });
+    } else {
+
+      window.location.href = "/cadastrar-loja";
+
+    }
+
+  });
+
+}
 
     } else {
 

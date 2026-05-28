@@ -7,9 +7,22 @@ function Store() {
     
     const { id } = useParams();
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem("user"));
 
-    const [produtos, setProdutos] = useState([]);
+    let user = null;
+
+try {
+  const storedUser = localStorage.getItem("user");
+  user = storedUser ? JSON.parse(storedUser) : null;
+} catch (err) {
+  user = null;
+  localStorage.removeItem("user");
+}
+
+const isLogged = !!user;
+const isLojista = user?.tipo === "lojista";
+const isDonoDaLoja = isLojista && user?.loja_id === Number(id);
+    
+const [produtos, setProdutos] = useState([]);
     const [pagina, setPagina] = useState(1);
     const [temMaisProdutos, setTemMaisProdutos] = useState(true);
     const [store, setStore] = useState(null);
@@ -52,15 +65,7 @@ function Store() {
             });
     }, [id, pagina]);
 
-    useEffect(() => {
-
-  const interval = setInterval(() => {
-    window.location.reload();
-  }, 120000);
-
-  return () => clearInterval(interval);
-
-}, []);
+    
 
 
 
@@ -68,11 +73,11 @@ function Store() {
     // CARREGAR LOJA
     // =========================
     useEffect(() => {
-        fetch(`http://localhost:3000/api/stores/${id}`)
-            .then(res => res.json())
-            .then(data => setStore(data))
-            .catch(err => console.log(err));
-    }, [id]);
+    fetch(`http://localhost:3000/api/stores/${id}`)
+        .then(res => res.json())
+        .then(data => setStore(data))
+        .catch(err => console.log(err));
+}, [id]);
 
     // =========================
     // FILTRO PRODUTOS
@@ -135,7 +140,7 @@ function Store() {
 
                 <div className="top-actions" ref={menuRef}>
 
-                   {user?.tipo === "lojista" && (
+                   {isDonoDaLoja && (
   <button
     className="btn-mais"
     onClick={() => setMenuConfig(prev => !prev)}
@@ -144,7 +149,7 @@ function Store() {
   </button>
 )}
 
-                    {user?.tipo === "lojista" && menuConfig && (
+{isDonoDaLoja && menuConfig && (
   <div className="dropdown-config-top">
     <button onClick={handleDashboard}>
       📊 Painel da Loja

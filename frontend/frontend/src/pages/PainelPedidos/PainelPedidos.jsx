@@ -9,6 +9,7 @@ function PainelPedidos() {
     const navigate = useNavigate();
     const { id: storeId } = useParams();
     const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
 
     const [pedidos, setPedidos] = useState([]);
 
@@ -26,34 +27,32 @@ function abrirPedido(id) {
 
     useEffect(() => {
 
-        audioRef.current = new Audio(somPedido);
-        audioRef.current.volume = 1;
+    audioRef.current = new Audio(somPedido);
+    audioRef.current.volume = 1;
 
-        const fetchPedidos = () => {
-            fetch(`http://localhost:3000/api/loja/${storeId}/pedidos`, {
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) setPedidos(data);
-            });
-        };
-
-        fetchPedidos();
-
-        socket.emit("join_loja", storeId);
-
-        socket.on("novo_pedido", (data) => {
-
-            audioRef.current.currentTime = 0;
-            audioRef.current.play().catch(() => {});
-
-            fetchPedidos();
+    const fetchPedidos = () => {
+        fetch(`http://localhost:3000/api/loja/pedidos`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data)) setPedidos(data);
         });
+    };
 
-        return () => socket.off("novo_pedido");
+    fetchPedidos();
 
-    }, [storeId, token]);
+    socket.emit("join_loja", user.id);
+
+    socket.on("novo_pedido", () => {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => {});
+        fetchPedidos();
+    });
+
+    return () => socket.off("novo_pedido");
+
+}, [token, storeId, user]);
 
     // 🔥 ABRIR MODAL
     function abrirModal(pedido, tipo) {

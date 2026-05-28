@@ -1,12 +1,13 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./Home.css";
 
 function Home() {
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [lojas, setLojas] = useState([]);
-  
   const [produtos, setProdutos] = useState([]);
   const [menuAberto, setMenuAberto] = useState(false);
   const [modalSair, setModalSair] = useState(false);
@@ -16,144 +17,109 @@ function Home() {
   const [pagina, setPagina] = useState(1);
   const [temMaisProdutos, setTemMaisProdutos] = useState(true);
   const [quantidadeCarrinho, setQuantidadeCarrinho] = useState(0);
+
+  const [modalCarrinhoVazio, setModalCarrinhoVazio] = useState(false);
+
   const menuRef = useRef(null);
 
-  const token = localStorage.getItem("token");
-
+  // =========================
+  // FECHAR MENU
+  // =========================
   useEffect(() => {
 
-  function handleClickFora(event) {
+    function handleClickFora(event) {
 
-    if (
-      menuRef.current &&
-      !menuRef.current.contains(event.target)
-    ) {
-      setMenuAberto(false);
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target)
+      ) {
+        setMenuAberto(false);
+      }
+
     }
 
-  }
+    document.addEventListener("mousedown", handleClickFora);
 
-  document.addEventListener("mousedown", handleClickFora);
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickFora
+      );
+    };
 
-  return () => {
-    document.removeEventListener(
-      "mousedown",
-      handleClickFora
-    );
+  }, []);
+
+  // =========================
+  // SAIR
+  // =========================
+  const sair = () => {
+
+    localStorage.removeItem("token");
+
+    setModalSair(false);
+
+    navigate("/login");
+
   };
 
-}, []);
+  
 
-  const sair = () => {
-  localStorage.removeItem("token");
 
-  setModalSair(false);
 
-  navigate("/login");
-
-  window.location.reload();
-};
 
   // =========================
-  // PROTEÇÃO DE ROTA
+  // CATEGORIAS
   // =========================
   useEffect(() => {
-    if (!token) {
-      navigate("/login", { replace: true });
-    }
+
+    fetch("http://localhost:3000/api/categories")
+      .then(res => res.json())
+      .then(data => {
+        setCategorias(data);
+      })
+      .catch(err => console.log(err));
+
   }, []);
-
-  // =========================
-  // TOKEN EXPIRADO
-  // =========================
-  useEffect(() => {
-    try {
-      if (!token) return;
-
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      const expiracao = payload.exp * 1000;
-
-      if (Date.now() >= expiracao) {
-        localStorage.removeItem("token");
-
-        setTimeout(() => {
-          navigate("/login", { replace: true });
-        }, 50);
-      }
-    } catch (error) {
-      localStorage.removeItem("token");
-
-      setTimeout(() => {
-        navigate("/login", { replace: true });
-      }, 50);
-    }
-  }, []);
-
-  useEffect(() => {
-
-  const interval = setInterval(() => {
-    window.location.reload();
-  }, 30000);
-
-  return () => clearInterval(interval);
-
-}, []);
-
-
-
-useEffect(() => {
-  fetch("http://localhost:3000/api/categories")
-    .then(res => res.json())
-    .then(data => {
-      console.log("CATEGORIAS VINDAS DO BACKEND:", data);
-      setCategorias(data);
-    })
-    .catch(err => console.log("ERRO CATEGORIAS:", err));
-}, []);
 
   // =========================
   // LOJAS
   // =========================
   useEffect(() => {
-    fetch(`http://localhost:3000/api/stores?busca=${busca}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => {
-        if (res.status === 401) {
-          localStorage.removeItem("token");
-          navigate("/login", { replace: true });
-          return null;
-        }
-        return res.json();
-      })
+
+    fetch(`http://localhost:3000/api/stores?busca=${busca}`)
+      .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) setLojas(data);
+
+        if (Array.isArray(data)) {
+          setLojas(data);
+        }
+
       })
       .catch(err => console.log(err));
+
   }, [busca]);
 
   // =========================
   // PRODUTOS
   // =========================
   useEffect(() => {
+
     let url = `http://localhost:3000/api/products?pagina=${pagina}`;
 
-    if (busca) url += `&busca=${busca}`;
-    if (categoriaSelecionada) url += `&categoria=${categoriaSelecionada}`;
+    if (busca) {
+      url += `&busca=${busca}`;
+    }
 
-    fetch(url, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => {
-        if (res.status === 401) {
-          localStorage.removeItem("token");
-          navigate("/login", { replace: true });
-          return null;
-        }
-        return res.json();
-      })
+    if (categoriaSelecionada) {
+      url += `&categoria=${categoriaSelecionada}`;
+    }
+
+    fetch(url)
+      .then(res => res.json())
       .then(data => {
+
         if (Array.isArray(data)) {
+
           if (pagina === 1) {
             setProdutos(data);
           } else {
@@ -161,14 +127,30 @@ useEffect(() => {
           }
 
           setTemMaisProdutos(data.length >= 30);
+
         } else {
+
           setProdutos([]);
+
         }
+
       })
       .catch(err => console.log(err));
+
   }, [categoriaSelecionada, busca, pagina]);
 
+  // =========================
+  // CARRINHO
+  // =========================
+  
   useEffect(() => {
+
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    setQuantidadeCarrinho(0);
+    return;
+  }
 
   fetch("http://localhost:3000/api/cart", {
     headers: {
@@ -178,9 +160,7 @@ useEffect(() => {
     .then(res => res.json())
     .then(data => {
 
-      console.log(data);
-
-      if(Array.isArray(data)){
+      if (Array.isArray(data)) {
 
         const total = data.reduce(
           (acc, item) => acc + item.quantidade,
@@ -192,13 +172,21 @@ useEffect(() => {
       }
 
     })
-    .catch(err => console.log(err));
+    .catch(() => setQuantidadeCarrinho(0));
 
-}, []);
+}, [location]);
 
-const [modalCarrinhoVazio, setModalCarrinhoVazio] = useState(false);
+  // =========================
+  // ABRIR CARRINHO
+  // =========================
+  const abrirCarrinho = async () => {
 
-const abrirCarrinho = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    setModalCarrinhoVazio(true);
+    return;
+  }
 
   try {
 
@@ -223,11 +211,16 @@ const abrirCarrinho = async () => {
 
 };
 
-useEffect(() => {
-  if (location.state?.pedidoSucesso) {
-    alert("Pedido realizado com sucesso!");
-  }
-}, []);
+  // =========================
+  // ALERTA PEDIDO
+  // =========================
+  useEffect(() => {
+
+    if (location.state?.pedidoSucesso) {
+      alert("Pedido realizado com sucesso!");
+    }
+
+  }, []);
 
   return (
     <div className="home">

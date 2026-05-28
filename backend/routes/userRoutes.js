@@ -13,23 +13,37 @@ const SECRET = "segredo_super";
 // ===============================
 router.post('/users', (req, res) => {
 
-    const { username, password, tipo } = req.body;
+    const { username, password } = req.body;
+
+    const tipo = "cliente";
 
     const sql = `
         INSERT INTO users (username, password, tipo)
         VALUES (?, ?, ?)
     `;
 
-    db.query(sql, [username, password, tipo], (err) => {
+    db.query(
+        sql,
+        [username, password, tipo],
+        (err) => {
 
-        if (err) {
-            console.log(err);
-            return res.status(500).json(err);
+            if (err) {
+
+                console.log(err);
+
+                return res
+                    .status(500)
+                    .json(err);
+
+            }
+
+            res.json({
+                message:
+                    "Conta criada com sucesso!"
+            });
+
         }
-
-        res.json({ message: "Usuário criado com sucesso!" });
-
-    });
+    );
 
 });
 
