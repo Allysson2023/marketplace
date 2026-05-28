@@ -20,6 +20,9 @@ function Home() {
 
   const [modalCarrinhoVazio, setModalCarrinhoVazio] = useState(false);
 
+  const token = localStorage.getItem("token");
+const estaLogado = !!token;
+
   const menuRef = useRef(null);
 
   // =========================
@@ -249,12 +252,7 @@ function Home() {
   </span>
 </button>
 
-          <button
-  onClick={() => setModalSair(true)}
-  className="btn-sair"
->
-  Sair
-</button>
+          
 
           <button
             onClick={() => setMenuAberto(!menuAberto)}
@@ -275,18 +273,47 @@ function Home() {
       {/* MENU */}
       {menuAberto && (
   <div className="menu-dropdown" ref={menuRef}>
-    
-    <div
-      className="menu-item"
-      onClick={() => navigate("/meus-pedidos")}
-    >
-      📦 Histórico de Pedidos
-    </div>
 
-    
+    {!estaLogado ? (
+      <>
+      
+        <div
+          className="menu-item"
+          onClick={() => navigate("/login")}
+        >
+          🔑 Entrar
+        </div>
+
+        <div
+          className="menu-item"
+          onClick={() => navigate("/cadastro")}
+        >
+          👤 Criar Conta
+        </div>
+
+      </>
+    ) : (
+      <>
+      
+        <div
+          className="menu-item"
+          onClick={() => navigate("/meus-pedidos")}
+        >
+          📦 Histórico de Pedidos
+        </div>
+
+        <div
+          className="menu-item"
+          onClick={() => setModalSair(true)}
+        >
+          🚪 Sair do Login
+        </div>
+
+      </>
+    )}
 
   </div>
-      )}
+)}
 
       {/* LOJAS */}
       <h3 className="centraliza-titulo" >Nossas Lojas</h3>
