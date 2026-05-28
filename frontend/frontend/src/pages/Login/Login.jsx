@@ -105,6 +105,18 @@ function Login() {
 )}
         <button>Entrar</button>
       </form>
+      {/* NOVO BOTÃO */}
+<button
+  type="button"
+  className="btn-guest"
+  onClick={() => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/";
+  }}
+>
+  Continuar sem login 👀
+</button>
 
     </div>
     </div>
