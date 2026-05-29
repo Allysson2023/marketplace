@@ -25,34 +25,39 @@ const mensagemInicial = location.state?.mensagemInicial;
     // ===============================
     useEffect(() => {
 
-        if (!chatId || !token) return;
+    if (!chatId || !token) return;
 
-        fetch(`http://localhost:3000/api/chat/${chatId}/mensagens`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
+    async function loadChat() {
+        try {
 
-            if (!Array.isArray(data)) return;
+            const [msgRes, chatRes] = await Promise.all([
+                fetch(`http://localhost:3000/api/chat/${chatId}/mensagens`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }),
+                fetch(`http://localhost:3000/api/chat/${chatId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+            ]);
 
-            setMensagens(data);
+            const msgs = await msgRes.json();
+            const chat = await chatRes.json();
 
-            if (data.length > 0) {
-                const primeira = data[0];
-
-                setChatInfo({
-    cliente_id: primeira.cliente_id,
-    loja_id: primeira.loja_id,
-    chat_id: chatId
-});
+            if (Array.isArray(msgs)) {
+                setMensagens(msgs);
             }
 
-        })
-        .catch(err => console.log(err));
+            setChatInfo(chat);
 
-    }, [chatId, token]);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    loadChat();
+
+}, [chatId, token]);
+
+    
 
     // ===============================
     // SOCKET ENTRAR NO CHAT
@@ -76,10 +81,7 @@ const mensagemInicial = location.state?.mensagemInicial;
 
             setMensagens(prev => {
 
-                const existe = prev.some(
-    m => m.id === msg.id || 
-         (m.temp_id && m.temp_id === msg.temp_id)
-);
+                const existe = prev.some(m => m.id === msg.id);
                 if (existe) return prev;
 
                 return [...prev, msg];
@@ -114,6 +116,16 @@ const mensagemInicial = location.state?.mensagemInicial;
     async function enviarMensagem() {
     if (!mensagem.trim()) return;
 
+    const tempMsg = {
+        id: Date.now(),
+        mensagem,
+        remetente_tipo: "cliente",
+        criado_em: new Date().toISOString()
+    };
+
+    // 🔥 MOSTRA INSTANTE (OTIMISTA)
+    setMensagens(prev => [...prev, tempMsg]);
+
     try {
         const res = await fetch("http://localhost:3000/api/chat/mensagem", {
             method: "POST",
@@ -129,17 +141,16 @@ const mensagemInicial = location.state?.mensagemInicial;
             })
         });
 
-        if (!res.ok) throw new Error("Erro ao enviar");
-        // 🔥 adiciona imediatamente na tela
-setMensagens(prev => [
-    ...prev,
-    {
-        id: Date.now(),
-        mensagem,
-        remetente_tipo: "cliente",
-        criado_em: new Date().toISOString()
-    }
-]);
+        const data = await res.json();
+
+        // 🔥 opcional: atualizar ID real
+        setMensagens(prev =>
+            prev.map(m =>
+                m.id === tempMsg.id
+                    ? { ...m, id: data.id }
+                    : m
+            )
+        );
 
         setMensagem("");
 
@@ -194,19 +205,17 @@ setMensagens(prev => [
             {/* HEADER */}
             <div className="chat-header">
 
-                <button onClick={() => navigate(-1)}>
-                    ← Voltar
-                </button>
+    <button onClick={() => navigate(-1)}>
+        ← Voltar
+    </button>
 
-                💬 Conversando com{" "}
-                <b>
-                    {chatInfo?.loja_id
-                        ? `Loja #${chatInfo.loja_id}`
-                        : "Loja"}
-                </b>
+    💬 Conversando com{" "}
 
-                {" - Pedido #" + chatId}
-            </div>
+    <b>
+        {chatInfo?.loja_nome || "Loja"}
+    </b>
+
+</div>
 
             {/* MENSAGENS */}
             <div
@@ -216,7 +225,7 @@ setMensagens(prev => [
 
                 {mensagens.map((msg) => {
 
-                    const hora = new Date(msg.criado_em || Date.now())
+                    const hora = new Date(msg.criado_em )
                         .toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit"

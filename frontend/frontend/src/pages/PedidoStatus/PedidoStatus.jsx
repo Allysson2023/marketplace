@@ -50,6 +50,38 @@ function PedidoStatus() {
     //    navigate(`/chat/${pedido.id}`);
     //}
 
+    async function abrirChat() {
+
+    try {
+
+        const res = await fetch(
+            "http://localhost:3000/api/chat/abrir",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    loja_id: pedido.loja_id
+                })
+            }
+        );
+
+        const data = await res.json();
+
+        if (!data.chat_id) {
+            alert("Erro ao abrir chat");
+            return;
+        }
+
+        navigate(`/chat/${data.chat_id}`);
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 
 
     return (
@@ -90,13 +122,7 @@ function PedidoStatus() {
     {/* CHAT INTERNO */}
     <button
     className="btn-chat-interno"
-    onClick={() =>
-        navigate(`/chat/${pedido.id}`, {
-            state: {
-                mensagemInicial: `Olá, tenho uma dúvida sobre o pedido #${pedido.id}`
-            }
-        })
-    }
+    onClick={() => abrirChat()}
 >
     💬 Falar com a Loja (Chat Interno)
 </button>

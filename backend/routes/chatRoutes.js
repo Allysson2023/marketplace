@@ -69,10 +69,10 @@ function checkChatAccess(req, res, next) {
         const chat = result[0];
 
         const usuarioEhCliente =
-            chat.cliente_id === req.user.id;
+    Number(chat.cliente_id) === Number(req.user.id);
 
-        const usuarioEhDonoLoja =
-            chat.dono_loja === req.user.id;
+const usuarioEhDonoLoja =
+    Number(chat.dono_loja) === Number(req.user.id);
 
         if (!usuarioEhCliente && !usuarioEhDonoLoja) {
 
@@ -120,11 +120,11 @@ function checkChatMessageAccess(req, res, next) {
 
         const chat = result[0];
 
-        const usuarioEhCliente =
-            chat.cliente_id === req.user.id;
+       const usuarioEhCliente =
+    Number(chat.cliente_id) === Number(req.user.id);
 
-        const usuarioEhDonoLoja =
-            chat.dono_loja === req.user.id;
+const usuarioEhDonoLoja =
+    Number(chat.dono_loja) === Number(req.user.id);
 
         if (!usuarioEhCliente && !usuarioEhDonoLoja) {
             return res.status(403).json({
@@ -272,13 +272,13 @@ router.post("/mensagem", authMiddleware, (req, res) => {
 
                 if (err) return res.status(500).json(err);
                 const novaMensagem = {
-                id: result.insertId,
-                chat_id: chatId,
-                mensagem,
-                remetente_tipo,
-                remetente_id,
-                criado_em: new Date()
-            };
+    id: result.insertId,
+    chat_id: chatId,
+    mensagem,
+    remetente_tipo,
+    remetente_id,
+    criado_em: new Date().toISOString()
+};
 
             const io = getIo();
 
@@ -296,6 +296,105 @@ router.post("/mensagem", authMiddleware, (req, res) => {
             }
         );
     }
+});
+
+router.post("/abrir", authMiddleware, (req, res) => {
+
+    const cliente_id = req.user.id;
+    const { loja_id } = req.body;
+
+    // procura chat existente
+    const buscarChat = `
+        SELECT *
+        FROM chats
+        WHERE cliente_id = ?
+        AND loja_id = ?
+        LIMIT 1
+    `;
+
+    db.query(
+        buscarChat,
+        [cliente_id, loja_id],
+        (err, result) => {
+
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            // já existe
+            if (result.length > 0) {
+
+                return res.json({
+                    chat_id: result[0].id
+                });
+
+            }
+
+            // cria novo
+            const criarChat = `
+                INSERT INTO chats
+                (cliente_id, loja_id, atualizado_em)
+                VALUES (?, ?, NOW())
+            `;
+
+            db.query(
+                criarChat,
+                [cliente_id, loja_id],
+                (err2, result2) => {
+
+                    if (err2) {
+                        return res.status(500).json(err2);
+                    }
+
+                    res.json({
+                        chat_id: result2.insertId
+                    });
+
+                }
+            );
+
+        }
+    );
+
+});
+
+// ==========================================
+// DADOS DO CHAT
+// ==========================================
+router.get("/:chatId", authMiddleware,
+    checkChatAccess, (req, res) => {
+
+    const { chatId } = req.params;
+
+    const sql = `
+        SELECT
+            c.*,
+            s.nome AS loja_nome
+        FROM chats c
+
+        INNER JOIN stores s
+            ON s.id = c.loja_id
+
+        WHERE c.id = ?
+        LIMIT 1
+    `;
+
+    db.query(sql, [chatId], (err, result) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: "Chat não encontrado"
+            });
+        }
+
+        res.json(result[0]);
+
+    });
+
 });
 
 
