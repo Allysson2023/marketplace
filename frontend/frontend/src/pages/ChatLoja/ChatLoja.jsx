@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import socket from "../../socket";
 import "./ChatLoja.css";
-
+ 
 function ChatLoja() {
 
     const { chatId } = useParams();
@@ -26,7 +26,7 @@ function ChatLoja() {
 
         if (!chatId || !user?.loja_id) return;
 
-        fetch(`http://localhost:3000/api/chat/loja/${user.loja_id}`, {
+        fetch(`http://localhost:3000/api/chat/${chatId}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -71,10 +71,14 @@ function ChatLoja() {
     // SOCKET ENTRAR NO CHAT
     // ===============================
     useEffect(() => {
-        if (chatId) {
-            socket.emit("entrar_chat", chatId);
-        }
-    }, [chatId]);
+    if (!chatId) return;
+
+    socket.emit("entrar_chat", { chatId });
+
+    return () => {
+        socket.emit("sair_chat", { chatId });
+    };
+}, [chatId]);
 
     // ===============================
     // CARREGAR MENSAGENS
@@ -105,26 +109,20 @@ function ChatLoja() {
 
     const handle = (msg) => {
 
-        if (String(msg.chat_id) === String(chatId)) {
+        setMensagens(prev => {
 
-            setMensagens(prev => {
+            const exists = prev.some(
+                m => m.id === msg.id || m.temp_id === msg.temp_id
+            );
 
-                const exists = prev.some(
-                    m => String(m.id) === String(msg.id)
-                );
+            if (exists) return prev;
 
-                if (exists) return prev;
-
-                return [...prev, msg];
-            });
-
-        }
+            return [...prev, msg];
+        });
     };
 
-    // 🔥 ESCUTAR EVENTO
     socket.on("nova_mensagem", handle);
 
-    // 🔥 LIMPAR
     return () => {
         socket.off("nova_mensagem", handle);
     };
@@ -146,34 +144,52 @@ function ChatLoja() {
     // ===============================
     // ENVIAR MENSAGEM
     // ===============================
-    async function enviar() {
+    const [enviando, setEnviando] = useState(false);
 
-        if (!texto.trim()) return;
+async function enviar() {
+    if (!texto.trim() || enviando) return;
 
-        const msg = texto.trim();
-        setTexto("");
+    setEnviando(true);
 
-        try {
+    const msg = texto.trim();
+    setTexto("");
 
-            await fetch("http://localhost:3000/api/chat/mensagem", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    mensagem: msg,
-                    tipo: "texto",
-                    remetente_tipo: "loja",
-                    loja_id: user?.loja_id
-                })
-            });
+    try {
+        const res = await fetch("http://localhost:3000/api/chat/mensagem", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                chat_id: chatId,
+                mensagem: msg,
+                tipo: "texto",
+                remetente_tipo: "loja",
+                loja_id: user?.loja_id
+            })
+        });
 
-        } catch (err) {
-            console.log("Erro enviar:", err);
-        }
+        if (!res.ok) throw new Error("Erro ao enviar");
+
+        // 🔥 mostra imediatamente na tela
+setMensagens(prev => [
+    ...prev,
+    {
+        id: Date.now(),
+        mensagem: msg,
+        remetente_tipo: "loja",
+        criado_em: new Date().toISOString()
     }
+]);
+
+    } catch (err) {
+        console.log(err);
+    } finally {
+        setEnviando(false);
+    }
+}
+
 
     return (
 

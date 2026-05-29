@@ -88,44 +88,34 @@ function checkChatAccess(req, res, next) {
 
 }
 function checkChatMessageAccess(req, res, next) {
-
     const { chat_id } = req.body;
 
-    // ==========================================
-    // CHAT AINDA NÃO EXISTE
-    // ==========================================
-    // permite criar automaticamente
-    if (!chat_id) {
-        return res.status(400).json({
-            message: "chat_id obrigatório"
+    // só garante login
+    if (!req.user) {
+        return res.status(401).json({
+            message: "Precisa estar logado"
         });
     }
 
+    // se não tem chat_id, deixa criar novo chat
+    if (!chat_id) {
+        return next();
+    }
+
     const sql = `
-        SELECT
-            c.*,
-            s.user_id as dono_loja
+        SELECT c.*, s.user_id as dono_loja
         FROM chats c
-
-        INNER JOIN stores s
-            ON s.id = c.loja_id
-
+        INNER JOIN stores s ON s.id = c.loja_id
         WHERE c.id = ?
         LIMIT 1
     `;
 
     db.query(sql, [chat_id], (err, result) => {
 
-        if (err) {
-            return res.status(500).json(err);
-        }
+        if (err) return res.status(500).json(err);
 
-        // ==========================================
-        // CHAT NÃO EXISTE
-        // ==========================================
-        // deixa criar automaticamente
         if (result.length === 0) {
-            return next();
+            return next(); // chat novo permitido
         }
 
         const chat = result[0];
@@ -137,19 +127,14 @@ function checkChatMessageAccess(req, res, next) {
             chat.dono_loja === req.user.id;
 
         if (!usuarioEhCliente && !usuarioEhDonoLoja) {
-
             return res.status(403).json({
                 message: "Acesso negado"
             });
-
         }
 
         next();
-
     });
-
 }
-
 // ==========================================
 // LISTAR CHATS DA LOJA (INBOX)
 // ==========================================
@@ -229,211 +214,88 @@ router.get("/:chatId/mensagens", authMiddleware,
 // ==========================================
 // ENVIAR MENSAGEM
 // ==========================================
-router.post("/mensagem", authMiddleware,
-    checkChatMessageAccess,(req, res) => {
+router.post("/mensagem", authMiddleware, (req, res) => {
 
     const {
         chat_id,
         mensagem,
         tipo,
-        remetente_tipo
+        remetente_tipo,
+        loja_id,
+        cliente_id
     } = req.body;
 
     const remetente_id = req.user.id;
 
-    // ==========================================
-    // VERIFICAR CHAT
-    // ==========================================
-    const verificarChat = `
-        SELECT *
-        FROM chats
-        WHERE id = ?
-    `;
+    // 1. se não tem chat → cria
+    if (!chat_id) {
 
-    db.query(verificarChat, [chat_id], (err, chatResult) => {
+        const criarChat = `
+    INSERT INTO chats
+    (pedido_id, cliente_id, loja_id, atualizado_em, tem_nova_msg)
+    VALUES (?, ?, ?, NOW(), TRUE)
+`;
 
-        if (err) {
-            console.log(err);
-            return res.status(500).json(err);
-        }
-
-        // ==========================================
-        // CHAT NÃO EXISTE
-        // ==========================================
-        if (chatResult.length === 0) {
-
-            const buscarPedido = `
-                SELECT loja_id
-                FROM pedidos
-                WHERE id = ?
-            `;
-
-            db.query(
-                buscarPedido,
-                [chat_id],
-                (err2, pedidoResult) => {
-
-                    if (err2) {
-                        console.log(err2);
-                        return res.status(500).json(err2);
-                    }
-                    
-                    if (pedidoResult.length === 0) {
-    return res.status(404).json({
-        message: "Pedido não encontrado"
-    });
-}
-
-                    const lojaId = pedidoResult[0]?.loja_id;
-
-                    const criarChat = `
-                        INSERT INTO chats
-                        (
-                            id,
-                            pedido_id,
-                            cliente_id,
-                            loja_id,
-                            atualizado_em,
-                            tem_nova_msg
-                        )
-                        VALUES (?, ?, ?, ?, NOW(), TRUE)
-                    `;
-
-                    db.query(
-                        criarChat,
-                        [
-                            chat_id,
-                            chat_id,
-                            remetente_id,
-                            lojaId
-                        ],
-                        (err3) => {
-
-                            if (err3) {
-                                console.log(err3);
-                                return res.status(500).json(err3);
-                            }
-
-                            salvarMensagem(lojaId);
-                        }
-                    );
-
-                }
-            );
-
-        } else {
-
-            const lojaId = chatResult[0].loja_id;
-
-            salvarMensagem(lojaId);
-        }
-
-    });
-
-
-    // ==========================================
-    // SALVAR MENSAGEM
-    // ==========================================
-    function salvarMensagem(lojaId) {
-
-        const sql = `
-            INSERT INTO mensagens
-            (
-                chat_id,
-                remetente_id,
-                remetente_tipo,
-                tipo,
-                mensagem
-            )
-            VALUES (?, ?, ?, ?, ?)
-        `;
-
-        db.query(
-            sql,
+        db.query(criarChat,
             [
-                chat_id,
-                remetente_id,
-                remetente_tipo,
-                tipo,
-                mensagem
+                null,
+                remetente_tipo === "cliente" ? remetente_id : cliente_id,
+                loja_id
             ],
             (err, result) => {
 
-                if (err) {
-                    console.log(err);
-                    return res.status(500).json(err);
-                }
+                if (err) return res.status(500).json(err);
 
-                // ==========================================
-                // ATUALIZA CHAT
-                // ==========================================
-                const atualizarChat = `
-                    UPDATE chats
-                    SET
-                        atualizado_em = NOW(),
-                        tem_nova_msg = TRUE
-                    WHERE id = ?
-                `;
+                const novoChatId = result.insertId;
 
-                db.query(atualizarChat, [chat_id]);
+                salvarMensagem(novoChatId, loja_id);
+            }
+        );
 
-                // ==========================================
-                // BUSCAR MENSAGEM COMPLETA
-                // ==========================================
-                const buscarMensagem = `
-                    SELECT *
-                    FROM mensagens
-                    WHERE id = ?
-                `;
+    } else {
 
-                db.query(
-                    buscarMensagem,
-                    [result.insertId],
-                    (err2, mensagemResult) => {
-
-                        if (err2) {
-                            console.log(err2);
-                            return res.status(500).json(err2);
-                        }
-
-                        const novaMensagem = mensagemResult[0];
-
-                        const io = getIo();
-
-                        // ==========================================
-                        // CHAT TEMPO REAL
-                        // ==========================================
-                        io.to(`chat_${chat_id}`).emit(
-                            "nova_mensagem",
-                            novaMensagem
-                        );
-
-                        // ==========================================
-                        // NOTIFICAÇÃO LOJA
-                        // ==========================================
-                        if (lojaId && remetente_tipo === "cliente") {
-
-    io.to(`loja_${lojaId}`).emit(
-    "nova_mensagem_loja",
-    {
-        ...novaMensagem,
-        pedido_id: chat_id,
-        remetente_id,
-        remetente_tipo,
-        loja_id: lojaId
+        // chat já existe
+        salvarMensagem(chat_id);
     }
-);
-}
 
-                        return res.json(novaMensagem);
+    function salvarMensagem(chatId, lojaId) {
 
-                    }
-                );
+        const sql = `
+            INSERT INTO mensagens
+            (chat_id, remetente_id, remetente_tipo, tipo, mensagem)
+            VALUES (?, ?, ?, ?, ?)
+        `;
 
+        db.query(sql,
+            [chatId, remetente_id, remetente_tipo, tipo, mensagem],
+            (err, result) => {
+
+                if (err) return res.status(500).json(err);
+                const novaMensagem = {
+                id: result.insertId,
+                chat_id: chatId,
+                mensagem,
+                remetente_tipo,
+                remetente_id,
+                criado_em: new Date()
+            };
+
+            const io = getIo();
+
+            // 🔥 EMITE DEPOIS DE SALVAR
+            io.to(`chat_${chatId}`).emit(
+                "nova_mensagem",
+                novaMensagem
+            );
+
+                return res.json({
+                    message: "Mensagem enviada",
+                    chat_id: chatId,
+                    id: result.insertId
+                });
             }
         );
     }
-
 });
 
 

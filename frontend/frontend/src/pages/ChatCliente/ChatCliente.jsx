@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate,  useLocation  } from "react-router-dom";
 import socket from "../../socket";
 import "./ChatCliente.css";
 
@@ -12,9 +12,13 @@ function ChatCliente() {
     const [mensagens, setMensagens] = useState([]);
     const [chatInfo, setChatInfo] = useState(null);
 
+const jaEnviouInicial = useRef(false);
     const token = localStorage.getItem("token");
 
     const mensagensRef = useRef(null);
+
+    const location = useLocation();
+const mensagemInicial = location.state?.mensagemInicial;
 
     // ===============================
     // CARREGAR MENSAGENS + CHAT INFO
@@ -39,10 +43,10 @@ function ChatCliente() {
                 const primeira = data[0];
 
                 setChatInfo({
-                    cliente_id: primeira.cliente_id,
-                    loja_id: primeira.loja_id,
-                    pedido_id: primeira.chat_id
-                });
+    cliente_id: primeira.cliente_id,
+    loja_id: primeira.loja_id,
+    chat_id: chatId
+});
             }
 
         })
@@ -54,21 +58,28 @@ function ChatCliente() {
     // SOCKET ENTRAR NO CHAT
     // ===============================
     useEffect(() => {
-        if (!chatId) return;
+    if (!chatId) return;
 
-        socket.emit("entrar_chat", chatId);
-    }, [chatId]);
+    socket.emit("entrar_chat", { chatId });
+
+    return () => {
+        socket.emit("sair_chat", { chatId });
+    };
+}, [chatId]);
 
     // ===============================
     // SOCKET MENSAGENS EM TEMPO REAL
     // ===============================
     useEffect(() => {
-
+ 
         const handleMessage = (msg) => {
 
             setMensagens(prev => {
 
-                const existe = prev.some(m => m.id === msg.id);
+                const existe = prev.some(
+    m => m.id === msg.id || 
+         (m.temp_id && m.temp_id === msg.temp_id)
+);
                 if (existe) return prev;
 
                 return [...prev, msg];
@@ -89,8 +100,10 @@ function ChatCliente() {
     useEffect(() => {
 
         if (mensagensRef.current) {
-            mensagensRef.current.scrollTop =
-                mensagensRef.current.scrollHeight;
+            mensagensRef.current?.scrollTo({
+    top: mensagensRef.current.scrollHeight,
+    behavior: "smooth"
+});
         }
 
     }, [mensagens]);
@@ -99,10 +112,10 @@ function ChatCliente() {
     // ENVIAR MENSAGEM
     // ===============================
     async function enviarMensagem() {
+    if (!mensagem.trim()) return;
 
-        if (!mensagem.trim()) return;
-
-        await fetch("http://localhost:3000/api/chat/mensagem", {
+    try {
+        const res = await fetch("http://localhost:3000/api/chat/mensagem", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -116,8 +129,64 @@ function ChatCliente() {
             })
         });
 
-        setMensagem("");
+        if (!res.ok) throw new Error("Erro ao enviar");
+        // 🔥 adiciona imediatamente na tela
+setMensagens(prev => [
+    ...prev,
+    {
+        id: Date.now(),
+        mensagem,
+        remetente_tipo: "cliente",
+        criado_em: new Date().toISOString()
     }
+]);
+
+        setMensagem("");
+
+    } catch (err) {
+        console.log(err);
+        alert("Erro ao enviar mensagem");
+    }
+}
+
+useEffect(() => {
+    if (!mensagemInicial || !chatId || !token) return;
+    if (jaEnviouInicial.current) return;
+
+    const enviarInicial = async () => {
+        try {
+            await fetch("http://localhost:3000/api/chat/mensagem", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    mensagem: mensagemInicial,
+                    tipo: "texto",
+                    remetente_tipo: "cliente"
+                })
+            });
+            // 🔥 adiciona imediatamente na tela
+setMensagens(prev => [
+    ...prev,
+    {
+        id: Date.now(),
+        mensagem: mensagemInicial,
+        remetente_tipo: "cliente",
+        criado_em: new Date().toISOString()
+    }
+]);
+
+            jaEnviouInicial.current = true; // 🔥 bloqueia duplicação
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    enviarInicial();
+}, [mensagemInicial, chatId, token]);
 
     return (
         <div className="chat-container">

@@ -55,7 +55,7 @@ function Mensagens() {
             onClick={() =>
               navigate(`/chat/${c.chatId}`)
             }
-          >
+          > 
 
             <h3>
               {c.nomeLoja || `Loja #${c.loja_id}`}

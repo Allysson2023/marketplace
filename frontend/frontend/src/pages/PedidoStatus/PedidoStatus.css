@@ -22,6 +22,11 @@
   font-weight: bold;
 }
 
+.topo-pedido h2 {
+  font-size: 14px;
+  color: #555;
+}
+
 .topo-pedido button {
   padding: 10px 14px;
   border: none;
@@ -89,6 +94,43 @@
 .btn-chat-loja:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(37, 211, 102, 0.35);
+}
+
+/* =========================
+   BOTÃO CHAT INTERNO (NOVO)
+========================= */
+.btn-chat-interno {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+
+  background: #2563eb;
+  color: #fff;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  border: none;
+  cursor: pointer;
+
+  transition: 0.2s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.btn-chat-interno:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+/* =========================
+   CONTAINER BOTÕES (RECOMENDADO)
+========================= */
+.botoes-contato {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 /* =========================
@@ -178,7 +220,7 @@
 }
 
 /* =========================
-   STATUS CORES (OPCIONAL)
+   STATUS CORES
 ========================= */
 .status.AGUARDANDO {
   color: orange;

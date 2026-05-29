@@ -73,20 +73,35 @@ function PedidoStatus() {
 
                 <h2>⏳ {pedido.status}</h2>
 
-                {pedido.whatsapp ? (
-  <a
-    className="btn-chat-loja"
-    href={`https://wa.me/${pedido.whatsapp.replace(/\D/g, "")}?text=Olá,%20tenho%20uma%20dúvida%20sobre%20o%20pedido%20%23${pedido.id}`}
-    target="_blank"
-    rel="noreferrer"
-  >
-    💬 Falar com Loja
-  </a>
-) : (
-  <p style={{ color: "gray", marginTop: "10px" }}>
-    Loja sem WhatsApp cadastrado
-  </p>
-)}
+                <div className="botoes-contato">
+
+    {/* WhatsApp (opcional mantém) */}
+    {pedido.whatsapp && (
+        <a
+            className="btn-whatsapp"
+            href={`https://wa.me/${pedido.whatsapp.replace(/\D/g, "")}?text=Olá,%20tenho%20uma%20dúvida%20sobre%20o%20pedido%20%23${pedido.id}`}
+            target="_blank"
+            rel="noreferrer"
+        >
+            💬 WhatsApp da Loja
+        </a>
+    )}
+
+    {/* CHAT INTERNO */}
+    <button
+    className="btn-chat-interno"
+    onClick={() =>
+        navigate(`/chat/${pedido.id}`, {
+            state: {
+                mensagemInicial: `Olá, tenho uma dúvida sobre o pedido #${pedido.id}`
+            }
+        })
+    }
+>
+    💬 Falar com a Loja (Chat Interno)
+</button>
+
+</div>
 
                 
 

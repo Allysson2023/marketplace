@@ -96,8 +96,11 @@ function App() {
         <Route path="/admin/pedido/:id" element={<AdminPedido />} />
         <Route path="/notificacoes" element={<Notificacoes />} />
         <Route path="/chat/:chatId" element={<ChatCliente />} />
-        <Route path="/chat/:chatId/loja" element={<ChatLoja />} />
-        <Route path="/chats" element={<ChatListLoja />} />
+        
+        <Route path="/loja/chats" element={<ChatListLoja />} />
+        <Route path="/loja/chat/:chatId" element={<ChatLoja />} />
+
+
         <Route path="/store/:id/dashboard" element={<StoreDashboard />} />
         <Route path="/store/:id/mais-vendidos" element={<MaisVendidos />}/>
         <Route path="/store/:id/estoque" element={<Estoque />}/>
