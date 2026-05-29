@@ -108,16 +108,7 @@ function PedidoStatus() {
                 <div className="botoes-contato">
 
     {/* WhatsApp (opcional mantém) */}
-    {pedido.whatsapp && (
-        <a
-            className="btn-whatsapp"
-            href={`https://wa.me/${pedido.whatsapp.replace(/\D/g, "")}?text=Olá,%20tenho%20uma%20dúvida%20sobre%20o%20pedido%20%23${pedido.id}`}
-            target="_blank"
-            rel="noreferrer"
-        >
-            💬 WhatsApp da Loja
-        </a>
-    )}
+    
 
     {/* CHAT INTERNO */}
     <button
