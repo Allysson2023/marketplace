@@ -295,6 +295,12 @@ const estaLogado = !!token;
       </>
     ) : (
       <>
+      <div
+  className="menu-item"
+  onClick={() => navigate("/mensagens")}
+>
+  💬 Minhas Conversas
+</div>
       
         <div
           className="menu-item"

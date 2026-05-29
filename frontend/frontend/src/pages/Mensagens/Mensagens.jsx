@@ -7,26 +7,34 @@ function Mensagens() {
   const [conversas, setConversas] = useState([]);
   const navigate = useNavigate();
 
+
+ useEffect(() => {
+
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
+  fetch("http://localhost:3000/api/chat/cliente", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+    .then(res => res.json())
+    .then(data => {
 
-    fetch("http://localhost:3000/api/chat/cliente", {
-      headers: {
-        Authorization: `Bearer ${token}`
+      console.log("RESPOSTA CHAT:", data);
+
+      if (Array.isArray(data)) {
+        setConversas(data);
+      } 
+      else {
+        setConversas([]);
       }
+
     })
-      .then(res => res.json())
-      .then(data => {
+    .catch(err => console.log(err));
 
-        console.log("CHAT CLIENTE:", data);
+  console.log("TOKEN SENDO USADO:", token);
 
-        setConversas(Array.isArray(data) ? data : []);
-
-      })
-      .catch(err => console.log(err));
-
-  }, [token]);
+}, []);
 
   return (
     <div className="mensagens-container">

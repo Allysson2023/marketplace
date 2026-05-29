@@ -42,14 +42,13 @@ function checkChatAccess(req, res, next) {
     const { chatId } = req.params;
 
     const sql = `
-        SELECT
-            c.*,
-            s.user_id as dono_loja
+        SELECT 
+            c.id,
+            c.cliente_id,
+            c.loja_id,
+            s.user_id AS dono_loja
         FROM chats c
-
-        INNER JOIN stores s
-            ON s.id = c.loja_id
-
+        INNER JOIN stores s ON s.id = c.loja_id
         WHERE c.id = ?
         LIMIT 1
     `;
@@ -68,24 +67,23 @@ function checkChatAccess(req, res, next) {
 
         const chat = result[0];
 
-        const usuarioEhCliente =
-    Number(chat.cliente_id) === Number(req.user.id);
+        const userId = Number(req.user.id);
 
-const usuarioEhDonoLoja =
-    Number(chat.dono_loja) === Number(req.user.id);
+        const isCliente = Number(chat.cliente_id) === userId;
+        const isLojaOwner = Number(chat.dono_loja) === userId;
 
-        if (!usuarioEhCliente && !usuarioEhDonoLoja) {
-
+        // 🔥 BLOQUEIO TOTAL
+        if (!isCliente && !isLojaOwner) {
             return res.status(403).json({
-                message: "Acesso negado"
+                message: "Você não tem acesso a esse chat"
             });
-
         }
 
+        // 🔥 IMPORTANTE: salva no req pra reutilizar
+        req.chat = chat;
+
         next();
-
     });
-
 }
 function checkChatMessageAccess(req, res, next) {
     const { chat_id } = req.body;
@@ -135,6 +133,48 @@ const usuarioEhDonoLoja =
         next();
     });
 }
+
+ router.get("/cliente", authMiddleware, (req, res) => {
+        
+            const clienteId = req.user.id;
+        
+            const sql = `
+                SELECT 
+                    c.id AS chatId,
+                    c.loja_id,
+                    c.atualizado_em,
+        
+                    (
+                        SELECT mensagem
+                        FROM mensagens m
+                        WHERE m.chat_id = c.id
+                        ORDER BY m.id DESC
+                        LIMIT 1
+                    ) AS ultimaMensagem,
+        
+                    l.nome AS nomeLoja
+        
+                FROM chats c
+        
+                INNER JOIN stores l ON l.id = c.loja_id
+        
+                WHERE c.cliente_id = ?
+        
+                ORDER BY c.atualizado_em DESC
+            `;
+        
+            db.query(sql, [clienteId], (err, result) => {
+        
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json(err);
+                }
+        
+                res.json(result);
+        
+            });
+        
+        });
 // ==========================================
 // LISTAR CHATS DA LOJA (INBOX)
 // ==========================================
@@ -181,6 +221,44 @@ router.get("/loja/:lojaId", authMiddleware,
 
 });
 
+// ==========================================
+// DADOS DO CHAT
+// ==========================================
+router.get("/:chatId", authMiddleware,
+    checkChatAccess, (req, res) => {
+
+    const { chatId } = req.params;
+
+    const sql = `
+        SELECT
+            c.*,
+            s.nome AS loja_nome
+        FROM chats c
+
+        INNER JOIN stores s
+            ON s.id = c.loja_id
+
+        WHERE c.id = ?
+        LIMIT 1
+    `;
+
+    db.query(sql, [chatId], (err, result) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: "Chat não encontrado"
+            });
+        }
+
+        res.json(result[0]);
+
+    });
+
+});
 
 // ==========================================
 // LISTAR MENSAGENS DO CHAT
@@ -229,13 +307,13 @@ router.post("/mensagem", authMiddleware, (req, res) => {
 
     // 1. se não tem chat → cria
     if (!chat_id) {
-
+        
         const criarChat = `
     INSERT INTO chats
     (pedido_id, cliente_id, loja_id, atualizado_em, tem_nova_msg)
     VALUES (?, ?, ?, NOW(), TRUE)
 `;
-
+ 
         db.query(criarChat,
             [
                 null,
@@ -298,6 +376,7 @@ router.post("/mensagem", authMiddleware, (req, res) => {
     }
 });
 
+        
 router.post("/abrir", authMiddleware, (req, res) => {
 
     const cliente_id = req.user.id;
@@ -358,44 +437,6 @@ router.post("/abrir", authMiddleware, (req, res) => {
 
 });
 
-// ==========================================
-// DADOS DO CHAT
-// ==========================================
-router.get("/:chatId", authMiddleware,
-    checkChatAccess, (req, res) => {
-
-    const { chatId } = req.params;
-
-    const sql = `
-        SELECT
-            c.*,
-            s.nome AS loja_nome
-        FROM chats c
-
-        INNER JOIN stores s
-            ON s.id = c.loja_id
-
-        WHERE c.id = ?
-        LIMIT 1
-    `;
-
-    db.query(sql, [chatId], (err, result) => {
-
-        if (err) {
-            return res.status(500).json(err);
-        }
-
-        if (result.length === 0) {
-            return res.status(404).json({
-                message: "Chat não encontrado"
-            });
-        }
-
-        res.json(result[0]);
-
-    });
-
-});
 
 
 // ==========================================
@@ -427,48 +468,6 @@ router.put("/visualizar/:chatId", authMiddleware,
 
 });
 
-
-router.get("/cliente", authMiddleware, (req, res) => {
-
-    const clienteId = req.user.id;
-
-    const sql = `
-        SELECT 
-            c.id AS chatId,
-            c.loja_id,
-            c.atualizado_em,
-
-            (
-                SELECT mensagem
-                FROM mensagens m
-                WHERE m.chat_id = c.id
-                ORDER BY m.id DESC
-                LIMIT 1
-            ) AS ultimaMensagem,
-
-            l.nome AS nomeLoja
-
-        FROM chats c
-
-        INNER JOIN stores l ON l.id = c.loja_id
-
-        WHERE c.cliente_id = ?
-
-        ORDER BY c.atualizado_em DESC
-    `;
-
-    db.query(sql, [clienteId], (err, result) => {
-
-        if (err) {
-            console.log(err);
-            return res.status(500).json(err);
-        }
-
-        res.json(result);
-
-    });
-
-});
 
 
 module.exports = router;
