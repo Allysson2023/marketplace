@@ -84,7 +84,7 @@ function EditarLoja(){
                 onClick={() => navigate(-1)}
             >
                 ← Voltar
-            </button>
+            </button> 
 
             <div className="edit-loja-card">
 
