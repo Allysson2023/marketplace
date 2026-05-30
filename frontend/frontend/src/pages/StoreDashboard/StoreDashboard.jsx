@@ -255,7 +255,7 @@ console.log(resumo);
           </h1>
 
           <p className="dashboard-subtitle">
-            Visão geral das vendas e desempenho
+            Acompanhe vendas, pedidos e desempenho da loja
           </p>
 
         </div>
@@ -353,7 +353,7 @@ console.log(resumo);
 >
   <span>💬</span>
   <h3>Conversas</h3>
-
+ 
   {resumo.chatsNaoLidos > 0 && (
     <div className="badge-chat">
       {resumo.chatsNaoLidos}
