@@ -14,7 +14,7 @@ function Mensagens() {
 
   fetch("http://localhost:3000/api/chat/cliente", {
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}` 
     }
   })
     .then(res => res.json())
@@ -61,8 +61,10 @@ function Mensagens() {
             key={c.chatId}
             className="chat-card"
             onClick={() =>
-              navigate(`/chat/${c.chatId}`)
-            }
+  navigate(`/chat/${c.chatId}`, {
+    state: { tipo: "cliente" }
+  })
+}
           > 
 
             <h3>

@@ -241,7 +241,7 @@ console.log(resumo);
       </div>
 
     ))}
-
+ 
   </div>
 
 </div>
@@ -347,6 +347,19 @@ console.log(resumo);
 
       {/* AÇÕES */}
       <div className="quick-actions">
+        <div
+  className="quick-card"
+  onClick={() => navigate(`/loja/${id}/chats`)}
+>
+  <span>💬</span>
+  <h3>Conversas</h3>
+
+  {resumo.chatsNaoLidos > 0 && (
+    <div className="badge-chat">
+      {resumo.chatsNaoLidos}
+    </div>
+  )}
+</div>
 
         <div
           className="quick-card"

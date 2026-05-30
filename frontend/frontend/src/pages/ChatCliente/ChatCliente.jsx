@@ -4,7 +4,7 @@ import socket from "../../socket";
 import "./ChatCliente.css";
 
 function ChatCliente() {
-
+ 
     const { chatId } = useParams();
     const navigate = useNavigate();
 
@@ -76,39 +76,61 @@ const mensagemInicial = location.state?.mensagemInicial;
     // SOCKET MENSAGENS EM TEMPO REAL
     // ===============================
     useEffect(() => {
- 
-        const handleMessage = (msg) => {
 
-            setMensagens(prev => {
+    if (!chatId) return;
 
-                const existe = prev.some(m => m.id === msg.id);
-                if (existe) return prev;
+    const handleMessage = (msg) => {
 
-                return [...prev, msg];
+        if (!msg?.chat_id) return;
+        if (Number(msg.chat_id) !== Number(chatId)) return;
 
+        setMensagens(prev => {
+
+            const exists = prev.some(m => {
+
+                // 🔥 fallback seguro (NUNCA depende só de id)
+                return (
+                    (m.id && msg.id && m.id === msg.id) ||
+                    (m.temp_id && msg.temp_id && m.temp_id === msg.temp_id) ||
+                    (m.mensagem === msg.mensagem &&
+                     m.remetente_tipo === msg.remetente_tipo &&
+                     Math.abs(
+                        new Date(m.criado_em) - new Date(msg.criado_em)
+                     ) < 2000)
+                );
             });
 
-        };
+            if (exists) return prev;
 
-        socket.on("nova_mensagem", handleMessage);
+            return [...prev, msg];
+        });
+    };
 
-        return () => socket.off("nova_mensagem", handleMessage);
+    socket.on("nova_mensagem", handleMessage);
 
-    }, []);
+    return () => socket.off("nova_mensagem", handleMessage);
+
+}, [chatId]);
 
     // ===============================
     // SCROLL AUTOMÁTICO
     // ===============================
     useEffect(() => {
 
-        if (mensagensRef.current) {
-            mensagensRef.current?.scrollTo({
-    top: mensagensRef.current.scrollHeight,
-    behavior: "smooth"
-});
-        }
+    const el = mensagensRef.current;
+    if (!el) return;
 
-    }, [mensagens]);
+    const nearBottom =
+        el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+
+    if (nearBottom) {
+        el.scrollTo({
+            top: el.scrollHeight,
+            behavior: "smooth"
+        });
+    }
+
+}, [mensagens]);
 
     // ===============================
     // ENVIAR MENSAGEM
@@ -134,7 +156,7 @@ const mensagemInicial = location.state?.mensagemInicial;
                 Authorization: `Bearer ${token}`
             },
             body: JSON.stringify({
-                chat_id: chatId,
+                chat_id: Number(chatId),
                 mensagem,
                 tipo: "texto",
                 remetente_tipo: "cliente"
@@ -161,10 +183,15 @@ const mensagemInicial = location.state?.mensagemInicial;
 }
 
 useEffect(() => {
+
     if (!mensagemInicial || !chatId || !token) return;
-    if (jaEnviouInicial.current) return;
 
     const enviarInicial = async () => {
+
+        if (jaEnviouInicial.current) return;
+
+        jaEnviouInicial.current = true;
+
         try {
             await fetch("http://localhost:3000/api/chat/mensagem", {
                 method: "POST",
@@ -173,30 +200,32 @@ useEffect(() => {
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    chat_id: chatId,
+                    chat_id: Number(chatId),
                     mensagem: mensagemInicial,
                     tipo: "texto",
                     remetente_tipo: "cliente"
                 })
             });
-            // 🔥 adiciona imediatamente na tela
-setMensagens(prev => [
-    ...prev,
-    {
-        id: Date.now(),
-        mensagem: mensagemInicial,
-        remetente_tipo: "cliente",
-        criado_em: new Date().toISOString()
-    }
-]);
 
-            jaEnviouInicial.current = true; // 🔥 bloqueia duplicação
+            setMensagens(prev => [
+                ...prev,
+                {
+                    id: Date.now(),
+                    temp_id: Date.now(),
+                    chat_id: Number(chatId),
+                    mensagem: mensagemInicial,
+                    remetente_tipo: "cliente",
+                    criado_em: new Date().toISOString()
+                }
+            ]);
+
         } catch (err) {
             console.log(err);
         }
     };
 
     enviarInicial();
+
 }, [mensagemInicial, chatId, token]);
 
     return (

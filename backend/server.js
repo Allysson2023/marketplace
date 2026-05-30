@@ -78,12 +78,16 @@ io.on("connection", (socket) => {
 });
 
     // chat específico (CLIENTE + LOJA)
-    socket.on("entrar_chat", (chatId) => {
+    socket.on("entrar_chat", ({ chatId }) => {
 
-        socket.join(`chat_${chatId}`);
+    socket.join(`chat_${chatId}`);
 
-        console.log(`💬 Entrou no chat: chat_${chatId}`);
-    });
+    console.log(`💬 Entrou no chat: chat_${chatId}`);
+});
+
+socket.on("sair_chat", ({ chatId }) => {
+    socket.leave(`chat_${chatId}`);
+});
 
 });
 

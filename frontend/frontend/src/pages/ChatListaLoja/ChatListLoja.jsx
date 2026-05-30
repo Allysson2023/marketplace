@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useParams} from "react-router-dom";
 import socket from "../../socket";
 import "./ChatListLoja.css";
 
@@ -10,6 +10,9 @@ function ChatListLoja() {
     const [chats, setChats] = useState([]);
     const navigate = useNavigate();
 
+    const params = useParams();
+const lojaId = Number(params.id);
+
     const token = localStorage.getItem("token");
 
     let user = null;
@@ -19,111 +22,78 @@ try {
     user = null;
 }
 
-    const lojaId = user?.loja_id;
 
 
 
-
-    const audioCooldown = useRef(false);
-
-const playSound = () => {
-    if (audioCooldown.current) return;
-
-    audioRef.current.currentTime = 0;
-    audioRef.current.play().catch(() => {});
-
-    audioCooldown.current = true;
-
-    setTimeout(() => {
-        audioCooldown.current = false;
-    }, 800);
-};
+   
 
     // ===============================
     // CARREGAR CHATS
     // ===============================
     const carregarChats = async () => {
+    if (!lojaId || !token) return;
 
-        if (!lojaId || !token) return;
-
-        try {
-
-            const res = await fetch("http://localhost:3000/api/chat/mensagem", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-        chat_id: chatId,
-        mensagem: msg,
-        tipo: "texto",
-        remetente_tipo: "loja",
-        loja_id: user?.loja_id
-    })
-});
-
-if (!res.ok) throw new Error("Erro ao enviar mensagem");
-
-socket.emit("nova_mensagem", {
-    chat_id: chatId,
-    mensagem: msg,
-    remetente_tipo: "loja"
-});
-
-            const data = await res.json();
-
-            if (Array.isArray(data)) {
-
-                // ordena logo ao carregar
-                const chatsOrdenados = data.sort((a, b) =>
-                    new Date(b.atualizado_em || 0) -
-                    new Date(a.atualizado_em || 0)
-                );
-
-                setChats(chatsOrdenados);
+    try {
+        const res = await fetch(
+            `http://localhost:3000/api/chat/loja/${lojaId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             }
+        );
 
-        } catch (err) {
-            console.log(err);
-        }
-    };
+        if (!res.ok) throw new Error("Erro ao carregar chats");
+
+        const data = await res.json();
+
+        const chatsOrdenados = data.sort(
+            (a, b) =>
+                new Date(b.atualizado_em || 0) -
+                new Date(a.atualizado_em || 0)
+        );
+
+        setChats(chatsOrdenados);
+
+    } catch (err) {
+        console.log(err);
+    }
+};
 
     // ===============================
     // INIT
     // ===============================
     useEffect(() => {
+  if (!token) return;
 
-        carregarChats();
+  if (!lojaId) return;
 
-        if (lojaId) {
-            socket.emit("join_loja", lojaId);
-        }
-
-    }, [lojaId]);
+  carregarChats();
+  socket.emit("join_loja", lojaId);
+}, [lojaId, token]);
 
     // ===============================
     // SOCKET TEMPO REAL
     // ===============================
-    useEffect(() => {
+    const currentUser = JSON.parse(localStorage.getItem("user"));
+
+useEffect(() => {
 
     const handleNovaMsg = (msg) => {
 
-        let currentUser = null;
-        try {
-            currentUser = JSON.parse(localStorage.getItem("user"));
-        } catch (e) {
-            currentUser = null;
-        }
-
-        if (
+        const isMyMessage =
             msg.remetente_tipo === "loja" &&
-            Number(msg.remetente_id) === Number(currentUser?.id)
-        ) {
-            return;
-        }
+            Number(msg.remetente_id) === Number(currentUser?.id);
 
-        playSound();
+        const isChatOpen =
+            window.location.pathname.includes(`/chat/${msg.chat_id}/loja`);
+
+        if (isMyMessage || isChatOpen) return;
+
+        try {
+            const audio = new Audio(somNotificacao);
+            audio.play();
+        } catch {}
 
         setChats(prev => {
             let updated = [...prev];
@@ -150,8 +120,7 @@ socket.emit("nova_mensagem", {
             }
 
             updated.sort((a, b) =>
-                new Date(b.atualizado_em || 0) -
-                new Date(a.atualizado_em || 0)
+                new Date(b.atualizado_em || 0) - new Date(a.atualizado_em || 0)
             );
 
             return updated;
@@ -164,7 +133,7 @@ socket.emit("nova_mensagem", {
         socket.off("nova_mensagem_loja", handleNovaMsg);
     };
 
-}, []);
+}, [lojaId]);
 
     // ===============================
     // ABRIR CHAT
@@ -194,7 +163,7 @@ socket.emit("nova_mensagem", {
             )
         );
 
-        navigate(`/chat/${chatId}/loja`);
+        navigate(`/chat/${Number(chatId)}/loja`);
 
     } catch (err) {
         console.log(err);
@@ -207,6 +176,11 @@ socket.emit("nova_mensagem", {
     function voltar() {
         navigate(-1);
     }
+
+    useEffect(() => {
+    console.log("USER:", user);
+    console.log("LOJA_ID:", lojaId);
+}, []);
 
     return (
 

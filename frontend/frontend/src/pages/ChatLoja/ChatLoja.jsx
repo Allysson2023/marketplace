@@ -33,14 +33,8 @@ function ChatLoja() {
         })
         .then(res => res.json())
         .then(data => {
-
-            const chat = data.find(c => String(c.id) === String(chatId));
-
-            if (chat) {
-                setChatInfo(chat);
-            }
-
-        })
+    setChatInfo(data);
+})
         .catch(err => console.log("Erro chatInfo:", err));
 
     }, [chatId, user?.loja_id, token]);
@@ -106,18 +100,29 @@ function ChatLoja() {
     // SOCKET REALTIME
     // ===============================
     useEffect(() => {
+    if (!chatId) return;
 
     const handle = (msg) => {
 
-        setMensagens(prev => {
+        if (!msg?.chat_id) return;
+        if (Number(msg.chat_id) !== Number(chatId)) return;
 
+        const isMyMessage =
+            msg.remetente_tipo === "loja" &&
+            Number(msg.remetente_id) === Number(user?.id);
+
+        if (isMyMessage) return; // ❌ bloqueia eco
+
+        setMensagens(prev => {
             const exists = prev.some(
-                m => m.id === msg.id || m.temp_id === msg.temp_id
+                m =>
+                    (msg.id && m.id === msg.id) ||
+                    (msg.temp_id && m.temp_id === msg.temp_id)
             );
 
             if (exists) return prev;
 
-            return [...prev, msg];
+            return [...prev, msg]; // ✅ CORRETO
         });
     };
 
@@ -126,20 +131,23 @@ function ChatLoja() {
     return () => {
         socket.off("nova_mensagem", handle);
     };
-
-}, [chatId]);
+}, [chatId, user?.id]);
 
     // ===============================
     // AUTO SCROLL
     // ===============================
     useEffect(() => {
+    const el = mensagensRef.current;
+    if (!el) return;
 
-        if (mensagensRef.current) {
-            mensagensRef.current.scrollTop =
-                mensagensRef.current.scrollHeight;
-        }
+    const nearBottom =
+        el.scrollHeight - el.scrollTop - el.clientHeight < 120;
 
-    }, [mensagens]);
+    if (nearBottom) {
+        el.scrollTop = el.scrollHeight;
+    }
+
+}, [mensagens]);
 
     // ===============================
     // ENVIAR MENSAGEM
@@ -162,7 +170,7 @@ async function enviar() {
                 Authorization: `Bearer ${token}`
             },
             body: JSON.stringify({
-                chat_id: chatId,
+                chat_id: Number(chatId),
                 mensagem: msg,
                 tipo: "texto",
                 remetente_tipo: "loja",
@@ -177,6 +185,8 @@ setMensagens(prev => [
     ...prev,
     {
         id: Date.now(),
+        temp_id: Date.now(),
+        chat_id: Number(chatId),
         mensagem: msg,
         remetente_tipo: "loja",
         criado_em: new Date().toISOString()
