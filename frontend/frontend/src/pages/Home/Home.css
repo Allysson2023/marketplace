@@ -701,7 +701,7 @@ PAGINAÇÃO
     cursor: pointer;
     transition: 0.2s;
 }
-
+ 
 .btn-notificacao:disabled {
     opacity: 0.4;
     cursor: not-allowed;
@@ -709,25 +709,193 @@ PAGINAÇÃO
 }
 
 
-@media(max-width: 768px){
+/* =========================
+TABLETS
+========================= */
+
+@media (max-width: 768px){
 
     .topo{
         flex-direction: column;
-        gap: 10px;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .acoes-topo{
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .acoes-topo input{
+        width: 100%;
+        min-width: 0;
+    }
+
+    .btn-carrinho{
+        flex-shrink: 0;
+    }
+
+    .btn-mais{
+        flex-shrink: 0;
+    }
+
+    .btn-notificacao{
+        flex-shrink: 0;
+    }
+
+    .produto-grid{
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card-produto img{
+        height: 180px;
+    }
+    
+
+    .menu-dropdown{
+        position: fixed;
+        top: 80px;
+        right: 10px;
+        width: 90%;
+        max-width: 260px;
+    }
+
+    .modal{
+        width: 90%;
+        max-width: 320px;
+    }
+
+    .modal-sair{
+        width: 90%;
+        max-width: 320px;
+    }
+
+    .cart-badge{
+        min-width: 20px;
+        height: 20px;
+        padding: 0 4px;
+    }
+}
+
+/* =========================
+CELULARES
+========================= */
+
+@media (max-width: 500px){
+
+    .home{
+        padding: 10px;
+    }
+
+    .topo{
+        padding: 12px;
+    }
+
+    .topo h2{
+        font-size: 24px;
+        text-align: center;
     }
 
     .acoes-topo{
         width: 100%;
     }
 
+    .acoes-topo input{
+        width: 100%;
+    }
+
     .produto-grid{
-        grid-template-columns: repeat(2, 1fr);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+    .card-produto{
+        width: 100%;
+    }
+
+    .card-produto img{
+        height: 220px;
+    }
+
+    .card-loja{
+        min-width: 120px;
+    }
+
+    .btn-carregar{
+        width: 100%;
+    }
+
+    .paginacao{
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .menu-dropdown{
+        width: calc(100% - 20px);
+        max-width: none;
+        right: 10px;
     }
 }
 
-@media(max-width: 500px){
+/* =========================
+CELULARES PEQUENOS
+========================= */
 
-    .produto-grid{
-        grid-template-columns: 1fr;
+@media (max-width: 360px){
+
+    .home{
+        padding: 8px;
+    }
+
+    .topo h2{
+        font-size: 22px;
+    }
+
+    .acoes-topo{
+        gap: 6px;
+    }
+
+    .acoes-topo input{
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .btn-carrinho{
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .btn-mais{
+        width: 40px;
+        height: 40px;
+        font-size: 24px;
+    }
+
+    .btn-notificacao{
+        font-size: 18px;
+    }
+
+    .card-loja{
+        min-width: 100px;
+        padding: 10px;
+    }
+
+    .card-loja img{
+        width: 70px;
+        height: 70px;
+    }
+
+    .card-produto img{
+        height: 180px;
+    }
+
+    .preco-atual{
+        font-size: 18px;
+    }
+
+    .btn-carregar{
+        padding: 12px;
+        font-size: 14px;
     }
 }

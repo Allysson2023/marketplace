@@ -362,11 +362,10 @@ const estaLogado = !!token;
 
   {categorias.map((cat, index) => {
 
-  console.log(cat);
 
   return (
     <span
-      key={index}
+      key={cat.nome}
       className={`categoria-item ${
         categoriaSelecionada === cat.nome
           ? "categoria-ativa"
