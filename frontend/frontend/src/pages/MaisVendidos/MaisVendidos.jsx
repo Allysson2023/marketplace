@@ -84,7 +84,7 @@ function MaisVendidos() {
                   #{index + 1}
                 </span>
 
-                <div>
+                <div> 
                   <p className="mv-name">{p.nome}</p>
                   <small>{p.total_vendido}  {
     p.total_vendido > 1 ? "vendas" : "venda"
