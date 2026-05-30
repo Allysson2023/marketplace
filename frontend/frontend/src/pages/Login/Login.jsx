@@ -71,7 +71,7 @@ function Login() {
 
     }
 
-  } catch (err) {
+  } catch (err) { 
 
     setMensagemErro("Erro no servidor");
 
@@ -84,6 +84,10 @@ function Login() {
 
     <div className="login-container">
       <h2>Economica</h2>
+
+<p className="subtitulo">
+  Entre na sua conta e encontre as melhores ofertas.
+</p>
 
       <form onSubmit={handleLogin}>
         <input
