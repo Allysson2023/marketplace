@@ -95,8 +95,13 @@ GRID
 .card-admin{
     background: white;
     padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+
+.card-admin:hover{
+    transform: translateY(-3px);
 }
 
 .card-admin h2{
@@ -132,10 +137,14 @@ PRODUTOS
     display: flex;
     align-items: center;
     gap: 20px;
-    padding: 15px 0;
+    padding: 18px 0;
     border-bottom: 1px solid #eee;
+    transition: 0.3s;
 }
 
+.produto-item:hover{
+    background: #f8fafc;
+}
 .produto-item:last-child{
     border-bottom: none;
 }
@@ -186,7 +195,7 @@ AÇÕES STATUS
 
 .btn-status:hover{
     transform: translateY(-2px);
-}
+} 
 
 .btn-status.aceito{
     background: #2ecc71;
@@ -213,7 +222,8 @@ FOOTER
 ========================= */
 
 .footer-admin{
-    background: white;
+    background: linear-gradient(135deg,#111827,#1e293b);
+    color: white;
     padding: 25px;
     border-radius: 16px;
     text-align: right;
@@ -221,8 +231,7 @@ FOOTER
 }
 
 .footer-admin h2{
-    color: #111;
-    font-size: 2rem;
+    color: white;
 }
 
 
@@ -230,14 +239,27 @@ FOOTER
 
 
 /* =========================
-RESPONSIVO
+TABLET
 ========================= */
 
-@media(max-width: 768px){
+@media (max-width: 768px){
+
+    .admin-pedido{
+        padding: 15px;
+    }
 
     .topo-admin{
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .topo-admin h1{
+        font-size: 1.8rem;
+    }
+
+    .btn-voltar{
+        width: 100%;
     }
 
     .produto-item{
@@ -247,15 +269,141 @@ RESPONSIVO
 
     .produto-item img{
         width: 100%;
+        max-width: 100%;
         height: 220px;
     }
 
     .acoes-status{
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 10px;
     }
 
     .btn-status{
         width: 100%;
+        padding: 14px;
     }
 
+    .footer-admin h2{
+        font-size: 1.7rem;
+    }
+}
+
+/* =========================
+CELULARES
+========================= */
+
+@media (max-width: 480px){
+
+    .admin-pedido{
+        padding: 12px;
+    }
+
+    .topo-admin h1{
+        font-size: 1.5rem;
+    }
+
+    .status{
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    .grid-admin{
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .card-admin{
+        padding: 18px;
+        border-radius: 14px;
+    }
+
+    .card-admin h2{
+        font-size: 1.1rem;
+    }
+
+    .card-admin p{
+        font-size: 14px;
+    }
+
+    .produtos-admin{
+        padding: 18px;
+    }
+
+    .produto-item{
+        gap: 12px;
+    }
+
+    .produto-item img{
+        height: 180px;
+        border-radius: 10px;
+    }
+
+    .produto-item h3{
+        font-size: 15px;
+    }
+
+    .produto-item p,
+    .produto-item span{
+        font-size: 13px;
+    }
+
+    .acoes-status{
+        grid-template-columns: 1fr;
+    }
+
+    .btn-status{
+        font-size: 14px;
+        padding: 15px;
+    }
+
+    .footer-admin{
+        padding: 20px;
+        text-align: center;
+    }
+
+    .footer-admin h2{
+        font-size: 1.5rem;
+    }
+}
+
+/* =========================
+CELULARES PEQUENOS
+========================= */
+
+@media (max-width: 360px){
+
+    .admin-pedido{
+        padding: 10px;
+    }
+
+    .topo-admin h1{
+        font-size: 1.3rem;
+    }
+
+    .btn-voltar{
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .card-admin{
+        padding: 15px;
+    }
+
+    .card-admin p{
+        font-size: 13px;
+    }
+
+    .produto-item img{
+        height: 150px;
+    }
+
+    .btn-status{
+        font-size: 13px;
+        padding: 13px;
+    }
+
+    .footer-admin h2{
+        font-size: 1.3rem;
+    }
 }

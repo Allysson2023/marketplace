@@ -125,7 +125,7 @@ function AdminPedido() {
                     <h2>Cliente</h2>
                     
                     <p><strong>Nome:</strong> {pedido.nome_cliente}</p>
-
+ 
                     {pedido.dadosEntrega && (
                         <>
                             <p><strong>Pagamento:</strong> {pedido.dadosEntrega.pagamento}</p>
