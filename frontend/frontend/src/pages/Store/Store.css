@@ -1050,31 +1050,6 @@ img{
     transition: 0.3s;
 }
 
-/* =========================
-   AJUSTE MOBILE NOVOS ELEMENTOS
-========================= */
-
-@media(max-width: 600px){
-
-    .store-top-bar{
-        padding: 0 10px;
-    }
-
-    .btn-mais{
-        width: 38px;
-        height: 38px;
-        font-size: 20px;
-    }
-
-    .horario-loja{
-        font-size: 13px;
-    }
-
-    .social-btn{
-        font-size: 12px;
-        padding: 6px 10px;
-    }
-}
 
 /* =========================
    ANIMAÇÕES
@@ -1092,56 +1067,163 @@ img{
 }
 
 
-@media(max-width: 900px){
+/* =========================
+   TABLET
+========================= */
+@media (max-width: 900px){
 
     .store-profile{
         flex-direction: column;
-
         text-align: center;
+        padding: 25px;
+        gap: 20px;
+    }
 
-        padding-top: 45px;
+    .store-logo{
+        width: 130px;
+        height: 130px;
     }
 
     .store-info h1{
-        font-size: 32px;
+        font-size: 30px;
     }
 
     .store-stats{
         justify-content: center;
     }
-    .store-products h2{
-        font-size: 38px;
-        text-align: center;
+
+    .store-social{
+        justify-content: center;
     }
 
     .store-products{
-        margin-top: 70px;
+        margin-top: 80px;
+    }
+
+    .products-grid{
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
     }
 
 }
 
-@media(max-width: 600px){
-
-    .products-grid{
-        grid-template-columns: 1fr;
-    }
+/* =========================
+   CELULAR
+========================= */
+@media (max-width: 600px){
 
     .store-header{
-        min-height: 160px;
+        min-height: 600px;
+    }
+
+    .store-profile{
+        width: 95%;
+        padding: 20px;
+        border-radius: 25px;
+        gap: 15px;
     }
 
     .store-logo{
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
     }
 
     .store-info h1{
-        font-size: 28px;
+        font-size: 24px;
+    }
+
+    .store-info p{
+        font-size: 14px;
+    }
+
+    .store-social{
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .social-btn{
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .store-stats{
+        justify-content: center;
+    }
+
+    .store-stats span{
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .search-box input{
+        padding: 14px;
+        font-size: 14px;
     }
 
     .store-products h2{
-        font-size: 28px;
-        text-align: center;
+        font-size: 24px;
+    }
+
+    /* 2 PRODUTOS POR LINHA */
+    .products-grid{
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .product-card{
+        border-radius: 16px;
+    }
+
+    .product-card img{
+        height: 150px;
+    }
+
+    .product-info{
+        padding: 10px;
+    }
+
+    .product-info h3{
+        font-size: 14px;
+        min-height: auto;
+    }
+
+    .product-price{
+        font-size: 18px;
+    }
+
+    .btn-back{
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    .btn-mais{
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+
+}
+
+/* =========================
+   CELULARES MUITO PEQUENOS
+========================= */
+@media (max-width: 380px){
+
+    .products-grid{
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .product-card img{
+        height: 130px;
+    }
+
+    .product-info h3{
+        font-size: 12px;
+    }
+
+    .product-price{
+        font-size: 16px;
     }
 
 }

@@ -302,7 +302,7 @@ const [produtos, setProdutos] = useState([]);
                                 </p>
                             </div>
                         </div>
-                    ))}
+                    ))} 
 
                 </div>
 
