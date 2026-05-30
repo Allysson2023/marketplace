@@ -10,7 +10,7 @@ function Estoque() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  useEffect(() =>  {
     carregarEstoque();
   }, []);
 
