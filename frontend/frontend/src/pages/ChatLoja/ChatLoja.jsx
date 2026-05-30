@@ -19,6 +19,7 @@ function ChatLoja() {
     const [chatInfo, setChatInfo] = useState(null);
     const [cliente, setCliente] = useState(null);
 
+    const lojaId = user?.loja_id;
     // ===============================
     // BUSCAR INFO DO CHAT (pedido + cliente_id)
     // ===============================
@@ -37,7 +38,7 @@ function ChatLoja() {
 })
         .catch(err => console.log("Erro chatInfo:", err));
 
-    }, [chatId, user?.loja_id, token]);
+    }, [chatId, lojaId, token]);
 
     // ===============================
     // BUSCAR DADOS DO CLIENTE

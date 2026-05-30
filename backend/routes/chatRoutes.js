@@ -352,6 +352,7 @@ router.post("/mensagem", authMiddleware, (req, res) => {
                 const novaMensagem = {
     id: result.insertId,
     chat_id: chatId,
+    loja_id,
     mensagem,
     remetente_tipo,
     remetente_id,
@@ -360,11 +361,17 @@ router.post("/mensagem", authMiddleware, (req, res) => {
 
             const io = getIo();
 
-            // 🔥 EMITE DEPOIS DE SALVAR
-            io.to(`chat_${chatId}`).emit(
-                "nova_mensagem",
-                novaMensagem
-            );
+// mensagem dentro do chat
+io.to(`chat_${chatId}`).emit(
+    "nova_mensagem",
+    novaMensagem
+);
+
+// mensagem para atualizar lista da loja
+io.to(`loja_${loja_id}`).emit(
+    "nova_mensagem_loja",
+    novaMensagem
+);
 
                 return res.json({
                     message: "Mensagem enviada",
