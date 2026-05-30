@@ -64,7 +64,9 @@ const [sucesso, setSucesso] = useState("");
             > 
 
                 <h2>Criar Conta</h2>
-
+<p className="cadastro-subtitulo">
+  Crie sua conta e aproveite as melhores ofertas.
+</p>
                 <input
                     type="text"
                     placeholder="Usuário"
@@ -102,7 +104,7 @@ const [sucesso, setSucesso] = useState("");
                 </span>
 
             </form>
-
+ 
         </div>
 
     );

@@ -1,170 +1,382 @@
-body {
-    margin: 0;
-    font-family: 'Segoe UI', system-ui, Arial;
-}
 
 /* =========================
    FUNDO
 ========================= */
-.cadastro-container {
+
+.cadastro-container{
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    background: linear-gradient(135deg, #0b1220, #111a2e);
-    position: relative;
-}
+    padding: 20px;
 
-/* luz suave */
-.cadastro-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
+    position: relative;
+
+    overflow: hidden;
 
     background:
-        radial-gradient(circle at top left, rgba(99,102,241,0.12), transparent 40%),
-        radial-gradient(circle at bottom right, rgba(16,185,129,0.10), transparent 40%);
+        radial-gradient(circle at top left, #1e3a8a 0%, transparent 35%),
+        radial-gradient(circle at bottom right, #059669 0%, transparent 35%),
+        linear-gradient(135deg, #0b1220, #111827);
+}
+
+/* bolha azul */
+
+.cadastro-container::before{
+    content: "";
+
+    position: absolute;
+
+    width: 320px;
+    height: 320px;
+
+    top: -120px;
+    left: -120px;
+
+    border-radius: 50%;
+
+    background: rgba(79,70,229,0.18);
+
+    filter: blur(80px);
+}
+
+/* bolha verde */
+
+.cadastro-container::after{
+    content: "";
+
+    position: absolute;
+
+    width: 380px;
+    height: 380px;
+
+    bottom: -180px;
+    right: -180px;
+
+    border-radius: 50%;
+
+    background: rgba(16,185,129,0.15);
+
+    filter: blur(90px);
 }
 
 /* =========================
-   FORM CARD
+   CARD
 ========================= */
-.cadastro-form {
-    position: relative;
-    z-index: 1;
 
-    width: 380px;
+.cadastro-form{
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+    max-width: 430px;
 
     padding: 40px 32px;
 
-    border-radius: 16px;
+    border-radius: 26px;
 
-    background: rgba(255,255,255,0.04);
-    backdrop-filter: blur(14px);
+    background: rgba(255,255,255,0.06);
 
-    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
 
-    box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.10);
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,0.35);
 
     display: flex;
     flex-direction: column;
-    gap: 12px;
+
+    gap: 15px;
+
+    animation: aparecer .5s ease;
 }
 
-/* título */
-.cadastro-form h2 {
-    color: white;
+@keyframes aparecer{
+
+    from{
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to{
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   TÍTULO
+========================= */
+
+.cadastro-form h2{
     text-align: center;
 
-    font-size: 26px;
-    margin-bottom: 10px;
+    color: white;
+
+    font-size: 34px;
+
+    font-weight: 700;
+
+    margin-bottom: 5px;
 }
 
-/* inputs */
-.cadastro-form input {
-    padding: 14px;
+/* subtítulo opcional */
 
-    border-radius: 10px;
+.cadastro-form h2::after{
+    content: "Crie sua conta gratuitamente";
 
-    border: 1px solid rgba(255,255,255,0.08);
+    display: block;
 
-    background: rgba(255,255,255,0.03);
+    margin-top: 10px;
+
+    font-size: 14px;
+
+    font-weight: 400;
+
+    color: rgba(255,255,255,0.65);
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.cadastro-form input{
+    width: 100%;
+
+    padding: 15px;
+
+    border-radius: 14px;
+
+    border: 1px solid rgba(255,255,255,0.10);
+
+    background: rgba(255,255,255,0.05);
 
     color: white;
+
+    font-size: 15px;
 
     outline: none;
 
-    font-size: 14px;
-
-    transition: 0.2s ease;
+    transition: .25s;
 }
 
-.cadastro-form input::placeholder {
-    color: rgba(255,255,255,0.4);
+.cadastro-form input::placeholder{
+    color: rgba(255,255,255,0.45);
 }
 
-.cadastro-form input:focus {
-    border-color: rgba(99,102,241,0.6);
-    background: rgba(255,255,255,0.05);
+.cadastro-form input:focus{
+    border-color: #4f46e5;
+
+    background: rgba(255,255,255,0.08);
+
+    box-shadow:
+        0 0 0 4px rgba(79,70,229,0.15);
 }
 
-/* botão */
-.cadastro-form button {
-    margin-top: 10px;
+/* =========================
+   BOTÃO
+========================= */
 
-    padding: 14px;
+.cadastro-form button{
+    width: 100%;
+
+    padding: 15px;
 
     border: none;
-    border-radius: 10px;
 
-    background: #4f46e5;
-
-    color: white;
-
-    font-size: 14px;
-    font-weight: 600;
+    border-radius: 14px;
 
     cursor: pointer;
 
-    transition: 0.2s ease;
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4f46e5,
+            #2563eb
+        );
+
+    transition: .25s;
 }
 
-.cadastro-form button:hover {
-    background: #4338ca;
+.cadastro-form button:hover{
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 25px rgba(37,99,235,0.35);
+}
+
+.cadastro-form button:disabled{
+    opacity: .7;
+    cursor: not-allowed;
+}
+
+/* =========================
+   LINK LOGIN
+========================= */
+
+.link-login{
+    text-align: center;
+
+    color: rgba(255,255,255,0.7);
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    margin-top: 5px;
+
+    transition: .25s;
+}
+
+.link-login:hover{
+    color: white;
+
     transform: translateY(-1px);
 }
 
-/* link login */
-.link-login {
+/* =========================
+   MENSAGEM ERRO
+========================= */
+
+.msg-erro{
+    padding: 12px;
+
+    border-radius: 12px;
+
     text-align: center;
 
-    color: rgba(255,255,255,0.6);
-
     font-size: 13px;
 
-    cursor: pointer;
+    color: #fecaca;
 
-    margin-top: 8px;
-
-    transition: 0.2s ease;
-}
-
-.link-login:hover {
-    color: white;
-}
-
-/* mensagens */
-.msg-erro {
     background: rgba(239,68,68,0.12);
-    color: #fca5a5;
-
-    padding: 10px;
-    border-radius: 8px;
-
-    font-size: 13px;
 
     border: 1px solid rgba(239,68,68,0.25);
+
+    animation: fadeMsg .3s ease;
 }
 
-.msg-sucesso {
-    background: rgba(34,197,94,0.12);
-    color: #86efac;
+/* =========================
+   MENSAGEM SUCESSO
+========================= */
 
-    padding: 10px;
-    border-radius: 8px;
+.msg-sucesso{
+    padding: 12px;
+
+    border-radius: 12px;
+
+    text-align: center;
 
     font-size: 13px;
 
+    color: #86efac;
+
+    background: rgba(34,197,94,0.12);
+
     border: 1px solid rgba(34,197,94,0.25);
+
+    animation: fadeMsg .3s ease;
 }
 
-/* mobile */
-@media (max-width: 480px) {
-    .cadastro-form {
-        width: 90%;
-        padding: 28px 20px;
+@keyframes fadeMsg{
+
+    from{
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to{
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 768px){
+
+    .cadastro-form{
+        max-width: 400px;
+    }
+
+    .cadastro-form h2{
+        font-size: 30px;
+    }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 480px){
+
+    .cadastro-container{
+        padding: 15px;
+    }
+
+    .cadastro-form{
+        width: 100%;
+
+        padding: 30px 22px;
+
+        border-radius: 22px;
+    }
+
+    .cadastro-form h2{
+        font-size: 28px;
+    }
+
+    .cadastro-form h2::after{
+        font-size: 13px;
+    }
+
+    .cadastro-form input{
+        padding: 14px;
+        font-size: 14px;
+    }
+
+    .cadastro-form button{
+        padding: 14px;
+        font-size: 14px;
+    }
+
+    .link-login{
+        font-size: 13px;
+    }
+}
+
+/* =========================
+   CELULAR PEQUENO
+========================= */
+
+@media (max-width: 360px){
+
+    .cadastro-form{
+        padding: 25px 18px;
+    }
+
+    .cadastro-form h2{
+        font-size: 25px;
+    }
+
+    .cadastro-form h2::after{
+        font-size: 12px;
+    }
+
+    .cadastro-form input{
+        padding: 13px;
     }
 }
