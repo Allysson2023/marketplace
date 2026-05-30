@@ -100,81 +100,103 @@ useEffect(() => {
 
 }
 
-    return(
+    return (
+  <div className="perfil-container">
 
-        <div className="perfil-container">
-            <form
-                className="perfil-form"
-                onSubmit={atualizarPerfil}
+    <div className="perfil-card">
+
+      <div className="perfil-header">
+        <h1>⚙️ Atualizar Perfil</h1>
+        <p>Mantenha as informações da sua loja sempre atualizadas.</p>
+      </div>
+
+      <form
+        className="perfil-form"
+        onSubmit={atualizarPerfil}
+      >
+
+        {imagemAtual && (
+          <div className="foto-container">
+            <img
+              className="preview-perfil"
+              src={`http://localhost:3000/uploads/lojas/${imagemAtual}`}
+              alt="Perfil"
+            />
+          </div>
+        )}
+
+        <label className="label-upload">
+          📷 Alterar Foto da Loja
+        </label>
+
+        <input
+          type="file"
+          onChange={(e) => setImagem(e.target.files[0])}
+        />
+
+        <input
+          type="text"
+          placeholder="Nome de usuário"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Nome da Loja"
+          value={nomeLoja}
+          onChange={(e) => setNomeLoja(e.target.value)}
+        />
+
+        <select
+          value={categoria}
+          onChange={(e) => setCategoria(e.target.value)}
+        >
+          <option value="">
+            Escolha uma categoria
+          </option>
+
+          {categorias.map((cat) => (
+            <option
+              key={cat.id}
+              value={cat.nome}
             >
-                <h2>Atualizar Perfil</h2>
-
-                {imagemAtual && (
-
-    <img
-        className="preview-perfil"
-        src={`http://localhost:3000/uploads/lojas/${imagemAtual}`}
-        alt="Perfil"
-    />
-
-)}
-
-                <input
-                    type="file"
-                    onChange={(e) => setImagem(e.target.files[0])}
-                />
-
-                <input
-                    type="text"
-                    placeholder="Novo usuário"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <input
-                    type="text"
-                    placeholder="Nome da loja"
-                    value={nomeLoja}
-                    onChange={(e) => setNomeLoja(e.target.value)}
-                />
-                <select value={categoria}
-                    onChange={(e) => setCategoria(e.target.value)}>
-
-                <option value="">
-                        Escolha uma categoria
-                </option>
-
-                {categorias.map(cat => (
-
-                <option
-                    key={cat.id}
-                    value={cat.nome}
-                >
-                {cat.nome}
-                </option>         
-    ))}
-    
-
+              {cat.nome}
+            </option>
+          ))}
         </select>
-                <div className="botoes">
 
-        <button
-    type="button"
-    className="btn-voltar"
-    onClick={() => navigate(-1)}
->
-    Voltar
-</button>
+        {mensagem && (
+          <div className="mensagem">
+            {mensagem}
+          </div>
+        )}
 
-        <button type="submit">
-            Atualizar
-        </button>
+        <div className="botoes">
 
-  
-</div>
-                <p>{mensagem}</p>
-            </form>
+          <button
+            type="button"
+            className="btn-voltar"
+            onClick={() => navigate(-1)}
+          >
+            ⬅ Voltar
+          </button>
+
+          <button
+            type="submit"
+            className="btn-salvar"
+          >
+            💾 Atualizar Perfil
+          </button>
+
         </div>
-    );
+
+      </form>
+
+    </div>
+
+  </div>
+);
 }
 
 export default AtualizarPerfil;

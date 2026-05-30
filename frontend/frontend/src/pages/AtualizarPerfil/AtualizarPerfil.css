@@ -1,90 +1,181 @@
-.perfil-container {
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(135deg, #f5f5f5, #e9ecef);
+*{
+    box-sizing:border-box;
 }
 
-.perfil-form {
-    width: 100%;
-    max-width: 420px;
-    background: white;
-    padding: 35px;
-    border-radius: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-    transition: 0.3s;
+.perfil-container{
+    min-height:100vh;
+    background:#f5f7fb;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
 }
 
-.perfil-form:hover {
-    transform: translateY(-2px);
+.perfil-card{
+    width:100%;
+    max-width:650px;
 }
 
-.perfil-form h2 {
-    text-align: center;
-    font-size: 22px;
+.perfil-header{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.perfil-header h1{
+    font-size:2rem;
+    color:#111827;
+    margin-bottom:8px;
+}
+
+.perfil-header p{
+    color:#6b7280;
+    font-size:15px;
+}
+
+.perfil-form{
+    background:#fff;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 8px 30px rgba(0,0,0,.08);
+
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.foto-container{
+    display:flex;
+    justify-content:center;
+    margin-bottom:10px;
+}
+
+.preview-perfil{
+    width:140px;
+    height:140px;
+    object-fit:cover;
+    border-radius:50%;
+    border:5px solid #fff;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.label-upload{
+    font-weight:600;
+    color:#374151;
 }
 
 .perfil-form input,
-select {
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    outline: none;
-    font-size: 14px;
-    transition: 0.2s;
+.perfil-form select{
+    width:100%;
+    padding:14px;
+    border:1px solid #d1d5db;
+    border-radius:12px;
+    font-size:15px;
+    transition:.3s;
+    background:#fff;
 }
 
 .perfil-form input:focus,
-select:focus {
-    border-color: #2e7d32;
-    box-shadow: 0 0 0 2px rgba(46,125,50,0.2);
+.perfil-form select:focus{
+    outline:none;
+    border-color:#2563eb;
+    box-shadow:0 0 0 4px rgba(37,99,235,.15);
 }
 
-.perfil-form button {
-    background: #2e7d32;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.2s;
+.mensagem{
+    background:#fef3c7;
+    color:#92400e;
+    padding:12px;
+    border-radius:10px;
+    text-align:center;
+    font-weight:600;
 }
 
-.perfil-form button:hover {
-    background: #256428;
-    transform: scale(1.02);
+.botoes{
+    display:flex;
+    gap:12px;
+    margin-top:10px;
 }
 
-.botoes {
-    display: flex;
-    gap: 10px;
+.botoes button{
+    flex:1;
+    border:none;
+    border-radius:12px;
+    padding:14px;
+    cursor:pointer;
+    font-weight:700;
+    transition:.3s;
 }
 
-.botoes button {
-    flex: 1;
+.btn-voltar{
+    background:#374151;
+    color:white;
 }
 
-.btn-voltar {
-    background: #555 !important;
+.btn-voltar:hover{
+    background:#1f2937;
+    transform:translateY(-2px);
 }
 
-.btn-voltar:hover {
-    background: #444 !important;
+.btn-salvar{
+    background:#2563eb;
+    color:white;
 }
 
-.preview-perfil {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
-    margin: 0 auto 20px;
-    border: 4px solid white;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+.btn-salvar:hover{
+    background:#1d4ed8;
+    transform:translateY(-2px);
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media(max-width:768px){
+
+    .perfil-header h1{
+        font-size:1.8rem;
+    }
+
+    .perfil-form{
+        padding:25px;
+    }
+
+}
+
+/* =========================
+   CELULAR
+========================= */
+
+@media(max-width:480px){
+
+    .perfil-container{
+        padding:12px;
+    }
+
+    .perfil-header h1{
+        font-size:1.5rem;
+    }
+
+    .perfil-header p{
+        font-size:14px;
+    }
+
+    .perfil-form{
+        padding:20px;
+        border-radius:16px;
+    }
+
+    .preview-perfil{
+        width:110px;
+        height:110px;
+    }
+
+    .botoes{
+        flex-direction:column;
+    }
+
+    .botoes button{
+        width:100%;
+    }
+
 }
