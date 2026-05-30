@@ -1,6 +1,6 @@
 .chat-list-container {
     min-height: 100vh;
-    background: #0f172a;
+    background: linear-gradient(180deg, #0f172a, #111827);
     padding: 20px;
     color: white;
     font-family: Arial, Helvetica, sans-serif;
@@ -15,28 +15,29 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .top-bar h2 {
     margin: 0;
     font-size: 28px;
+    font-weight: 700;
 }
 
 .btn-voltar {
-    background: #2563eb;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
     border: none;
     color: white;
-    padding: 10px 18px;
-    border-radius: 10px;
+    padding: 12px 18px;
+    border-radius: 12px;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 600;
     transition: 0.3s;
 }
 
 .btn-voltar:hover {
-    opacity: 0.9;
+    transform: translateY(-2px);
 }
 
 /* =========================
@@ -46,7 +47,7 @@
 .lista-chats {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 14px;
 }
 
 /* =========================
@@ -59,22 +60,31 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     gap: 15px;
 
     background: #1e293b;
 
     padding: 18px;
 
-    border-radius: 15px;
+    border-radius: 18px;
 
     cursor: pointer;
 
-    transition: 0.3s;
+    transition: all 0.3s ease;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+
+    border: 1px solid rgba(255,255,255,0.05);
 }
 
 .chat-card:hover {
+    transform: translateY(-3px);
     background: #334155;
-    transform: translateY(-2px);
+}
+
+.chat-card:active {
+    transform: scale(0.98);
 }
 
 /* =========================
@@ -83,6 +93,7 @@
 
 .chat-card.ativo {
     border: 2px solid #22c55e;
+    background: rgba(34,197,94,0.08);
 }
 
 /* =========================
@@ -91,13 +102,14 @@
 
 .chat-info {
     flex: 1;
-    overflow: hidden;
+    min-width: 0;
 }
 
 .chat-info h3 {
     margin: 0;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     font-size: 18px;
+    font-weight: 600;
 }
 
 .ultima-msg {
@@ -105,9 +117,9 @@
     color: #cbd5e1;
     font-size: 14px;
 
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* =========================
@@ -117,6 +129,7 @@
 .chat-seta {
     font-size: 22px;
     color: #94a3b8;
+    flex-shrink: 0;
 }
 
 /* =========================
@@ -124,7 +137,6 @@
 ========================= */
 
 .bolinha-notificacao {
-
     position: absolute;
 
     top: 12px;
@@ -136,6 +148,8 @@
     border-radius: 50%;
 
     background: #22c55e;
+
+    box-shadow: 0 0 10px #22c55e;
 }
 
 /* =========================
@@ -144,13 +158,13 @@
 
 .sem-chats {
     text-align: center;
-    margin-top: 60px;
+    margin-top: 80px;
     color: #94a3b8;
     font-size: 18px;
 }
 
 /* =========================
-   RESPONSIVO
+   TABLETS
 ========================= */
 
 @media (max-width: 768px) {
@@ -160,11 +174,11 @@
     }
 
     .top-bar h2 {
-        font-size: 22px;
+        font-size: 24px;
     }
 
     .chat-card {
-        padding: 15px;
+        padding: 16px;
     }
 
     .chat-info h3 {
@@ -174,5 +188,70 @@
     .ultima-msg {
         font-size: 13px;
     }
+}
 
+/* =========================
+   CELULARES
+========================= */
+
+@media (max-width: 480px) {
+
+    .chat-list-container {
+        padding: 12px;
+    }
+
+    .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .top-bar h2 {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .btn-voltar {
+        width: 100%;
+        padding: 14px;
+    }
+
+    .chat-card {
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    .chat-info h3 {
+        font-size: 15px;
+    }
+
+    .ultima-msg {
+        font-size: 12px;
+    }
+
+    .chat-seta {
+        font-size: 20px;
+    }
+}
+
+/* =========================
+   CELULARES PEQUENOS
+========================= */
+
+@media (max-width: 360px) {
+
+    .top-bar h2 {
+        font-size: 20px;
+    }
+
+    .chat-card {
+        padding: 12px;
+    }
+
+    .chat-info h3 {
+        font-size: 14px;
+    }
+
+    .ultima-msg {
+        font-size: 11px;
+    }
 }

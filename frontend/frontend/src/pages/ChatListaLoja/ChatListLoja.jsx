@@ -66,7 +66,7 @@ try {
     useEffect(() => {
   if (!token) return;
 
-  if (!lojaId) return;
+  if (!lojaId) return; 
 
   carregarChats();
   socket.emit("join_loja", lojaId);
@@ -226,7 +226,7 @@ useEffect(() => {
                             <div className="chat-info">
 
                                 <h3>
-                                    Pedido #{chat.pedido_id}
+                                    Pedido #{chat.cliente_id}
                                 </h3>
 
                                 <p className="ultima-msg">
