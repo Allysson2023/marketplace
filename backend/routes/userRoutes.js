@@ -9,7 +9,7 @@ const SECRET = "segredo_super";
 
 
 // ===============================
-// CRIAR USUÁRIO
+// CRIAR USUÁRIO TEMOS NO BANCO enum('cliente','lojista','funcionario','admin')
 // ===============================
 router.post('/users', (req, res) => {
 
