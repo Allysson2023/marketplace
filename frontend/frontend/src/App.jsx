@@ -31,6 +31,7 @@ import Clientes from "./pages/Clientes/Clientes";
 import Mensagens from "./pages/Mensagens/Mensagens";
 import CadastroCliente from "./pages/CadastroCliente/CadastroCliente";
 import AtualizarCliente from "./pages/AtualizarCliente/AtualizarCliente";
+import PerfilCliente from "./pages/PerfilCliente/PerfilCliente";
 
 function App() {
 
@@ -110,6 +111,10 @@ function App() {
         <Route path="/mensagens" element={<Mensagens />} />
         <Route path="/cadastro" element={<CadastroCliente />}/>
         <Route path="/atualizar-cliente/:id" element={<AtualizarCliente />}/>
+      <Route
+    path="/perfil"
+    element={<PerfilCliente />}
+/>
       </Routes>
 
     </BrowserRouter>

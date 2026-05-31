@@ -219,6 +219,49 @@ if (Number(id) !== Number(userIdLogado)) {
 
 });
 
+// ===============================
+// PERFIL DO CLIENTE
+// ===============================
+router.get('/client-profile', authMiddleware, (req, res) => {
+
+    const userId = req.user.id;
+
+    const sql = `
+        SELECT
+            u.id,
+            u.username,
+            u.created_at,
+            COUNT(p.id) AS total_compras
+        FROM users u
+        LEFT JOIN pedidos p
+            ON p.usuario_id = u.id
+        WHERE u.id = ?
+        GROUP BY u.id
+    `;
+
+    db.query(sql, [userId], (err, result) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({
+                error: "Usuário não encontrado"
+            });
+        }
+
+        res.json({
+    id: result[0].id,
+    username: result[0].username,
+    created_at: result[0].created_at,
+    total_compras: result[0].total_compras
+});
+
+    });
+
+});
+
 
 // ===============================
 // PERFIL LOGADO
