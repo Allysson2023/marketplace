@@ -46,6 +46,7 @@ try {
         if (!res.ok) throw new Error("Erro ao carregar chats");
 
         const data = await res.json();
+        console.log(JSON.stringify(data, null, 2));
 
         const chatsOrdenados = data.sort(
             (a, b) =>
@@ -226,7 +227,7 @@ useEffect(() => {
                             <div className="chat-info">
 
                                 <h3>
-                                    Pedido #{chat.cliente_id}
+                                    👤 {chat.cliente_nome}
                                 </h3>
 
                                 <p className="ultima-msg">

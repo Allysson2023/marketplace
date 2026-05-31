@@ -184,28 +184,33 @@ router.get("/loja/:lojaId", authMiddleware,
     const { lojaId } = req.params;
 
     const sql = `
-        SELECT
-            c.id,
-            c.pedido_id,
-            c.cliente_id,
-            c.loja_id,
-            c.criado_em,
-            c.atualizado_em,
-            c.tem_nova_msg,
+       SELECT
+    c.id,
+    c.pedido_id,
+    c.cliente_id,
+    c.loja_id,
+    c.criado_em,
+    c.atualizado_em,
+    c.tem_nova_msg,
 
-            (
-                SELECT mensagem
-                FROM mensagens m
-                WHERE m.chat_id = c.id
-                ORDER BY m.id DESC
-                LIMIT 1
-            ) as ultima_mensagem
+    u.username AS cliente_nome,
 
-        FROM chats c
+    (
+        SELECT mensagem
+        FROM mensagens m
+        WHERE m.chat_id = c.id
+        ORDER BY m.id DESC
+        LIMIT 1
+    ) as ultima_mensagem
 
-        WHERE c.loja_id = ?
+FROM chats c
 
-        ORDER BY c.atualizado_em DESC
+INNER JOIN users u
+    ON u.id = c.cliente_id
+
+WHERE c.loja_id = ?
+
+ORDER BY c.atualizado_em DESC
     `;
 
     db.query(sql, [lojaId], (err, result) => {
