@@ -310,6 +310,13 @@ const estaLogado = !!token;
         </div>
 
         <div
+    className="menu-item"
+    onClick={() => navigate("/perfil")}
+  >
+    👤 Meu Perfil
+  </div>
+
+        <div
           className="menu-item"
           onClick={() => setModalSair(true)}
         >

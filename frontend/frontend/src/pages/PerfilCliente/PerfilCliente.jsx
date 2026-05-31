@@ -78,13 +78,9 @@ function PerfilCliente() {
 
                 <button
                     className="btn-editar"
-                    onClick={() => navigate("/cliente/editar")}
+                    onClick={() => navigate(`/atualizar-cliente/${usuario.id}`)}
                 >
                     Editar Perfil
-                </button>
-
-                <button className="btn-senha">
-                    Alterar Senha
                 </button>
 
                 <button
