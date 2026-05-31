@@ -121,6 +121,104 @@ router.get('/users', authMiddleware,  (req, res) => {
 
 });
 
+// ===============================
+// BUSCAR USUÁRIO POR ID
+// ===============================
+router.get('/users/:id', authMiddleware, (req, res) => {
+
+    const { id } = req.params;
+
+    const sql = `
+        SELECT
+            id,
+            username
+        FROM users
+        WHERE id = ?
+        LIMIT 1
+    `;
+
+    db.query(sql, [id], (err, result) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({
+                error: "Usuário não encontrado"
+            });
+        }
+
+        res.json(result[0]);
+
+    });
+
+});
+
+// ===============================
+// ATUALIZAR USUÁRIO
+// ===============================
+router.put('/users/:id', authMiddleware,(req, res) => {
+    const userIdLogado = req.user.id;
+const { id } = req.params;
+
+if (Number(id) !== Number(userIdLogado)) {
+    return res.status(403).json({
+        error: "Você não tem permissão para alterar este usuário"
+    });
+}
+
+    const {
+        username,
+        password
+    } = req.body;
+
+    let sql;
+    let valores;
+
+    if (password) {
+
+        sql = `
+            UPDATE users
+            SET username = ?, password = ?
+            WHERE id = ?
+        `;
+
+        valores = [
+            username,
+            password,
+            id
+        ];
+
+    } else {
+
+        sql = `
+            UPDATE users
+            SET username = ?
+            WHERE id = ?
+        `;
+
+        valores = [
+            username,
+            id
+        ];
+
+    }
+
+    db.query(sql, valores, (err) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        res.json({
+            message: "Usuário atualizado com sucesso"
+        });
+
+    });
+
+});
+
 
 // ===============================
 // PERFIL LOGADO

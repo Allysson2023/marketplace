@@ -30,6 +30,7 @@ import Financeiro from "./pages/Financeiro/Financeiro";
 import Clientes from "./pages/Clientes/Clientes";
 import Mensagens from "./pages/Mensagens/Mensagens";
 import CadastroCliente from "./pages/CadastroCliente/CadastroCliente";
+import AtualizarCliente from "./pages/AtualizarCliente/AtualizarCliente";
 
 function App() {
 
@@ -108,6 +109,7 @@ function App() {
         <Route path="/store/:id/clientes" element={<Clientes />}/>
         <Route path="/mensagens" element={<Mensagens />} />
         <Route path="/cadastro" element={<CadastroCliente />}/>
+        <Route path="/atualizar-cliente/:id" element={<AtualizarCliente />}/>
       </Routes>
 
     </BrowserRouter>

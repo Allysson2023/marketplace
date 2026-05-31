@@ -1,0 +1,172 @@
+
+/* Container */
+.atualizar-container{
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    position: relative;
+    overflow: hidden;
+
+    background:
+        radial-gradient(circle at top left, #1e3a8a 0%, transparent 35%),
+        radial-gradient(circle at bottom right, #059669 0%, transparent 35%),
+        linear-gradient(135deg, #0b1220, #111827);
+}
+
+/* Card */
+
+.atualizar-form{
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+    max-width: 430px;
+
+    padding: 40px 32px;
+
+    border-radius: 26px;
+
+    background: rgba(255,255,255,.06);
+
+    backdrop-filter: blur(20px);
+
+    border: 1px solid rgba(255,255,255,.10);
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.35);
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+/* Título */
+
+.atualizar-form h2{
+    text-align: center;
+    color: white;
+    font-size: 34px;
+}
+
+.atualizar-subtitulo{
+    text-align: center;
+    color: rgba(255,255,255,.7);
+    margin-bottom: 10px;
+}
+
+/* Inputs */
+
+.atualizar-form input{
+    width: 100%;
+
+    padding: 15px;
+
+    border-radius: 14px;
+
+    border: 1px solid rgba(255,255,255,.10);
+
+    background: rgba(255,255,255,.05);
+
+    color: white;
+
+    outline: none;
+}
+
+.atualizar-form input:focus{
+    border-color: #4f46e5;
+
+    box-shadow:
+        0 0 0 4px rgba(79,70,229,.15);
+}
+
+/* Botão */
+
+.atualizar-form button{
+    width: 100%;
+
+    padding: 15px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4f46e5,
+            #2563eb
+        );
+}
+
+/* Voltar */
+
+.link-voltar{
+    text-align: center;
+
+    color: rgba(255,255,255,.7);
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+.link-voltar:hover{
+    color: white;
+}
+
+/* Mensagens */
+
+.msg-erro{
+    padding: 12px;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    color: #fecaca;
+
+    background: rgba(239,68,68,.12);
+
+    border: 1px solid rgba(239,68,68,.25);
+}
+
+.msg-sucesso{
+    padding: 12px;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    color: #86efac;
+
+    background: rgba(34,197,94,.12);
+
+    border: 1px solid rgba(34,197,94,.25);
+}
+
+/* Mobile */
+
+@media(max-width:480px){
+
+    .atualizar-form{
+        padding: 28px 20px;
+    }
+
+    .atualizar-form h2{
+        font-size: 28px;
+    }
+}
