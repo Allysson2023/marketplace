@@ -5,6 +5,7 @@ import "./PerfilCliente.css";
 function PerfilCliente() {
 
     const navigate = useNavigate();
+    const [totalPedidos, setTotalPedidos] = useState(0);
 
     const [usuario, setUsuario] = useState({
         username: "",
@@ -14,7 +15,33 @@ function PerfilCliente() {
 
     useEffect(() => {
         carregarPerfil();
+    carregarPedidos();
     }, []);
+
+    const carregarPedidos = async () => {
+
+    try {
+
+        const resposta = await fetch(
+            "http://localhost:3000/api/meus-pedidos",
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            }
+        );
+
+        const dados = await resposta.json();
+
+        if (Array.isArray(dados)) {
+            setTotalPedidos(dados.length);
+        }
+
+    } catch (erro) {
+        console.log(erro);
+    }
+
+};
 
     const carregarPerfil = async () => {
         try {
@@ -65,7 +92,7 @@ function PerfilCliente() {
                 <div className="estatisticas">
 
                     <div className="box-stat">
-                        <h3>0</h3>
+                        <h3>{totalPedidos}</h3>
                         <p>Pedidos</p>
                     </div>
 
