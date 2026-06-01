@@ -82,6 +82,7 @@ router.post(
 
     const { nome, categoria, whatsapp } = req.body;
     const imagem = req.file ? req.file.filename : null;
+    const funcionario_id = req.user.id;
 
     if (!nome || !categoria || !whatsapp) {
       return res.status(400).json({
@@ -90,12 +91,12 @@ router.post(
     }
 
     const sql = `
-      INSERT INTO stores (nome, categoria, imagem, whatsapp, user_id)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO stores (nome, categoria, imagem, whatsapp, funcionario_id, user_id)
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
 
     db.query(sql,
-      [nome, categoria, imagem, whatsapp, req.user.id],
+      [nome, categoria, imagem, whatsapp, funcionario_id, req.user.id],
       (err, result) => {
         if (err) {
           return res.status(500).json({ message: 'Erro ao criar loja' });

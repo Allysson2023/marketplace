@@ -13,18 +13,14 @@ function Login() {
   try {
 
     const resposta = await fetch("http://localhost:3000/api/login", {
-
       method: "POST",
-
       headers: {
         "Content-Type": "application/json"
       },
-
       body: JSON.stringify({
         username,
         password
       })
-
     });
 
     const dados = await resposta.json();
@@ -35,43 +31,15 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(dados.user));
       localStorage.setItem("lojaId", dados.user.loja_id);
 
-      if (dados.user.tipo === "cliente") {
-
-  window.location.href = "/";
-
-} else {
-
-  fetch("http://localhost:3000/api/minha-loja", {
-
-    headers: {
-      Authorization: `Bearer ${dados.token}`
-    }
-
-  })
-  .then(res => res.json())
-  .then(loja => {
-
-    if (loja.existe) {
-
       window.location.href = "/";
 
     } else {
 
-      window.location.href = "/cadastrar-loja";
+      setMensagemErro(dados.error || "Usuário ou senha inválidos");
 
     }
 
-  });
-
-}
-
-    } else {
-
-      setMensagemErro(dados.error);
-
-    }
-
-  } catch (err) { 
+  } catch (err) {
 
     setMensagemErro("Erro no servidor");
 
