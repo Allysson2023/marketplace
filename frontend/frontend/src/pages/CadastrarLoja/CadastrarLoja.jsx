@@ -8,6 +8,16 @@ function CadastrarLoja() {
   const [categoria, setCategoria] = useState("");
   const [categorias, setCategorias] = useState([]);
   const [imagem, setImagem] = useState(null);
+  const [username, setUsername] = useState("");
+const [password, setPassword] = useState("");
+
+const [mostrarModal, setMostrarModal] = useState(false);
+
+const [dadosLojista, setDadosLojista] = useState({
+  loja: "",
+  username: "",
+  password: ""
+});
 
   // NOVO
   const [whatsapp, setWhatsapp] = useState("");
@@ -22,8 +32,21 @@ function CadastrarLoja() {
 
   }, []);
 
+  function copiarDados() {
 
+  const texto = `
+Loja: ${dadosLojista.loja}
 
+Usuário: ${dadosLojista.username}
+
+Senha: ${dadosLojista.password}
+`;
+
+  navigator.clipboard.writeText(texto);
+
+  alert("Dados copiados!");
+}
+ 
 
   function cadastrarLoja(e){
 
@@ -37,9 +60,8 @@ function CadastrarLoja() {
 
     // NOVO
     formData.append("whatsapp", whatsapp);
-
-
-
+formData.append("username", username);
+formData.append("password", password);
 
     fetch("http://localhost:3000/api/stores", {
 
@@ -55,9 +77,13 @@ function CadastrarLoja() {
     .then(res => res.json())
     .then(data => {
 
-      alert("Loja criada com sucesso!");
+      setDadosLojista({
+  loja: nome,
+  username,
+  password
+});
 
-      navigate("/");
+setMostrarModal(true);
 
     });
 
@@ -69,13 +95,25 @@ function CadastrarLoja() {
   return (
 
     <div className="cadastro-loja">
+      <button
+  type="button"
+  className="btn-voltarw"
+  onClick={() => navigate(-1)}
+>
+  ← Voltar
+</button>
 
       <form
         onSubmit={cadastrarLoja}
         className="form-loja"
       >
 
-        <h2>Cadastrar Loja</h2>
+       <div className="topo-form">
+  <h2>Cadastrar Loja</h2>
+  <p>
+    Crie uma nova loja para começar a vender no marketplace.
+  </p>
+</div>
 
         <input
           type="text"
@@ -127,13 +165,80 @@ function CadastrarLoja() {
           onChange={(e) => setImagem(e.target.files[0])}
         />
 
+<input
+  type="text"
+  placeholder="Usuário do lojista"
+  value={username}
+  onChange={(e) => setUsername(e.target.value)}
+/>
 
+<input
+  type="password"
+  placeholder="Senha do lojista"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+/>
 
         <button type="submit">
           Criar Loja
         </button>
 
       </form>
+
+      {
+  mostrarModal && (
+
+    <div className="modal-overlay">
+
+      <div className="modal-lojista">
+
+        <h2>✅ Loja criada com sucesso</h2>
+
+        <div className="info-modal">
+          <strong>Loja:</strong>
+          <span>{dadosLojista.loja}</span>
+        </div>
+
+        <div className="info-modal">
+          <strong>Usuário:</strong>
+          <span>{dadosLojista.username}</span>
+        </div>
+
+        <div className="info-modal">
+          <strong>Senha:</strong>
+          <span>{dadosLojista.password}</span>
+        </div>
+
+        <div className="acoes-modal">
+
+          <button
+            className="btn-copiar"
+            onClick={copiarDados}
+          >
+            📋 Copiar Dados
+          </button>
+
+          <button
+            className="btn-fechar"
+            onClick={() => {
+
+              setMostrarModal(false);
+
+              navigate("/funcionario/dashboard");
+
+            }}
+          >
+            Fechar
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  )
+}
 
     </div>
 

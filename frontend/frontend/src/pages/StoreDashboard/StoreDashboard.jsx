@@ -203,20 +203,14 @@ useEffect(() => {
       </div>
     );
 
-  }
+  } 
 
-  
-
-
-
-console.log("ID da loja:", id);
-console.log("User:", user);
-console.log(resumo);
   return (
 
     <div className="dashboard-container">
-      <button className="btn-voltar" onClick={() => navigate(-1)}>
-          ⬅ Voltar
+      <button className="btn-voltardas"
+       onClick={() => navigate(-1)}>
+          ⬅ 
         </button>
 <div className="section">
 

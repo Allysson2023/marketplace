@@ -80,37 +80,125 @@ router.post(
   upload.single('imagem'),
   (req, res) => {
 
-    const { nome, categoria, whatsapp } = req.body;
+    const {
+      nome,
+      categoria,
+      whatsapp,
+      username,
+      password
+    } = req.body;
+
     const imagem = req.file ? req.file.filename : null;
     const funcionario_id = req.user.id;
 
-    if (!nome || !categoria || !whatsapp) {
+    if (
+      !nome ||
+      !categoria ||
+      !whatsapp ||
+      !username ||
+      !password
+    ) {
       return res.status(400).json({
-        message: 'Nome, categoria e WhatsApp são obrigatórios'
+        message: 'Preencha todos os campos'
       });
     }
 
-    const sql = `
-      INSERT INTO stores (nome, categoria, imagem, whatsapp, funcionario_id, user_id)
-      VALUES (?, ?, ?, ?, ?, ?)
+    // verifica se já existe usuário
+    const sqlVerifica = `
+      SELECT id
+      FROM users
+      WHERE username = ?
+      LIMIT 1
     `;
 
-    db.query(sql,
-      [nome, categoria, imagem, whatsapp, funcionario_id, req.user.id],
-      (err, result) => {
-        if (err) {
-          return res.status(500).json({ message: 'Erro ao criar loja' });
-        }
+    db.query(sqlVerifica, [username], (err, usuarioExiste) => {
 
-        res.json({
-          message: 'Loja criada com sucesso',
-          storeId: result.insertId
+      if (err) {
+        return res.status(500).json({
+          message: 'Erro ao verificar usuário'
         });
       }
-    );
+
+      if (usuarioExiste.length > 0) {
+        return res.status(400).json({
+          message: 'Usuário já existe'
+        });
+      }
+
+      // cria o lojista
+      const sqlUser = `
+        INSERT INTO users (
+          username,
+          password,
+          tipo
+        )
+        VALUES (?, ?, 'lojista')
+      `;
+
+      db.query(
+        sqlUser,
+        [username, password],
+        (err, userResult) => {
+
+          if (err) {
+            console.log(err);
+
+            return res.status(500).json({
+              message: 'Erro ao criar usuário'
+            });
+          }
+
+          const lojistaId = userResult.insertId;
+
+          // cria a loja vinculada ao lojista
+          const sqlStore = `
+            INSERT INTO stores (
+              nome,
+              categoria,
+              imagem,
+              whatsapp,
+              funcionario_id,
+              user_id
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+          `;
+
+          db.query(
+            sqlStore,
+            [
+              nome,
+              categoria,
+              imagem,
+              whatsapp,
+              funcionario_id,
+              lojistaId
+            ],
+            (err, storeResult) => {
+
+              if (err) {
+                console.log(err);
+
+                return res.status(500).json({
+                  message: 'Erro ao criar loja'
+                });
+              }
+
+              res.json({
+                message: 'Loja criada com sucesso',
+                storeId: storeResult.insertId,
+                lojistaId
+              });
+
+            }
+          );
+
+        }
+      );
+
+    });
+
   }
 );
-
 
 // ===============================
 // MINHA LOJA

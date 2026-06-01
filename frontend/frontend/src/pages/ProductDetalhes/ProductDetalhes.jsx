@@ -120,7 +120,7 @@ useEffect(() => {
         <div className="topo-detalhe">
 
             <button
-                className="btn-voltar"
+                className="btn-voltars"
                 onClick={() => navigate(-1)}
             >
                 ← Voltar

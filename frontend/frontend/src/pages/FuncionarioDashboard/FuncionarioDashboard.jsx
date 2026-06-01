@@ -10,7 +10,7 @@ function FuncionarioDashboard() {
 
       <div className="topo-dashboard">
         <button
-          className="btn-voltar"
+          className="btn-voltarr"
           onClick={() => navigate(-1)}
         >
           ← Voltar
@@ -59,7 +59,8 @@ function FuncionarioDashboard() {
           <button>Visualizar</button>
         </div>
 
-        <div className="card-funcionario">
+        <div className="card-funcionario"
+        onClick={() => navigate("/cadastrar-loja")}>
           <div className="icone-card">➕</div>
           <h2>Cadastrar Loja</h2>
           <p>
