@@ -23,6 +23,9 @@ function Home() {
   const token = localStorage.getItem("token");
 const estaLogado = !!token;
 
+const user = JSON.parse(localStorage.getItem("user"));
+const tipoUsuario = user?.tipo;
+
   const menuRef = useRef(null);
 
   // =========================
@@ -295,6 +298,17 @@ const estaLogado = !!token;
       </>
     ) : (
       <>
+
+{tipoUsuario === "funcionario" && (
+  <div
+    className="menu-item"
+    onClick={() => navigate("/funcionario/dashboard")}
+  >
+    🏢 Painel Administrativo
+  </div>
+)}
+
+
       <div
   className="menu-item"
   onClick={() => navigate("/mensagens")}

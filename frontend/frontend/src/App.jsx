@@ -32,6 +32,7 @@ import Mensagens from "./pages/Mensagens/Mensagens";
 import CadastroCliente from "./pages/CadastroCliente/CadastroCliente";
 import AtualizarCliente from "./pages/AtualizarCliente/AtualizarCliente";
 import PerfilCliente from "./pages/PerfilCliente/PerfilCliente";
+import FuncionarioDashboard from "./pages/FuncionarioDashboard/FuncionarioDashboard";
 
 function App() {
 
@@ -84,6 +85,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/product/:id" element={<ProductDetalhes />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/funcionario/dashboard" element={<FuncionarioDashboard />}/>
         <Route path="/carrinho" element={<Carrinho />} />
         <Route path="/cadastrar-produto" element={<CadastrarProduto />} />
         <Route path="/cadastrar-loja" element={<CadastrarLoja />} />
