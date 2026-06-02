@@ -1,9 +1,31 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "./FuncionarioDashboard.css";
 
 function FuncionarioDashboard() {
 
   const navigate = useNavigate();
+  const [resumo, setResumo] = useState(null);
+
+  useEffect(() => {
+  carregarResumo();
+}, []);
+
+const carregarResumo = async () => {
+
+  const resposta = await fetch(
+    "http://localhost:3000/api/funcionario/resumo",
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    }
+  );
+
+  const dados = await resposta.json();
+
+  setResumo(dados);
+};
 
   return (
     <div className="funcionario-container">
@@ -28,22 +50,21 @@ function FuncionarioDashboard() {
 
         <div className="resumo-card">
           <h3>🏪 Lojas</h3>
-          <span>0</span>
+          <span>{resumo?.totalLojas || 0}</span>
         </div>
 
-        <div className="resumo-card">
-          <h3>📦 Produtos</h3>
-          <span>0</span>
-        </div>
+        
 
         <div className="resumo-card">
-          <h3>💰 Vendas</h3>
-          <span>R$ 0,00</span>
+          <h3>💰 Valor</h3>
+          <span>R$ {(resumo?.ganhos || 0).toLocaleString("pt-BR", {
+      minimumFractionDigits: 2
+    })}</span>
         </div>
 
         <div className="resumo-card">
           <h3>📈 Crescimento</h3>
-          <span>0%</span>
+          <span>{resumo?.crescimento || 0}%</span>
         </div>
 
       </div>

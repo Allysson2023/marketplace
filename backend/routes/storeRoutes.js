@@ -972,4 +972,61 @@ router.get(
 
 });
 
+router.get(
+  "/funcionario/resumo",
+  authMiddleware,
+  (req, res) => {
+
+    const funcionarioId = req.user.id;
+
+    const sql = `
+      SELECT
+
+        COUNT(*) AS totalLojas,
+
+        COUNT(*) * 40 AS ganhos,
+
+        (
+          SELECT COUNT(*)
+          FROM products p
+          JOIN stores s ON s.id = p.store_id
+          WHERE s.funcionario_id = ?
+        ) AS totalProdutos
+
+      FROM stores
+      WHERE funcionario_id = ?
+    `;
+
+    db.query(
+      sql,
+      [funcionarioId, funcionarioId],
+      (err, result) => {
+
+        if (err) {
+          console.log(err);
+          return res.status(500).json(err);
+        }
+
+        const dados = result[0];
+
+        const meta = 50; // exemplo
+
+        const crescimento = Math.min(
+          ((dados.totalLojas / meta) * 100),
+          100
+        );
+
+        res.json({
+          totalLojas: dados.totalLojas,
+          ganhos: dados.ganhos,
+          totalProdutos: dados.totalProdutos,
+          crescimento: crescimento.toFixed(0)
+        });
+
+      }
+    );
+
+  }
+);
+
 module.exports = router;
