@@ -257,87 +257,82 @@ useEffect(() => {
       </div>
 
 
-      {/* CARDS */}
-      <div className="cards">
-      <div className="section">
+      <div className="sd-cards">
 
-  <h2>🎯 Meta do mês</h2>
+  {/* META DO MÊS */}
+  <div className="sd-section">
 
-  <div className="meta-box">
+    <h2 className="sd-title">🎯 Meta do mês</h2>
 
-    <div className="meta-bar">
+    <div className="sd-metaBox">
 
-      <div
-        className="meta-progress"
-        style={{
-          width: `${
-            (resumo.faturamentoMes / 100000) * 100
-          }%`
-        }}
-      />
+      <div className="sd-metaBar">
+
+        <div
+          className="sd-metaProgress"
+          style={{
+            width: `${
+              (resumo.faturamentoMes / 100000) * 100
+            }%`
+          }}
+        />
+
+      </div>
+
+      <p className="sd-metaText">
+        R$ {resumo.faturamentoMes} de R$ 100.000,00
+      </p>
 
     </div>
 
-    <p>
-      R$ {resumo.faturamentoMes} de R$ 100.000.00
-    </p>
+  </div>
 
+  {/* CARD HOJE */}
+  <div className="sd-card">
+    <h3 className="sd-cardTitle">Hoje</h3>
+    <p className="sd-cardValue">
+      {Number(resumo.faturamentoHoje || 0).toLocaleString(
+        "pt-BR",
+        { style: "currency", currency: "BRL" }
+      )}
+    </p>
+  </div>
+
+  {/* CARD MÊS */}
+  <div className="sd-card">
+    <h3 className="sd-cardTitle">Mês</h3>
+    <p className="sd-cardValue">
+      {Number(resumo.faturamentoMes || 0).toLocaleString(
+        "pt-BR",
+        { style: "currency", currency: "BRL" }
+      )}
+    </p>
+  </div>
+
+  {/* CARD ANO */}
+  <div className="sd-card">
+    <h3 className="sd-cardTitle">Ano</h3>
+    <p className="sd-cardValue">
+      {Number(resumo.faturamentoAno || 0).toLocaleString(
+        "pt-BR",
+        { style: "currency", currency: "BRL" }
+      )}
+    </p>
+  </div>
+
+  {/* PEDIDOS */}
+  <div className="sd-card">
+    <h3 className="sd-cardTitle">Pedidos</h3>
+    <p className="sd-cardValue">{resumo.totalPedidos}</p>
+  </div>
+
+  {/* PRODUTOS */}
+  <div className="sd-card">
+    <h3 className="sd-cardTitle">Produtos</h3>
+    <p className="sd-cardValue">{resumo.totalProdutos}</p>
   </div>
 
 </div>
-
-        <div className="card">
-  <h3>Hoje</h3>
-
-  <p>
-    {Number(resumo.faturamentoHoje || 0).toLocaleString(
-      "pt-BR",
-      {
-        style: "currency",
-        currency: "BRL"
-      }
-    )}
-  </p>
-</div>
-
-<div className="card">
-  <h3>Mês</h3>
-
-  <p>
-    {Number(resumo.faturamentoMes || 0).toLocaleString(
-      "pt-BR",
-      {
-        style: "currency",
-        currency: "BRL"
-      }
-    )}
-  </p>
-</div>
-
-<div className="card">
-  <h3>Ano</h3>
-
-  <p>
-    {Number(resumo.faturamentoAno || 0).toLocaleString(
-      "pt-BR",
-      {
-        style: "currency",
-        currency: "BRL"
-      }
-    )}
-  </p>
-</div>
-<div className="card">
-  <h3>Pedidos</h3>
-  <p>{resumo.totalPedidos}</p>
-</div>
-
-<div className="card">
-  <h3>Produtos</h3>
-  <p>{resumo.totalProdutos}</p>
-</div>
-
-      </div>
 
       {/* AÇÕES */}
       <div className="quick-actions">
