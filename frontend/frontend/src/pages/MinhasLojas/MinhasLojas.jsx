@@ -23,7 +23,6 @@ function MinhasLojas() {
         );
 
         const dados = await resposta.json();
-        console.log(JSON.stringify(dados, null, 2));
         setLojas(dados);
     };
 
@@ -85,7 +84,7 @@ function MinhasLojas() {
                 </div>
 
                 <div className="ml-box ml-highlight">
-                    <span>💰 Faturamento</span>
+                    <span>💰 Faturamento de Hoje</span>
 
                     <strong>
                         {Number(loja.faturamento || 0).toLocaleString("pt-BR", {
@@ -94,7 +93,6 @@ function MinhasLojas() {
                         })}
                     </strong>
 
-                    <small>somente pedidos finalizados</small>
                 </div>
 
             </div>

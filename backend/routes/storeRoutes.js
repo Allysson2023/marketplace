@@ -797,45 +797,57 @@ router.get(
 
     const sql = `
       SELECT
-        s.id,
-        s.nome,
-        s.categoria,
-        s.imagem,
+    s.id,
+    s.nome,
+    s.categoria,
+    s.imagem,
 
-        COUNT(DISTINCT p.id) AS total_produtos,
-        COUNT(DISTINCT pe.id) AS total_pedidos,
+    (
+        SELECT COUNT(*)
+        FROM products p
+        WHERE p.store_id = s.id
+    ) AS total_produtos,
 
-        COALESCE(SUM(CASE 
-          WHEN pe.status = 'finalizado' THEN pe.total 
-          ELSE 0 
-        END),0) AS faturamento,
+    (
+        SELECT COUNT(*)
+        FROM pedidos pe
+        WHERE pe.loja_id = s.id
+    ) AS total_pedidos,
 
-        CASE
-          WHEN s.horario_abertura IS NULL OR s.horario_fechamento IS NULL THEN 0
+    COALESCE((
+        SELECT SUM(pe.total)
+        FROM pedidos pe
+        WHERE pe.loja_id = s.id
+        AND pe.status = 'finalizado'
+        AND DATE(pe.created_at) = CURDATE()
+    ), 0) AS faturamento,
 
-          WHEN s.horario_abertura < s.horario_fechamento THEN
+    CASE
+        WHEN s.horario_abertura IS NULL
+          OR s.horario_fechamento IS NULL THEN 0
+
+        WHEN s.horario_abertura < s.horario_fechamento THEN
             CASE
-              WHEN CURTIME() BETWEEN s.horario_abertura AND s.horario_fechamento THEN 1
-              ELSE 0
+                WHEN CURTIME() BETWEEN s.horario_abertura
+                                   AND s.horario_fechamento
+                THEN 1
+                ELSE 0
             END
 
-          ELSE
+        ELSE
             CASE
-              WHEN CURTIME() >= s.horario_abertura 
-              OR CURTIME() < s.horario_fechamento THEN 1
-              ELSE 0
+                WHEN CURTIME() >= s.horario_abertura
+                  OR CURTIME() < s.horario_fechamento
+                THEN 1
+                ELSE 0
             END
-        END AS aberta
+    END AS aberta
 
-      FROM stores s
+FROM stores s
 
-      LEFT JOIN products p ON p.store_id = s.id
-      LEFT JOIN pedidos pe ON pe.loja_id = s.id
+WHERE s.funcionario_id = ?
 
-      WHERE s.funcionario_id = ?
-
-      GROUP BY s.id
-      ORDER BY s.id DESC
+ORDER BY s.id DESC
     `;
 
     db.query(sql, [funcionarioId], (err, result) => {
