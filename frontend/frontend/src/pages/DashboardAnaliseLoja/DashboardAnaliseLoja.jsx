@@ -7,7 +7,7 @@ function DashboardAnaliseLoja() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [dados, setDados] = useState(null);
+    const [analytics, setAnalytics] = useState(null);
 
     useEffect(() => {
         carregarDados();
@@ -25,53 +25,122 @@ function DashboardAnaliseLoja() {
         );
 
         const data = await resposta.json();
-        setDados(data);
+        console.log(data);
+        
+        setAnalytics(data);
     };
 
-    if (!dados) {
-        return <div className="loading">Carregando análise...</div>;
+    if (!analytics) {
+        return (
+            <div className="adl-loadingScreen">
+                Carregando análise da loja...
+            </div>
+        );
     }
 
     return (
-        <div className="dashboard-container">
+        <div className="adl-wrapper">
 
-            <button className="btn-voltar" onClick={() => navigate(-1)}>
-                ← Voltar
-            </button>
+            <div className="adl-topBar">
 
-            <h1>📊 {dados.nome}</h1>
+                <button
+                    className="adl-returnBtn"
+                    onClick={() => navigate(-1)}
+                >
+                    ← Voltar
+                </button>
 
-            <div className="cards">
-
-                <div className="card">
-                    <h3>💰 Faturamento</h3>
-                    <p>R$ {dados.faturamento}</p>
-                </div>
-
-                <div className="card">
-                    <h3>🛒 Pedidos</h3>
-                    <p>{dados.total_pedidos}</p>
-                </div>
-
-                <div className="card">
-                    <h3>📦 Produtos</h3>
-                    <p>{dados.total_produtos}</p>
-                </div>
-
-                <div className="card">
-                    <h3>📈 Ticket Médio</h3>
-                    <p>
-                        R$ {(dados.faturamento / (dados.total_pedidos || 1)).toFixed(2)}
-                    </p>
+                <div>
+                    <h1>{analytics.nome}</h1>
+                    <p>Painel completo da loja</p>
                 </div>
 
             </div>
 
-            <div className="status">
-                Status:
-                <span className={dados.faturamento > 1000 ? "green" : "red"}>
-                    {dados.faturamento > 1000 ? " 🟢 Boa" : " 🔴 Baixa"}
-                </span>
+            <div className="adl-kpiGrid">
+
+                <div className="adl-kpiCard">
+                    <span>💰 Hoje</span>
+                    <strong>
+                        R$ {Number(analytics.faturamentoHoje || 0).toFixed(2)}
+                    </strong>
+                </div>
+
+                <div className="adl-kpiCard">
+                    <span>📅 Mês</span>
+                    <strong>
+                        R$ {Number(analytics.faturamentoMes || 0).toFixed(2)}
+                    </strong>
+                </div>
+
+                <div className="adl-kpiCard">
+                    <span>🏆 Ano</span>
+                    <strong>
+                        R$ {Number(analytics.faturamentoAno || 0).toFixed(2)}
+                    </strong>
+                </div>
+
+                <div className="adl-kpiCard">
+                    <span>🛒 Pedidos</span>
+                    <strong>{analytics.total_pedidos}</strong>
+                </div>
+
+                <div className="adl-kpiCard">
+                    <span>📦 Produtos</span>
+                    <strong>{analytics.total_produtos}</strong>
+                </div>
+
+                <div className="adl-kpiCard">
+                    <span>📈 Ticket Médio</span>
+                    <strong>
+                        R$ {(
+                            (analytics.faturamentoMes || 0) /
+                            (analytics.total_pedidos || 1)
+                        ).toFixed(2)}
+                    </strong>
+                </div>
+
+            </div>
+
+            <div className="adl-analysisSection">
+
+                <div className="adl-analysisCard">
+
+                    <h3>Desempenho da Loja</h3>
+
+                    <div className="adl-performance">
+
+                        {analytics.faturamentoMes > 5000 ? (
+                            <span className="adl-good">
+                                🟢 Excelente desempenho
+                            </span>
+                        ) : analytics.faturamentoMes > 1000 ? (
+                            <span className="adl-medium">
+                                🟡 Crescimento moderado
+                            </span>
+                        ) : (
+                            <span className="adl-bad">
+                                🔴 Necessita atenção
+                            </span>
+                        )}
+
+                    </div>
+
+                </div>
+
+                <div className="adl-analysisCard">
+
+                    <h3>Resumo Rápido</h3>
+
+                    <ul className="adl-summaryList">
+                        <li>Total de produtos cadastrados</li>
+                        <li>Total de pedidos recebidos</li>
+                        <li>Faturamento atualizado</li>
+                        <li>Análise automática da loja</li>
+                    </ul>
+
+                </div>
+
             </div>
 
         </div>

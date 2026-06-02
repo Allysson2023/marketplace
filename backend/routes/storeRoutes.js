@@ -861,31 +861,46 @@ router.get("/funcionario/loja-dashboard/:id", authMiddleware, (req, res) => {
     const lojaId = req.params.id;
 
     const sql = `
-        SELECT 
+        SELECT
             s.id,
             s.nome,
 
-            -- 💰 FATURAMENTO REAL (somente pedidos finalizados)
             COALESCE((
-                SELECT SUM(pe.total)
-                FROM pedidos pe
-                WHERE pe.loja_id = s.id
-                AND pe.status = 'finalizado'
-            ), 0) AS faturamento,
+                SELECT SUM(total)
+                FROM pedidos
+                WHERE loja_id = s.id
+                AND status = 'finalizado'
+                AND DATE(created_at) = CURDATE()
+            ),0) AS faturamentoHoje,
 
-            -- 📦 TOTAL DE PRODUTOS
+            COALESCE((
+                SELECT SUM(total)
+                FROM pedidos
+                WHERE loja_id = s.id
+                AND status = 'finalizado'
+                AND MONTH(created_at) = MONTH(CURDATE())
+                AND YEAR(created_at) = YEAR(CURDATE())
+            ),0) AS faturamentoMes,
+
+            COALESCE((
+                SELECT SUM(total)
+                FROM pedidos
+                WHERE loja_id = s.id
+                AND status = 'finalizado'
+                AND YEAR(created_at) = YEAR(CURDATE())
+            ),0) AS faturamentoAno,
+
             COALESCE((
                 SELECT COUNT(*)
-                FROM products p
-                WHERE p.store_id = s.id
-            ), 0) AS total_produtos,
+                FROM products
+                WHERE store_id = s.id
+            ),0) AS total_produtos,
 
-            -- 🛒 TOTAL DE PEDIDOS
             COALESCE((
                 SELECT COUNT(*)
-                FROM pedidos pe
-                WHERE pe.loja_id = s.id
-            ), 0) AS total_pedidos
+                FROM pedidos
+                WHERE loja_id = s.id
+            ),0) AS total_pedidos
 
         FROM stores s
         WHERE s.id = ?
@@ -900,7 +915,9 @@ router.get("/funcionario/loja-dashboard/:id", authMiddleware, (req, res) => {
         }
 
         res.json(result[0]);
+
     });
+
 });
 
 
