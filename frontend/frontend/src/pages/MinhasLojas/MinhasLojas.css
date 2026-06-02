@@ -1,97 +1,168 @@
-.minhas-lojas-container{
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+.ml-container {
+  min-height: 100vh;
+  padding: 30px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  font-family: "Segoe UI", sans-serif;
+  color: #fff;
 }
 
-.topo-lojas{
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
+/* HEADER */
+.ml-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
 }
 
-.btn-voltar{
-    padding: 10px 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    background: #2c3e50;
-    color: white;
-    font-weight: bold;
+.ml-headerText h1 {
+  font-size: 32px;
+  margin: 0;
 }
 
-.btn-voltar:hover{
-    opacity: 0.9;
+.ml-headerText p {
+  color: #94a3b8;
+  margin-top: 5px;
 }
 
-.lista-lojas{
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+/* BACK BUTTON */
+.ml-backBtn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.card-loja{
-    background: #fff;
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+.ml-backBtn:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.1);
 }
 
-.card-loja img{
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 10px;
-    margin-bottom: 12px;
+/* GRID */
+.ml-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
 }
 
-.card-loja h2{
-    margin-bottom: 8px;
-    font-size: 20px;
+/* CARD */
+.ml-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(12px);
+  transition: 0.3s;
 }
 
-.card-loja p{
-    color: #666;
-    margin-bottom: 15px;
+.ml-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(99,102,241,0.5);
 }
 
-.info-loja{
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 15px;
+/* TOP */
+.ml-cardTop {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-.info-loja span{
-    font-size: 14px;
-    font-weight: 500;
+.ml-status {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-weight: bold;
 }
 
-.card-loja button{
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    background: #27ae60;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
+.ml-status.open {
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
 }
 
-.card-loja button:hover{
-    background: #219150;
+.ml-status.closed {
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
 }
 
-@media (max-width: 768px){
+.ml-category {
+  font-size: 12px;
+  color: #94a3b8;
+}
 
-    .topo-lojas{
-        flex-direction: column;
-        align-items: flex-start;
-    }
+/* TITLE */
+.ml-title {
+  margin: 10px 0 20px 0;
+  font-size: 20px;
+}
 
-    .lista-lojas{
-        grid-template-columns: 1fr;
-    }
+/* STATS */
+.ml-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
 
+.ml-box {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+}
+
+.ml-box span {
+  font-size: 12px;
+  color: #94a3b8;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.ml-box strong {
+  font-size: 15px;
+}
+
+/* HIGHLIGHT (FATURAMENTO) */
+.ml-highlight {
+  border: 1px solid rgba(34,197,94,0.4);
+  background: rgba(34,197,94,0.08);
+}
+
+.ml-highlight small {
+  display: block;
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 5px;
+}
+
+/* BUTTON */
+.ml-button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #4f46e5;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.ml-button:hover {
+  background: #6366f1;
+  transform: translateY(-2px);
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+  .ml-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .ml-headerText h1 {
+    font-size: 24px;
+  }
 }

@@ -843,27 +843,39 @@ router.get("/funcionario/loja-dashboard/:id", authMiddleware, (req, res) => {
             s.id,
             s.nome,
 
-            COALESCE(SUM(ped.total),0) AS faturamento,
+            -- 💰 FATURAMENTO REAL (somente pedidos finalizados)
+            COALESCE((
+                SELECT SUM(pe.total)
+                FROM pedidos pe
+                WHERE pe.loja_id = s.id
+                AND pe.status = 'finalizado'
+            ), 0) AS faturamento,
 
-            (SELECT COUNT(*) FROM pedido_itens pi
-             JOIN pedidos pe ON pe.id = pi.pedido_id
-             WHERE pe.loja_id = s.id) AS total_produtos,
+            -- 📦 TOTAL DE PRODUTOS
+            COALESCE((
+                SELECT COUNT(*)
+                FROM products p
+                WHERE p.store_id = s.id
+            ), 0) AS total_produtos,
 
-            (SELECT COUNT(*) FROM pedidos pe
-             WHERE pe.loja_id = s.id) AS total_pedidos
+            -- 🛒 TOTAL DE PEDIDOS
+            COALESCE((
+                SELECT COUNT(*)
+                FROM pedidos pe
+                WHERE pe.loja_id = s.id
+            ), 0) AS total_pedidos
 
         FROM stores s
-
-        LEFT JOIN pedidos ped ON ped.loja_id = s.id
-
         WHERE s.id = ?
-
-        GROUP BY s.id
+        LIMIT 1
     `;
 
     db.query(sql, [lojaId], (err, result) => {
 
-        if (err) return res.status(500).json(err);
+        if (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
 
         res.json(result[0]);
     });
