@@ -56,7 +56,11 @@ function FuncionarioDashboard() {
           <p>
             Visualize todas as lojas cadastradas e acompanhe suas atividades.
           </p>
-          <button>Visualizar</button>
+          <button
+    onClick={() => navigate("/minhas-lojas")}
+  >
+    Visualizar
+  </button>
         </div>
 
         <div className="card-funcionario"

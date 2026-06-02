@@ -787,4 +787,88 @@ router.get('/stores/:id/clientes', authMiddleware, checkOwner, (req, res) => {
 
 });
 
+
+router.get(
+  "/funcionario/minhas-lojas",
+  authMiddleware,
+  (req, res) => {
+
+    const funcionarioId = req.user.id;
+
+    const sql = `
+      SELECT
+          s.id,
+          s.nome,
+          s.categoria,
+          s.imagem,
+
+          COUNT(DISTINCT p.id) AS total_produtos,
+
+          COUNT(DISTINCT pe.id) AS total_pedidos,
+
+          COALESCE(SUM(pe.total),0) AS faturamento
+
+      FROM stores s
+
+      LEFT JOIN products p
+      ON p.store_id = s.id
+
+      LEFT JOIN pedidos pe
+      ON pe.loja_id = s.id
+
+      WHERE s.funcionario_id = ?
+
+      GROUP BY s.id
+
+      ORDER BY s.id DESC
+    `;
+
+    db.query(sql, [funcionarioId], (err, result) => {
+
+      if(err){
+        return res.status(500).json(err);
+      }
+
+      res.json(result);
+    });
+
+});
+
+router.get("/funcionario/loja-dashboard/:id", authMiddleware, (req, res) => {
+
+    const lojaId = req.params.id;
+
+    const sql = `
+        SELECT 
+            s.id,
+            s.nome,
+
+            COALESCE(SUM(ped.total),0) AS faturamento,
+
+            (SELECT COUNT(*) FROM pedido_itens pi
+             JOIN pedidos pe ON pe.id = pi.pedido_id
+             WHERE pe.loja_id = s.id) AS total_produtos,
+
+            (SELECT COUNT(*) FROM pedidos pe
+             WHERE pe.loja_id = s.id) AS total_pedidos
+
+        FROM stores s
+
+        LEFT JOIN pedidos ped ON ped.loja_id = s.id
+
+        WHERE s.id = ?
+
+        GROUP BY s.id
+    `;
+
+    db.query(sql, [lojaId], (err, result) => {
+
+        if (err) return res.status(500).json(err);
+
+        res.json(result[0]);
+    });
+});
+
+
+
 module.exports = router;
