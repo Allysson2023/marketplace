@@ -35,6 +35,8 @@ import PerfilCliente from "./pages/PerfilCliente/PerfilCliente";
 import FuncionarioDashboard from "./pages/FuncionarioDashboard/FuncionarioDashboard";
 import MinhasLojas from "./pages/MinhasLojas/MinhasLojas";
 import DashboardAnaliseLoja from "./pages/DashboardAnaliseLoja/DashboardAnaliseLoja";
+import TopLojas from "./pages/TopLojas/TopLojas";
+
 
 function App() {
 
@@ -127,6 +129,11 @@ function App() {
 <Route
   path="/dashboard-loja/:id"
   element={<DashboardAnaliseLoja />}
+/>
+
+<Route
+  path="/top-lojas"
+  element={<TopLojas />}
 />
       </Routes>
 

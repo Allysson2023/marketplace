@@ -73,32 +73,7 @@ function FuncionarioDashboard() {
           <button>Cadastrar</button>
         </div>
 
-        <div className="card-funcionario">
-          <div className="icone-card">📊</div>
-          <h2>Relatórios</h2>
-          <p>
-            Analise desempenho, crescimento e estatísticas das lojas.
-          </p>
-          <button>Acessar</button>
-        </div>
-
-        <div className="card-funcionario">
-          <div className="icone-card">💰</div>
-          <h2>Vendas</h2>
-          <p>
-            Monitore faturamento diário, mensal e anual das lojas.
-          </p>
-          <button>Ver Vendas</button>
-        </div>
-
-        <div className="card-funcionario">
-          <div className="icone-card">⚠️</div>
-          <h2>Lojas Inativas</h2>
-          <p>
-            Veja lojas sem vendas ou com baixa movimentação.
-          </p>
-          <button>Monitorar</button>
-        </div>
+        
 
         <div className="card-funcionario">
           <div className="icone-card">⭐</div>
@@ -106,7 +81,11 @@ function FuncionarioDashboard() {
           <p>
             Ranking das lojas com melhor desempenho no marketplace.
           </p>
-          <button>Visualizar</button>
+          <button
+            onClick={() => navigate("/top-lojas")}
+          >
+            Visualizar
+            </button>
         </div>
 
       </div>

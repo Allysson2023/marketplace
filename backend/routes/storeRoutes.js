@@ -920,6 +920,56 @@ router.get("/funcionario/loja-dashboard/:id", authMiddleware, (req, res) => {
 
 });
 
+router.get(
+  "/funcionario/top-lojas",
+  authMiddleware,
+  (req, res) => {
 
+    const sql = `
+      SELECT
+          s.id,
+          s.nome,
+          s.categoria,
+
+          COALESCE(
+            SUM(
+              CASE
+                WHEN p.status = 'finalizado'
+                AND DATE(p.created_at) = CURDATE()
+                THEN p.total
+                ELSE 0
+              END
+            ),0
+          ) AS faturamentoHoje,
+
+          COUNT(
+            DISTINCT CASE
+              WHEN DATE(p.created_at) = CURDATE()
+              THEN p.id
+            END
+          ) AS pedidosHoje
+
+      FROM stores s
+
+      LEFT JOIN pedidos p
+        ON p.loja_id = s.id
+
+      GROUP BY s.id
+
+      ORDER BY faturamentoHoje DESC
+    `;
+
+    db.query(sql, (err, result) => {
+
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+
+      res.json(result);
+
+    });
+
+});
 
 module.exports = router;
