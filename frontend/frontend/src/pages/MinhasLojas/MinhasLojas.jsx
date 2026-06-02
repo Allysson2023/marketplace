@@ -23,19 +23,10 @@ function MinhasLojas() {
         );
 
         const dados = await resposta.json();
+        console.log(JSON.stringify(dados, null, 2));
         setLojas(dados);
     };
 
-    // função simples para simular status da loja
-    const isAberta = (loja) => {
-        const agora = new Date();
-        const hora = agora.getHours();
-
-        const abertura = parseInt(loja.horario_abertura?.split(":")[0] || 0);
-        const fechamento = parseInt(loja.horario_fechamento?.split(":")[0] || 24);
-
-        return hora >= abertura && hora < fechamento;
-    };
 
     return (
   <div className="ml-container">
@@ -60,68 +51,64 @@ function MinhasLojas() {
     {/* LISTA */}
     <div className="ml-grid">
 
-      {lojas.map(loja => {
+      {lojas.map((loja) => {
 
-        const aberta = isAberta(loja);
+    const aberta = loja.aberta === 1;
 
-        return (
-          <div key={loja.id} className="ml-card">
+    return (
+        <div key={loja.id} className="ml-card">
 
-            {/* TOP INFO */}
             <div className="ml-cardTop">
 
-              <span className={aberta ? "ml-status open" : "ml-status closed"}>
-                {aberta ? "🟢 Aberta" : "🔴 Fechada"}
-              </span>
+                <span className={aberta ? "ml-status open" : "ml-status closed"}>
+                    {aberta ? "🟢 Aberta" : "🔴 Fechada"}
+                </span>
 
-              <span className="ml-category">
-                {loja.categoria}
-              </span>
+                <span className="ml-category">
+                    {loja.categoria}
+                </span>
 
             </div>
 
-            {/* TITLE */}
             <h2 className="ml-title">{loja.nome}</h2>
 
-            {/* STATS */}
             <div className="ml-stats">
 
-              <div className="ml-box">
-                <span>📦 Produtos</span>
-                <strong>{loja.total_produtos}</strong>
-              </div>
+                <div className="ml-box">
+                    <span>📦 Produtos</span>
+                    <strong>{loja.total_produtos}</strong>
+                </div>
 
-              <div className="ml-box">
-                <span>🛒 Pedidos</span>
-                <strong>{loja.total_pedidos}</strong>
-              </div>
+                <div className="ml-box">
+                    <span>🛒 Pedidos</span>
+                    <strong>{loja.total_pedidos}</strong>
+                </div>
 
-              <div className="ml-box ml-highlight">
-                <span>💰 Faturamento</span>
+                <div className="ml-box ml-highlight">
+                    <span>💰 Faturamento</span>
 
-                <strong>
-                  {Number(loja.faturamento || 0).toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL"
-                  })}
-                </strong>
+                    <strong>
+                        {Number(loja.faturamento || 0).toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL"
+                        })}
+                    </strong>
 
-                <small>pedidos finalizados</small>
-              </div>
+                    <small>somente pedidos finalizados</small>
+                </div>
 
             </div>
 
-            {/* BUTTON */}
             <button
-              className="ml-button"
-              onClick={() => navigate(`/dashboard-loja/${loja.id}`)}
+                className="ml-button"
+                onClick={() => navigate(`/dashboard-loja/${loja.id}`)}
             >
-              Ver Análise
+                Ver Análise
             </button>
 
-          </div>
-        );
-      })}
+        </div>
+    );
+})}
 
     </div>
 
