@@ -49,7 +49,7 @@ const carregarResumo = async () => {
       <div className="resumo-dashboard">
 
         <div className="resumo-card">
-          <h3>🏪 Lojas</h3>
+          <h3>🏪 Lojas Cadastrada</h3>
           <span>{resumo?.totalLojas || 0}</span>
         </div>
 

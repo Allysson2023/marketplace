@@ -19,6 +19,21 @@ function AtualizarCliente() {
     useEffect(() => {
         buscarCliente();
     }, []);
+    const [mostrarModal, setMostrarModal] = useState(false);
+
+    const abrirConfirmacao = (e) => {
+    e.preventDefault();
+
+    setErro("");
+
+    if (!username) {
+        setErro("Preencha o usuário");
+        return;
+    }
+
+    setMostrarModal(true);
+};
+
 
     const buscarCliente = async () => {
 
@@ -51,67 +66,62 @@ const res = await fetch(
         }
     };
 
-    const atualizar = async (e) => {
+    const atualizar = async () => {
 
-        e.preventDefault();
+    setErro("");
+    setSucesso("");
 
-        setErro("");
-        setSucesso("");
+    try {
 
-        if (!username) {
-            setErro("Preencha o usuário");
+        setLoading(true);
+
+        const body = {
+            username
+        };
+
+        if (password.trim()) {
+            body.password = password;
+        }
+
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(
+            `http://localhost:3000/api/users/${id}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(body)
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            setErro(data.error || "Erro ao atualizar");
             return;
         }
 
-        try {
+        setSucesso("Dados atualizados com sucesso!");
 
-            setLoading(true);
+        localStorage.removeItem("token");
 
-            const body = {
-                username
-            };
+        setTimeout(() => {
+            navigate("/login");
+        }, 1200);
 
-            if (password.trim()) {
-                body.password = password;
-            }
+    } catch {
 
-            const token = localStorage.getItem("token");
+        setErro("Erro no servidor");
 
-const res = await fetch(
-    `http://localhost:3000/api/users/${id}`,
-    {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(body)
+    } finally {
+
+        setLoading(false);
+
     }
-);
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                setErro(data.error || "Erro ao atualizar");
-                return;
-            }
-
-            setSucesso("Cliente atualizado com sucesso!");
-
-            setTimeout(() => {
-                navigate("/clientes");
-            }, 1200);
-
-        } catch {
-
-            setErro("Erro no servidor");
-
-        } finally {
-
-            setLoading(false);
-
-        }
-    };
+};
 
     if (carregando) {
         return (
@@ -129,7 +139,7 @@ const res = await fetch(
 
             <form
                 className="atualizar-form"
-                onSubmit={atualizar}
+                onSubmit={abrirConfirmacao}
             >
 
                 <h2>Atualizar Cliente</h2>
@@ -184,6 +194,47 @@ const res = await fetch(
                 </span>
 
             </form>
+
+            {
+    mostrarModal && (
+        <div className="modal-overlay">
+            <div className="modal-confirmacao">
+
+                <h3>Confirmar Alteração</h3>
+
+                <p>
+                    Tem certeza que deseja atualizar seus dados?
+                    Você precisará fazer login novamente.
+                </p>
+
+                <div className="modal-botoes">
+
+                    <button
+                        type="button"
+                        className="btn-cancelar"
+                        onClick={() => setMostrarModal(false)}
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="button"
+                        className="btn-confirmar"
+                        onClick={() => {
+                            setMostrarModal(false);
+                            atualizar();
+                        }}
+                    >
+                        Confirmar
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    )
+}
+
 
         </div>
 
