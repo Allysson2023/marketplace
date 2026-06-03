@@ -46,6 +46,8 @@ function AdminPedido() {
 
     }, [id, token]);
 
+    const [modalFinalizarPedido, setModalFinalizarPedido] = useState(false);
+
     async function atualizarStatus(status) {
 
         try {
@@ -215,7 +217,7 @@ function AdminPedido() {
 
                 <button
                     className="btn-status finalizado"
-                    onClick={() => atualizarStatus("finalizado")}
+                    onClick={() => setModalFinalizarPedido(true)}
                     disabled={status !== "rota"}
                 >
                     Finalizar
@@ -225,6 +227,7 @@ function AdminPedido() {
     className="btn-status cancelar"
     onClick={() => atualizarStatus("cancelado")}
     disabled={
+    status === "rota" ||
     status === "finalizado" ||
     status === "cancelado" ||
     status === "recusado"
@@ -243,6 +246,52 @@ function AdminPedido() {
     })}
 </h2>
             </div>
+
+            {modalFinalizarPedido && (
+
+    <div className="confirmar-finalizar-overlay">
+
+        <div className="confirmar-finalizar-box">
+
+            <h3>
+                Confirmar Finalização
+            </h3>
+
+            <p>
+                Deseja realmente marcar este pedido como finalizado?
+            </p>
+
+            <div className="confirmar-finalizar-botoes">
+
+                <button
+                    className="confirmar-finalizar-cancelar"
+                    onClick={() =>
+                        setModalFinalizarPedido(false)
+                    }
+                >
+                    Não
+                </button>
+
+                <button
+                    className="confirmar-finalizar-confirmar"
+                    onClick={() => {
+
+                        atualizarStatus("finalizado");
+
+                        setModalFinalizarPedido(false);
+
+                    }}
+                >
+                    Sim, Finalizar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+)}
 
         </div>
     );

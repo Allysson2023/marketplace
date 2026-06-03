@@ -57,29 +57,6 @@ STATUS
     text-transform: capitalize;
 }
 
-.status.aceito{
-    background: #2ecc71;
-}
-
-.status.recusado{
-    background: #e74c3c;
-}
-
-.status.separacao{
-    background: #f39c12;
-}
-
-.status.rota{
-    background: #3498db;
-}
-
-.status.finalizado{
-    background: #8e44ad;
-}
-.status.cancelado{
-    background: black;
-    color: white;
-}
 
 /* =========================
 GRID
@@ -216,7 +193,9 @@ AÇÕES STATUS
 .btn-status.recusado{
     background: #e74c3c;
 }
-
+.btn-status.cancelar{
+    background: #000000;
+}
 /* =========================
 FOOTER
 ========================= */
@@ -234,7 +213,59 @@ FOOTER
     color: white;
 }
 
+.confirmar-finalizar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
 
+.confirmar-finalizar-box {
+    background: #fff;
+    width: 420px;
+    max-width: 90%;
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.confirmar-finalizar-box h3 {
+    margin-bottom: 15px;
+    color: #222;
+}
+
+.confirmar-finalizar-box p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.confirmar-finalizar-botoes {
+    display: flex;
+    gap: 10px;
+}
+
+.confirmar-finalizar-cancelar,
+.confirmar-finalizar-confirmar {
+    flex: 1;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.confirmar-finalizar-cancelar {
+    background: #e5e7eb;
+}
+
+.confirmar-finalizar-confirmar {
+    background: #16a34a;
+    color: white;
+}
 
 
 
