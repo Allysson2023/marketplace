@@ -82,6 +82,10 @@ function PedidoStatus() {
     }
 }
 
+const podeAbrirChat =
+    pedido.status === "aceito" ||
+    pedido.status === "separação" ||
+    pedido.status === "em Rota";
 
 
     return (
@@ -107,13 +111,11 @@ function PedidoStatus() {
 
                 <div className="botoes-contato">
 
-    {/* WhatsApp (opcional mantém) */}
-    
-
     {/* CHAT INTERNO */}
     <button
     className="btn-chat-interno"
     onClick={() => abrirChat()}
+    disabled={!podeAbrirChat}
 >
     💬 Falar com a Loja (Chat Interno)
 </button>

@@ -237,3 +237,7 @@
 .status.CANCELADO {
   color: red;
 }
+.btn-chat-interno:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

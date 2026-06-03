@@ -106,7 +106,7 @@
 /* TEXTOS DOS CARDS */
 .sd-cardTitle {
   margin: 0;
-  color: #94a3b8;
+  color: #ffffff;
   font-size: 14px;
 }
 
@@ -114,7 +114,7 @@
   margin-top: 10px;
   font-size: 28px;
   font-weight: bold;
-  color: white;
+  color: rgb(255, 255, 255);
 }
 
 /* META SECTION */
@@ -125,7 +125,7 @@
 .sd-metaBar {
   width: 100%;
   height: 18px;
-  background: rgba(255,255,255,.08);
+  background: rgba(231, 0, 0, 0.08);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -137,7 +137,7 @@
 
 .sd-metaText {
   margin-top: 10px;
-  color: #020202;
+  color: #ffffff;
 }
 
 /* =========================
