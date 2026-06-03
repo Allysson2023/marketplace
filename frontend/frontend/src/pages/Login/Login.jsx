@@ -6,6 +6,8 @@ function Login() {
   const [password, setPassword] = useState("");
   const [mensagemErro, setMensagemErro] = useState("");
 
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+ 
   async function handleLogin(e) {
 
   e.preventDefault();
@@ -66,12 +68,23 @@ function Login() {
           onChange={(e) => setUsername(e.target.value)}
         />
 
-        <input
-          type="password"
-          placeholder="Senha"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className="input-senha">
+  <input
+    type={mostrarSenha ? "text" : "password"}
+    placeholder="Senha"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+  />
+
+  <button
+    type="button"
+    className="btn-mostrar-senha"
+    onClick={() => setMostrarSenha(!mostrarSenha)}
+  >
+    {mostrarSenha ? "🙈" : "👁"}
+  </button>
+</div>
+
 {mensagemErro && (
   <div className="mensagem-erro">
     {mensagemErro}

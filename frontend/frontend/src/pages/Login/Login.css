@@ -197,36 +197,25 @@ body{
    BOTÃO LOGIN
 ========================= */
 
-.login-container form button{
+.login-container form > button{
     width: 100%;
-
     margin-top: 5px;
-
     padding: 15px;
-
     border: none;
-
     border-radius: 14px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #4f46e5,
-            #2563eb
-        );
-
+    background: linear-gradient(
+        135deg,
+        #4f46e5,
+        #2563eb
+    );
     color: white;
-
     font-size: 15px;
-
     font-weight: bold;
-
     cursor: pointer;
-
     transition: .25s;
 }
 
-.login-container form button:hover{
+.login-container form > button:hover{
     transform: translateY(-2px);
 
     box-shadow:
@@ -283,6 +272,42 @@ body{
     text-align: center;
 
     font-size: 13px;
+}
+
+.input-senha {
+  position: relative;
+  width: 100%;
+}
+
+.input-senha input {
+  width: 100%;
+  padding-right: 45px;
+  box-sizing: border-box;
+}
+
+.btn-mostrar-senha {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    
+    background: transparent;
+    border: none;
+
+    color: rgba(255,255,255,0.7);
+
+    cursor: pointer;
+
+    font-size: 18px;
+
+    padding: 0;
+
+    width: auto;
+    height: auto;
+}
+
+.btn-mostrar-senha:hover {
+    color: white;
 }
 
 /* =========================
