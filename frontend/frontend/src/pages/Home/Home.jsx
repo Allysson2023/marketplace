@@ -363,6 +363,14 @@ if (usuarioLogado?.tipo === "admin") {
   </div>
 )}
 
+{tipoUsuario === "lojista" && (
+  <div
+    className="menu-item"
+    onClick={() => navigate(`/store/${user.loja_id}/dashboard`)}
+  >
+    🏪 Painel da Loja
+  </div>
+)}
 
       <div
   className="menu-item"
