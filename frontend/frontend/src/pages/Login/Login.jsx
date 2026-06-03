@@ -31,6 +31,8 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(dados.user));
       localStorage.setItem("lojaId", dados.user.loja_id);
 
+      sessionStorage.removeItem("boasVindas");
+
       window.location.href = "/";
 
     } else {

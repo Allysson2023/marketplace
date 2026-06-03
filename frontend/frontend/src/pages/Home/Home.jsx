@@ -19,6 +19,11 @@ function Home() {
   const [quantidadeCarrinho, setQuantidadeCarrinho] = useState(0);
 
   const [modalCarrinhoVazio, setModalCarrinhoVazio] = useState(false);
+  const [mostrarBoasVindas, setMostrarBoasVindas] =
+    useState(false);
+
+const [usuarioLogado, setUsuarioLogado] =
+    useState(null);
 
   const token = localStorage.getItem("token");
 const estaLogado = !!token;
@@ -32,6 +37,8 @@ const tipoUsuario = user?.tipo;
   // FECHAR MENU
   // =========================
   useEffect(() => {
+
+    
 
     function handleClickFora(event) {
 
@@ -55,18 +62,48 @@ const tipoUsuario = user?.tipo;
 
   }, []);
 
+  useEffect(() => {
+
+  const userSalvo =
+    localStorage.getItem("user");
+
+  const boasVindasMostrada =
+    sessionStorage.getItem("boasVindas");
+
+
+  if (
+    userSalvo &&
+    !boasVindasMostrada
+  ) {
+
+    setUsuarioLogado(
+      JSON.parse(userSalvo)
+    );
+
+    setMostrarBoasVindas(true);
+
+    sessionStorage.setItem(
+      "boasVindas",
+      "true"
+    );
+  }
+
+}, []);
+
   // =========================
   // SAIR
   // =========================
   const sair = () => {
 
-    localStorage.removeItem("token");
+  localStorage.removeItem("token");
 
-    setModalSair(false);
+  sessionStorage.removeItem("boasVindas");
 
-    navigate("/login");
+  setModalSair(false);
 
-  };
+  navigate("/login");
+
+};
 
   
 
@@ -227,6 +264,24 @@ const tipoUsuario = user?.tipo;
     }
 
   }, []);
+
+  let tipoExibicao = "";
+
+if (usuarioLogado?.tipo === "cliente") {
+  tipoExibicao = "Cliente";
+}
+
+if (usuarioLogado?.tipo === "lojista") {
+  tipoExibicao = "Lojista";
+}
+
+if (usuarioLogado?.tipo === "funcionario") {
+  tipoExibicao = "Funcionário";
+}
+
+if (usuarioLogado?.tipo === "admin") {
+  tipoExibicao = "Administrador";
+}
 
   return (
     <div className="home">
@@ -520,6 +575,46 @@ const tipoUsuario = user?.tipo;
         className="btn-ok"
       >
         OK
+      </button>
+
+    </div>
+
+  </div>
+
+)}
+{ mostrarBoasVindas && (
+
+  <div className="welcome-overlay">
+
+    <div className="welcome-card">
+
+      <div className="welcome-icon">
+        🎉
+      </div>
+
+      <h2 className="welcome-title">
+        Bem-vindo ao Econômica
+      </h2>
+
+      <p className="welcome-user">
+        Olá, <strong>{usuarioLogado?.username}</strong>
+      </p>
+
+      <div className="welcome-role">
+        {tipoExibicao}
+      </div>
+
+      <p className="welcome-text">
+        Seu acesso foi realizado com sucesso.
+        Aproveite todos os recursos da plataforma
+        e tenha uma excelente experiência.
+      </p>
+
+      <button
+        className="welcome-button"
+        onClick={() => setMostrarBoasVindas(false)}
+      >
+        Entrar no Sistema
       </button>
 
     </div>
