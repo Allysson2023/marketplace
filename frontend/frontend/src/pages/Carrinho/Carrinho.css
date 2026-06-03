@@ -295,3 +295,17 @@ PRODUTO INDISPONÍVEL
   border-radius: 8px;
   cursor: pointer;
 }
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-menos,
+.btn-mais,
+.btn-delete {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

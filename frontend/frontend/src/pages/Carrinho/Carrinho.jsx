@@ -36,6 +36,14 @@ const isEntregaValida =
   form.bairro.trim() !== "" &&
   form.pagamento.trim() !== "";
 
+  const [modalExcluir, setModalExcluir] = useState(false);
+const [produtoExcluir, setProdutoExcluir] = useState(null);
+
+const [modalLimpar, setModalLimpar] = useState(false);
+
+const [modalConfirmarPedido, setModalConfirmarPedido] =
+  useState(false);
+
   useEffect(() => {
 
     fetch("http://localhost:3000/api/cart", {
@@ -257,7 +265,34 @@ async function finalizarCompra() {
   }
 }
 
+const confirmarRemocao = () => {
 
+  fetch(
+    `http://localhost:3000/api/cart/delete/${produtoExcluir}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  )
+  .then(() => {
+
+    setCarrinho(prev =>
+      prev.filter(
+        item => item.product_id !== produtoExcluir
+      )
+    );
+
+    setModalExcluir(false);
+    setProdutoExcluir(null);
+
+  });
+
+};
+
+
+ 
   return (
 
     <div className="pagina-carrinho">
@@ -291,7 +326,7 @@ async function finalizarCompra() {
 
             <button
   className="btn-limpar"
-  onClick={limparCarrinho}
+  onClick={() => setModalLimpar(true)}
 >
   🧹 Limpar Carrinho
 </button>
@@ -334,9 +369,13 @@ async function finalizarCompra() {
 
                 <div className="actions">
 
-  <button className="btn-menos" onClick={() => diminuir(item.product_id)}>
-    -
-  </button>
+  <button
+  className="btn-menos"
+  onClick={() => diminuir(item.product_id)}
+  disabled={item.quantidade <= 1}
+>
+  -
+</button>
 
   <span>{item.quantidade}</span>
 
@@ -351,9 +390,15 @@ className="btn-mais"
   +
 </button>
 
-  <button className="btn-delete" onClick={() => remover(item.product_id)}>
-    🗑
-  </button>
+  <button
+  className="btn-delete"
+  onClick={() => {
+    setProdutoExcluir(item.product_id);
+    setModalExcluir(true);
+  }}
+>
+  🗑
+</button>
 
 </div>
 
@@ -501,9 +546,12 @@ className="btn-mais"
           Cancelar
         </button>
 
-        <button
-  onClick={finalizarCompra}
-  disabled={tipoPedido === "entrega" && !isEntregaValida}
+       <button
+  disabled={
+    tipoPedido === "entrega" &&
+    !isEntregaValida
+  }
+  onClick={() => setModalConfirmarPedido(true)}
 >
   Confirmar Pedido
 </button>
@@ -535,6 +583,107 @@ className="btn-mais"
     </div>
   </div>
 )}
+
+{modalExcluir && (
+  <div className="modal-overlay">
+    <div className="modal">
+
+      <h2>Excluir Item</h2>
+
+      <p>
+        Deseja realmente remover este produto do carrinho?
+      </p>
+
+      <div className="modal-botoes">
+
+        <button
+          onClick={() => {
+            setModalExcluir(false);
+            setProdutoExcluir(null);
+          }}
+        >
+          Cancelar
+        </button>
+
+        <button onClick={confirmarRemocao}>
+          Excluir
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
+
+{modalLimpar && (
+  <div className="modal-overlay">
+    <div className="modal">
+
+      <h2>Limpar Carrinho</h2>
+
+      <p>
+        Tem certeza que deseja remover todos os produtos?
+      </p>
+
+      <div className="modal-botoes">
+
+        <button
+          onClick={() => setModalLimpar(false)}
+        >
+          Cancelar
+        </button>
+
+        <button
+          onClick={() => {
+            limparCarrinho();
+            setModalLimpar(false);
+          }}
+        >
+          Limpar
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
+{modalConfirmarPedido && (
+  <div className="modal-overlay">
+    <div className="modal">
+
+      <h2>Finalizar Pedido</h2>
+
+      <p>
+        Deseja realmente enviar este pedido?
+      </p>
+
+      <div className="modal-botoes">
+
+        <button
+          onClick={() =>
+            setModalConfirmarPedido(false)
+          }
+        >
+          Cancelar
+        </button>
+
+        <button
+          onClick={() => {
+            setModalConfirmarPedido(false);
+            finalizarCompra();
+          }}
+        >
+          Sim, Enviar
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
 
     </div>
   );
