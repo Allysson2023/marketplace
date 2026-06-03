@@ -19,6 +19,8 @@ function AtualizarCliente() {
     useEffect(() => {
         buscarCliente();
     }, []);
+    const [usernameOriginal, setUsernameOriginal] = useState("");
+    const [senhaAlterada, setSenhaAlterada] = useState(false);
     const [mostrarModal, setMostrarModal] = useState(false);
 
     const abrirConfirmacao = (e) => {
@@ -30,6 +32,23 @@ function AtualizarCliente() {
         setErro("Preencha o usuário");
         return;
     }
+    if (password.trim()) {
+
+    if (password.length < 6) {
+        setErro("A senha deve ter pelo menos 6 caracteres");
+        return;
+    }
+
+    const senhaForte =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+
+    if (!senhaForte.test(password)) {
+        setErro(
+            "A senha deve conter letra maiúscula, minúscula e número"
+        );
+        return;
+    }
+}
 
     setMostrarModal(true);
 };
@@ -58,6 +77,7 @@ const res = await fetch(
             }
 
             setUsername(data.username);
+            setUsernameOriginal(data.username);
 
         } catch {
             setErro("Erro ao carregar cliente");
@@ -122,7 +142,10 @@ const res = await fetch(
 
     }
 };
-
+const houveAlteracao =
+    username !== usernameOriginal ||
+    senhaAlterada;
+    
     if (carregando) {
         return (
             <div className="atualizar-container">
@@ -142,7 +165,7 @@ const res = await fetch(
                 onSubmit={abrirConfirmacao}
             >
 
-                <h2>Atualizar Cliente</h2>
+                <h2>Atualizar Dados</h2>
 
                 <p className="atualizar-subtitulo">
                     Atualize os dados da conta.
@@ -161,10 +184,17 @@ const res = await fetch(
                     type="password"
                     placeholder="Nova senha (opcional)"
                     value={password}
-                    onChange={(e) =>
-                        setPassword(e.target.value)
-                    }
+                    onChange={(e) => {
+    setPassword(e.target.value);
+    setSenhaAlterada(
+        e.target.value.trim().length > 0
+    );
+}}
                 />
+                <small className="senha-info">
+    A senha deve ter pelo menos 6 caracteres,
+    uma letra maiúscula e um número.
+</small>
 
                 {erro &&
                     <div className="msg-erro">
@@ -178,7 +208,10 @@ const res = await fetch(
                     </div>
                 }
 
-                <button type="submit">
+                <button 
+                type="submit"
+                disabled={!houveAlteracao || loading}
+                >
 
                     {loading
                         ? "Salvando..."

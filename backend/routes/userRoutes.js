@@ -194,64 +194,97 @@ router.get('/users/:id', authMiddleware, (req, res) => {
 // ===============================
 // ATUALIZAR USUÁRIO
 // ===============================
-router.put('/users/:id', authMiddleware,(req, res) => {
-    const userIdLogado = req.user.id;
-const { id } = req.params;
+router.put('/users/:id', authMiddleware, async (req, res) => {
 
-if (Number(id) !== Number(userIdLogado)) {
-    return res.status(403).json({
-        error: "Você não tem permissão para alterar este usuário"
-    });
-}
+    try {
 
-    const {
-        username,
-        password
-    } = req.body;
+        const userIdLogado = req.user.id;
+        const { id } = req.params;
 
-    let sql;
-    let valores;
-
-    if (password) {
-
-        sql = `
-            UPDATE users
-            SET username = ?, password = ?
-            WHERE id = ?
-        `;
-
-        valores = [
-            username,
-            password,
-            id
-        ];
-
-    } else {
-
-        sql = `
-            UPDATE users
-            SET username = ?
-            WHERE id = ?
-        `;
-
-        valores = [
-            username,
-            id
-        ];
-
-    }
-
-    db.query(sql, valores, (err) => {
-
-        if (err) {
-            return res.status(500).json(err);
+        if (Number(id) !== Number(userIdLogado)) {
+            return res.status(403).json({
+                error: "Você não tem permissão para alterar este usuário"
+            });
         }
 
-        res.json({
-            message: "Usuário atualizado com sucesso"
+        const { username, password } = req.body;
+
+        if (!username || username.trim().length < 4) {
+            return res.status(400).json({
+                error: "O usuário deve ter pelo menos 4 caracteres"
+            });
+        }
+
+        let sql;
+        let valores;
+
+        if (password && password.trim()) {
+
+            if (password.length < 6) {
+                return res.status(400).json({
+                    error: "A senha deve ter pelo menos 6 caracteres"
+                });
+            }
+
+            const senhaForte =
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+
+            if (!senhaForte.test(password)) {
+                return res.status(400).json({
+                    error: "A senha deve conter letra maiúscula, minúscula e número"
+                });
+            }
+
+            const senhaHash = await bcrypt.hash(password, 10);
+
+            sql = `
+                UPDATE users
+                SET username = ?, password = ?
+                WHERE id = ?
+            `;
+
+            valores = [
+                username,
+                senhaHash,
+                id
+            ];
+
+        } else {
+
+            sql = `
+                UPDATE users
+                SET username = ?
+                WHERE id = ?
+            `;
+
+            valores = [
+                username,
+                id
+            ];
+
+        }
+
+        db.query(sql, valores, (err) => {
+
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            res.json({
+                message: "Usuário atualizado com sucesso"
+            });
+
         });
 
-    });
+    } catch (error) {
+
+        console.log(error);
+
+        return res.status(500).json({
+            error: "Erro interno do servidor"
+        });
+
+    }
 
 });
 

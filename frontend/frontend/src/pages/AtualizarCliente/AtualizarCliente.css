@@ -213,7 +213,17 @@
     background: #2563eb;
     color: white;
 }
-
+.senha-info {
+    display: block;
+    margin-top: 6px;
+    margin-bottom: 15px;
+    color: #666;
+    font-size: 13px;
+}
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 /* Mobile */
 
 @media(max-width:480px){
