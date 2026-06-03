@@ -6,7 +6,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadLojas');
 
 const SECRET = "segredo_super";
-
+const bcrypt = require("bcrypt");
 
 // ===============================
 // CRIAR USUÁRIO TEMOS NO BANCO enum('cliente','lojista','funcionario','admin')
@@ -56,20 +56,20 @@ router.post('/login', (req, res) => {
     const { username, password } = req.body;
 
     const sql = `
-        SELECT 
+        SELECT
             users.id,
             users.username,
+            users.password,
             users.tipo,
             stores.id AS loja_id
         FROM users
-        LEFT JOIN stores 
+        LEFT JOIN stores
             ON stores.user_id = users.id
-        WHERE users.username = ? 
-        AND users.password = ?
+        WHERE users.username = ?
         LIMIT 1
     `;
 
-    db.query(sql, [username, password], (err, result) => {
+    db.query(sql, [username], async (err, result) => {
 
         if (err) {
             console.log(err);
@@ -77,15 +77,51 @@ router.post('/login', (req, res) => {
         }
 
         if (result.length === 0) {
-            return res.status(401).json({ error: "Usuário ou senha inválidos" });
+            return res.status(401).json({
+                error: "Usuário ou senha inválidos"
+            });
         }
 
         const user = result[0];
 
+        let senhaCorreta = false;
+
+        // Senha criptografada com bcrypt
+        if (
+            user.password.startsWith("$2a$") ||
+            user.password.startsWith("$2b$") ||
+            user.password.startsWith("$2y$")
+        ) {
+
+            senhaCorreta = await bcrypt.compare(
+                password,
+                user.password
+            );
+
+        } else {
+
+            // Senha antiga salva em texto puro
+            senhaCorreta = (
+                password === user.password
+            );
+
+        }
+
+        if (!senhaCorreta) {
+            return res.status(401).json({
+                error: "Usuário ou senha inválidos"
+            });
+        }
+
         const token = jwt.sign(
-            { id: user.id },
+            {
+                id: user.id,
+                tipo: user.tipo
+            },
             SECRET,
-            { expiresIn: "23h" }
+            {
+                expiresIn: "23h"
+            }
         );
 
         res.json({

@@ -4,7 +4,7 @@ const router = express.Router();
 const db = require('../config/db');
 const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadLojas');
-
+const bcrypt = require("bcrypt");
 
 function checkOwner(req, res, next) {
   if (!req.user) {
@@ -78,124 +78,222 @@ router.post(
   '/stores',
   authMiddleware,
   upload.single('imagem'),
-  (req, res) => {
+  async (req, res) => {
 
-    const {
-      nome,
-      categoria,
-      whatsapp,
-      username,
-      password
-    } = req.body;
+    try {
 
-    const imagem = req.file ? req.file.filename : null;
-    const funcionario_id = req.user.id;
-
-    if (
-      !nome ||
-      !categoria ||
-      !whatsapp ||
-      !username ||
-      !password
-    ) {
-      return res.status(400).json({
-        message: 'Preencha todos os campos'
-      });
-    }
-
-    // verifica se já existe usuário
-    const sqlVerifica = `
-      SELECT id
-      FROM users
-      WHERE username = ?
-      LIMIT 1
-    `;
-
-    db.query(sqlVerifica, [username], (err, usuarioExiste) => {
-
-      if (err) {
-        return res.status(500).json({
-          message: 'Erro ao verificar usuário'
+      // Somente funcionário pode criar loja
+      if (req.user.tipo !== "funcionario") {
+        return res.status(403).json({
+          message: "Apenas funcionários podem criar lojas"
         });
       }
 
-      if (usuarioExiste.length > 0) {
+      const {
+        nome,
+        categoria,
+        whatsapp,
+        username,
+        password
+      } = req.body;
+
+      const nomeLimpo = nome?.trim();
+      const categoriaLimpa = categoria?.trim();
+      const whatsappLimpo = whatsapp?.trim();
+      const usernameLimpo = username?.trim().toLowerCase();
+
+      const funcionario_id = req.user.id;
+
+      // Campos obrigatórios
+      if (
+        !nomeLimpo ||
+        !categoriaLimpa ||
+        !whatsappLimpo ||
+        !usernameLimpo ||
+        !password
+      ) {
         return res.status(400).json({
-          message: 'Usuário já existe'
+          message: "Preencha todos os campos"
         });
       }
 
-      // cria o lojista
-      const sqlUser = `
-        INSERT INTO users (
-          username,
-          password,
-          tipo
-        )
-        VALUES (?, ?, 'lojista')
+      // Imagem obrigatória
+      if (!req.file) {
+        return res.status(400).json({
+          message: "Envie uma imagem da loja"
+        });
+      }
+
+      // Nome da loja
+      if (nomeLimpo.length < 3) {
+        return res.status(400).json({
+          message: "Nome da loja deve ter pelo menos 3 caracteres"
+        });
+      }
+
+      if (nomeLimpo.length > 100) {
+        return res.status(400).json({
+          message: "Nome da loja muito grande"
+        });
+      }
+
+      // Usuário
+      if (usernameLimpo.length < 4) {
+        return res.status(400).json({
+          message: "Usuário deve ter pelo menos 4 caracteres"
+        });
+      }
+
+      if (usernameLimpo.length > 30) {
+        return res.status(400).json({
+          message: "Usuário muito grande"
+        });
+      }
+
+      // Senha
+      if (password.length < 6) {
+        return res.status(400).json({
+          message: "Senha deve ter pelo menos 6 caracteres"
+        });
+      }
+
+      // WhatsApp
+      const telefoneRegex = /^[0-9]{10,13}$/;
+
+      if (!telefoneRegex.test(whatsappLimpo)) {
+        return res.status(400).json({
+          message: "WhatsApp inválido"
+        });
+      }
+
+      // Verifica categoria
+      const sqlCategoria = `
+        SELECT id
+        FROM categories
+        WHERE nome = ?
+        LIMIT 1
       `;
 
-      db.query(
-        sqlUser,
-        [username, password],
-        (err, userResult) => {
+      db.query(sqlCategoria, [categoriaLimpa], async (err, categoriaExiste) => {
+
+        if (err) {
+          return res.status(500).json({
+            message: "Erro ao validar categoria"
+          });
+        }
+
+        if (categoriaExiste.length === 0) {
+          return res.status(400).json({
+            message: "Categoria inválida"
+          });
+        }
+
+        // Verifica usuário
+        const sqlVerifica = `
+          SELECT id
+          FROM users
+          WHERE username = ?
+          LIMIT 1
+        `;
+
+        db.query(sqlVerifica, [usernameLimpo], async (err, usuarioExiste) => {
 
           if (err) {
-            console.log(err);
-
             return res.status(500).json({
-              message: 'Erro ao criar usuário'
+              message: "Erro ao verificar usuário"
             });
           }
 
-          const lojistaId = userResult.insertId;
+          if (usuarioExiste.length > 0) {
+            return res.status(400).json({
+              message: "Usuário já existe"
+            });
+          }
 
-          // cria a loja vinculada ao lojista
-          const sqlStore = `
-            INSERT INTO stores (
-              nome,
-              categoria,
-              imagem,
-              whatsapp,
-              funcionario_id,
-              user_id
+          // Criptografa senha
+          const senhaHash = await bcrypt.hash(password, 10);
+
+          const sqlUser = `
+            INSERT INTO users (
+              username,
+              password,
+              tipo
             )
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, 'lojista')
           `;
 
           db.query(
-            sqlStore,
-            [
-              nome,
-              categoria,
-              imagem,
-              whatsapp,
-              funcionario_id,
-              lojistaId
-            ],
-            (err, storeResult) => {
+            sqlUser,
+            [usernameLimpo, senhaHash],
+            (err, userResult) => {
 
               if (err) {
                 console.log(err);
 
                 return res.status(500).json({
-                  message: 'Erro ao criar loja'
+                  message: "Erro ao criar usuário"
                 });
               }
 
-              res.json({
-                message: 'Loja criada com sucesso',
-                storeId: storeResult.insertId,
-                lojistaId
-              });
+              const lojistaId = userResult.insertId;
+
+              const sqlStore = `
+                INSERT INTO stores (
+                  nome,
+                  categoria,
+                  imagem,
+                  whatsapp,
+                  funcionario_id,
+                  user_id
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
+              `;
+
+              db.query(
+                sqlStore,
+                [
+                  nomeLimpo,
+                  categoriaLimpa,
+                  req.file.filename,
+                  whatsappLimpo,
+                  funcionario_id,
+                  lojistaId
+                ],
+                (err, storeResult) => {
+
+                  if (err) {
+                    console.log(err);
+
+                    return res.status(500).json({
+                      message: "Erro ao criar loja"
+                    });
+                  }
+
+                  res.status(201).json({
+                    message: "Loja criada com sucesso",
+                    storeId: storeResult.insertId,
+                    lojistaId
+                  });
+
+                }
+              );
 
             }
           );
 
-        }
-      );
+        });
 
-    });
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      return res.status(500).json({
+        message: "Erro interno do servidor"
+      });
+
+    }
 
   }
 );

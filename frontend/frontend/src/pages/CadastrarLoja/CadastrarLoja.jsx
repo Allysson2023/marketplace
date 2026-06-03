@@ -13,6 +13,9 @@ const [password, setPassword] = useState("");
 
 const [mostrarModal, setMostrarModal] = useState(false);
 
+const [erroModal, setErroModal] = useState(false);
+const [mensagemErro, setMensagemErro] = useState("");
+
 const [dadosLojista, setDadosLojista] = useState({
   loja: "",
   username: "",
@@ -77,22 +80,42 @@ formData.append("password", password);
     .then(res => res.json())
     .then(data => {
 
-      setDadosLojista({
-  loja: nome,
-  username,
-  password
-});
+  if(data.message !== "Loja criada com sucesso"){
 
-setMostrarModal(true);
+    setMensagemErro(data.message);
+    setErroModal(true);
 
-    });
-
+    return;
   }
 
+  setDadosLojista({
+    loja: nome,
+    username,
+    password
+  });
+
+  setMostrarModal(true);
+
+})
+.catch(() => {
+
+  setMensagemErro("Erro ao conectar com o servidor.");
+  setErroModal(true);
+
+});
+
+  }
+const formularioValido =
+  nome.trim() &&
+  categoria.trim() &&
+  whatsapp.trim() &&
+  username.trim() &&
+  password.trim() &&
+  imagem;
 
 
 
-  return (
+  return ( 
 
     <div className="cadastro-loja">
       <button
@@ -179,7 +202,9 @@ setMostrarModal(true);
   onChange={(e) => setPassword(e.target.value)}
 />
 
-        <button type="submit">
+        <button type="submit"
+        disabled={!formularioValido}
+        >
           Criar Loja
         </button>
 
@@ -232,6 +257,30 @@ setMostrarModal(true);
           </button>
 
         </div>
+
+      </div>
+
+    </div>
+
+  )
+}
+{
+  erroModal && (
+
+    <div className="modal-overlay">
+
+      <div className="modal-lojista erro">
+
+        <h2>❌ Erro</h2>
+
+        <p>{mensagemErro}</p>
+
+        <button
+          className="btn-fechar"
+          onClick={() => setErroModal(false)}
+        >
+          Fechar
+        </button>
 
       </div>
 

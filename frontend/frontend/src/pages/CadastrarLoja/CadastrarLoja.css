@@ -294,6 +294,19 @@ select{
     }
 }
 
+.modal-lojista.erro {
+  max-width: 400px;
+  text-align: center;
+}
+
+.modal-lojista.erro h2 {
+  margin-bottom: 15px;
+}
+
+.modal-lojista.erro p {
+  margin-bottom: 20px;
+  font-size: 16px;
+}
 
 /* Mobile */
 
