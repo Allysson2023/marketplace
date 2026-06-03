@@ -57,8 +57,11 @@ function EditarLoja(){
     horario_abertura: loja.horario_abertura,
     horario_fechamento: loja.horario_fechamento,
     facebook: loja.facebook,
-    instagram: loja.instagram
+    instagram: loja.instagram,
+    meta_mensal: loja.meta_mensal
   };
+  console.log(payload);
+  
 
   const res = await fetch(`http://localhost:3000/api/stores/${id}`, {
     method: "PUT",
@@ -182,6 +185,28 @@ function EditarLoja(){
     placeholder="https://instagram.com/sua-loja"
   />
 </div>
+
+
+<div className="form-group">
+
+  <label>Meta Mensal (R$)</label>
+
+  <input
+    type="number"
+    min="0"
+    value={loja.meta_mensal || ""}
+    onChange={(e) =>
+      setLoja({
+        ...loja,
+        meta_mensal: e.target.value
+      })
+    }
+    placeholder="Ex: 50000"
+  />
+
+</div>
+
+
 
                 <button onClick={() => setShowModal(true)}>
   Atualizar Loja

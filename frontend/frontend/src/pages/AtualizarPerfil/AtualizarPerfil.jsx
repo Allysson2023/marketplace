@@ -14,6 +14,7 @@ function AtualizarPerfil(){
     const [imagemAtual, setImagemAtual] = useState("");
     const token = localStorage.getItem("token");
 
+
 useEffect(() => {
     fetch("http://localhost:3000/api/profile", {
         headers: {
@@ -56,6 +57,7 @@ useEffect(() => {
         formData.append("username", username);
         formData.append("nomeLoja", nomeLoja);
         formData.append("categoria", categoria);
+        formData.append("metaMensal", metaMensal);
 
         if(imagem){
             formData.append("imagem", imagem);
@@ -113,7 +115,7 @@ useEffect(() => {
       <form
         className="perfil-form"
         onSubmit={atualizarPerfil}
-      >
+      > 
 
         {imagemAtual && (
           <div className="foto-container">
@@ -147,6 +149,8 @@ useEffect(() => {
           value={nomeLoja}
           onChange={(e) => setNomeLoja(e.target.value)}
         />
+
+        
 
         <select
           value={categoria}

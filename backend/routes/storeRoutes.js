@@ -472,33 +472,48 @@ router.put('/stores/:id', authMiddleware, checkOwner, (req, res) => {
     horario_abertura,
     horario_fechamento,
     facebook,
-    instagram
+    instagram,
+  meta_mensal
   } = req.body;
 
   const sql = `
-    UPDATE stores
-    SET nome = ?, descricao = ?, horario_abertura = ?, horario_fechamento = ?, facebook = ?, instagram = ?
-    WHERE id = ? AND user_id = ?
-  `;
+  UPDATE stores
+  SET nome = ?,
+      descricao = ?,
+      horario_abertura = ?,
+      horario_fechamento = ?,
+      facebook = ?,
+      instagram = ?,
+      meta_mensal = ?
+  WHERE id = ? AND user_id = ?
+`;
 
   db.query(sql, [
-    nome,
-    descricao,
-    horario_abertura,
-    horario_fechamento,
-    facebook,
-    instagram,
-    req.storeId,
-    req.user.id
-  ], (err) => {
+  nome,
+  descricao,
+  horario_abertura,
+  horario_fechamento,
+  facebook,
+  instagram,
+  meta_mensal,
+  req.storeId,
+  req.user.id
+], (err) => {
 
-    if (err) {
-      return res.status(500).json({ message: 'Erro ao atualizar loja' });
-    }
+  if (err) {
+    return res.status(500).json({
+      message: "Erro ao atualizar loja"
+    });
+  }
 
-    res.json({ message: 'Loja atualizada com sucesso' });
+  res.json({
+    message: "Loja atualizada com sucesso"
   });
+
 });
+});
+
+
 
 // ===============================
 // DASHBOARD DA LOJA
@@ -507,8 +522,12 @@ router.get('/stores/:id/dashboard', authMiddleware, checkOwner,(req, res) => {
 
   const storeId = parseInt(req.params.id);
 
-
-  console.log('ENTROU NO DASHBOARD:', storeId);
+  // META MENSAL DA LOJA
+const sqlMetaMensal = `
+  SELECT meta_mensal
+  FROM stores
+  WHERE id = ?
+`;
 
   // FATURAMENTO ÚLTIMOS 7 DIAS
   const sqlUltimosDias = `
@@ -653,6 +672,12 @@ const sqlUltimoPedido = `
       console.log(err);
 
       return res.status(500).json(err);
+    }db.query(sqlMetaMensal, [storeId], (err, metaResult) => {
+
+    if (err) {
+      console.log(err);
+
+      return res.status(500).json(err);
     }
 
     db.query(sqlUltimosDias, [storeId], (err, vendasPorDia) => {
@@ -750,10 +775,13 @@ const sqlUltimoPedido = `
       vendasPorDia,
       pedidosPorDia,
 
+      metaMensal: metaResult[0]?.meta_mensal || 0,
+
       ultimoPedido: ultimoPedidoResult[0] || null
 
     });
 
+  });
   });
   });
 
@@ -777,6 +805,8 @@ const sqlUltimoPedido = `
 
 });
 
+
+
 router.get('/stores/:id/estoque', authMiddleware, checkOwner, (req, res) => {
 
   const storeId = req.params.id;
@@ -799,6 +829,8 @@ router.get('/stores/:id/estoque', authMiddleware, checkOwner, (req, res) => {
   });
 
 });
+
+
 
 router.get('/stores/:id/mais-vendidos', authMiddleware, checkOwner, (req, res) => {
 
@@ -830,6 +862,8 @@ router.get('/stores/:id/mais-vendidos', authMiddleware, checkOwner, (req, res) =
 
 });
 
+
+
 router.get('/stores/:id/financeiro', authMiddleware, checkOwner, (req, res) => {
 
   const storeId = req.params.id;
@@ -856,6 +890,8 @@ router.get('/stores/:id/financeiro', authMiddleware, checkOwner, (req, res) => {
   });
 
 });
+
+
 
 router.get('/stores/:id/clientes', authMiddleware, checkOwner, (req, res) => {
 

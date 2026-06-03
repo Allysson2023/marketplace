@@ -69,7 +69,7 @@ if (!response.ok) {
 }
 
 const data = await response.json();
-
+console.log(data);
       setResumo(data);
 
       setPedidosPorDia(data.pedidosPorDia || []);
@@ -212,33 +212,7 @@ useEffect(() => {
        onClick={() => navigate(-1)}>
           ⬅ 
         </button>
-<div className="section">
 
-  <h2>🔴 Atividade em Tempo Real</h2>
-
-  <div className="activity-feed">
-
-    {atividades.map((item, index) => (
-
-      <div className="activity-item" key={index}>
-
-        <div>
-          <strong>{item.titulo}</strong>
-
-          <p>{item.descricao}</p>
-        </div>
-
-        <span>
-          {item.tempo}
-        </span>
-
-      </div>
-
-    ))}
- 
-  </div>
-
-</div>
       {/* HEADER */}
       <div className="dashboard-header">
 
@@ -257,79 +231,56 @@ useEffect(() => {
       </div>
 
 
-      <div className="sd-cards">
+      <div className="sd-card">
 
-  {/* META DO MÊS */}
-  <div className="sd-section">
+  <h3 className="sd-cardTitle">
+    🎯 Meta do mês
+  </h3>
 
-    <h2 className="sd-title">🎯 Meta do mês</h2>
+  <div className="sd-metaBox">
 
-    <div className="sd-metaBox">
+    <div className="sd-metaBar">
 
-      <div className="sd-metaBar">
-
-        <div
-          className="sd-metaProgress"
-          style={{
-            width: `${
-              (resumo.faturamentoMes / 100000) * 100
-            }%`
-          }}
-        />
-
-      </div>
-
-      <p className="sd-metaText">
-        R$ {resumo.faturamentoMes} de R$ 100.000,00
-      </p>
+      <div
+        className="sd-metaProgress"
+        style={{
+          width: `${
+            resumo.metaMensal > 0
+              ? Math.min(
+                  (Number(resumo.faturamentoMes) /
+                    Number(resumo.metaMensal)) *
+                    100,
+                  100
+                )
+              : 0
+          }%`
+        }}
+      />
 
     </div>
 
-  </div>
+    <p className="sd-metaText">
 
-  {/* CARD HOJE */}
-  <div className="sd-card">
-    <h3 className="sd-cardTitle">Hoje</h3>
-    <p className="sd-cardValue">
-      {Number(resumo.faturamentoHoje || 0).toLocaleString(
-        "pt-BR",
-        { style: "currency", currency: "BRL" }
-      )}
-    </p>
-  </div>
-
-  {/* CARD MÊS */}
-  <div className="sd-card">
-    <h3 className="sd-cardTitle">Mês</h3>
-    <p className="sd-cardValue">
       {Number(resumo.faturamentoMes || 0).toLocaleString(
         "pt-BR",
-        { style: "currency", currency: "BRL" }
+        {
+          style: "currency",
+          currency: "BRL"
+        }
       )}
-    </p>
-  </div>
 
-  {/* CARD ANO */}
-  <div className="sd-card">
-    <h3 className="sd-cardTitle">Ano</h3>
-    <p className="sd-cardValue">
-      {Number(resumo.faturamentoAno || 0).toLocaleString(
+      {" de "}
+
+      {Number(resumo.metaMensal || 0).toLocaleString(
         "pt-BR",
-        { style: "currency", currency: "BRL" }
+        {
+          style: "currency",
+          currency: "BRL"
+        }
       )}
+
     </p>
-  </div>
 
-  {/* PEDIDOS */}
-  <div className="sd-card">
-    <h3 className="sd-cardTitle">Pedidos</h3>
-    <p className="sd-cardValue">{resumo.totalPedidos}</p>
-  </div>
-
-  {/* PRODUTOS */}
-  <div className="sd-card">
-    <h3 className="sd-cardTitle">Produtos</h3>
-    <p className="sd-cardValue">{resumo.totalProdutos}</p>
   </div>
 
 </div>
