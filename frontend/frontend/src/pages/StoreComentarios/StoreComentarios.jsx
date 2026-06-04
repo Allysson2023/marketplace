@@ -6,7 +6,7 @@ function StoreComentarios() {
 
     const { id } = useParams();
     const navigate = useNavigate();
-
+const [souDonoDaLoja, setSouDonoDaLoja] = useState(false);
     const [avaliacoesLoja, setAvaliacoesLoja] = useState([]);
 
     const [resumoAvaliacoes, setResumoAvaliacoes] = useState({
@@ -48,6 +48,32 @@ const [respostas, setRespostas] = useState({});
         .catch(err => console.log(err));
 
 }, [id]);
+
+useEffect(() => {
+
+    const token = localStorage.getItem("token");
+
+    fetch(
+        `http://localhost:3000/api/stores/${id}`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    )
+    .then(res => {
+        if (res.ok) {
+            setSouDonoDaLoja(true);
+        } else {
+            setSouDonoDaLoja(false);
+        }
+    })
+    .catch(() => {
+        setSouDonoDaLoja(false);
+    });
+
+}, [id]);
+
 
     const formatarData = (data) => {
 
@@ -228,11 +254,11 @@ const responderComentario = async (avaliacaoId) => {
             {avaliacao.resposta_loja}
         </p>
 
-    </div>
+    </div> 
 
 ) : (
 
-    tipoUsuario === "lojista" && (
+    souDonoDaLoja && (
 
         <div className="storeReplyForm">
 

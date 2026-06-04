@@ -116,9 +116,16 @@ function App() {
 />
 
 <Route
-    path="/store/:id/comentarios"
-    element={<StoreComentarios />}
+  path="/store/:id/comentarios"
+  element={<StoreComentarios />}
 />
+
+<Route
+  path="/store/:id/avaliacoes"
+  element={<StoreComentarios />}
+/>
+
+
       </Routes>
 
     </BrowserRouter>

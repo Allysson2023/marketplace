@@ -326,6 +326,14 @@ useEffect(() => {
         </div>
 
         <div
+  className="quick-card"
+  onClick={() => navigate(`/store/${id}/avaliacoes`)}
+>
+  <span>⭐</span>
+  <h3>Avaliações</h3>
+</div>
+
+        <div
           className="quick-card"
           onClick={() => navigate(`/editar-loja/${id}`)}
         >
