@@ -205,6 +205,26 @@ useEffect(() => {
 
   } 
 
+  const CustomTooltip = ({ active, payload, label }) => {
+
+  if (!active || !payload?.length) return null;
+
+  return (
+    <div className="sdTooltip">
+
+      <p>{label}</p>
+
+      <strong>
+        {payload[0].value}
+      </strong>
+
+    </div>
+  );
+
+};
+
+
+
   return (
 
     <div className="dashboard-containerr">
@@ -309,7 +329,7 @@ useEffect(() => {
           <h3>Novo Produto</h3>
         </div>
 
-        <div
+        <div 
           className="quick-card"
           onClick={() => navigate(`/store/${id}/admin/produtos`)}
         >
@@ -388,16 +408,16 @@ useEffect(() => {
 
 
       {/* GRÁFICO VENDAS */}
-      <div className="charts-grid">
+      <div className="sdChartsGrid">
       
       {/* PRODUTOS MAIS VENDIDOS */}
-<div className="section chart-section">
+<div className="sdChartCard">
 
   <div className="section-header">
     <h2>🔥 Produtos Mais Vendidos</h2>
   </div>
 
-  <div className="chart-container">
+  <div className="sdChartBody">
 
     <ResponsiveContainer width="100%" height={300}>
 
@@ -413,17 +433,29 @@ useEffect(() => {
 
         <CartesianGrid strokeDasharray="3 3" />
 
-        <XAxis dataKey="nome" />
+       <XAxis
+  dataKey="nome"
+  tick={{
+    fill: "#94a3b8",
+    fontSize: 12
+  }}
+/>
 
-        <YAxis />
+<YAxis
+  tick={{
+    fill: "#94a3b8",
+    fontSize: 12
+  }}
+/>
 
-        <Tooltip />
+        <Tooltip content={<CustomTooltip />} />
 
         <Bar
-          dataKey="quantidade"
-          fill="#00ff40"
-          radius={[10, 10, 0, 0]}
-        />
+  dataKey="quantidade"
+  fill="#22c55e"
+  radius={[10, 10, 0, 0]}
+  animationDuration={1000}
+/>
 
       </BarChart>
 
@@ -435,13 +467,13 @@ useEffect(() => {
 
 
 {/* PRODUTOS MENOS VENDIDOS */}
-<div className="section chart-section">
+<div className="sdChartCard">
 
   <div className="section-header">
     <h2>⚠️ Produtos Menos Vendidos</h2>
   </div>
 
-  <div className="chart-container">
+  <div className="sdChartBody">
 
     <ResponsiveContainer width="100%" height={300}>
 
@@ -457,17 +489,29 @@ useEffect(() => {
 
         <CartesianGrid strokeDasharray="3 3" />
 
-        <XAxis dataKey="nome" />
+        <XAxis
+  dataKey="nome"
+  tick={{
+    fill: "#94a3b8",
+    fontSize: 12
+  }}
+/>
 
-        <YAxis />
+<YAxis
+  tick={{
+    fill: "#94a3b8",
+    fontSize: 12
+  }}
+/>
 
-        <Tooltip />
+        <Tooltip content={<CustomTooltip />} />
 
         <Bar
-          dataKey="quantidade"
-          fill="#ff0000"
-          radius={[10, 10, 0, 0]}
-        />
+  dataKey="quantidade"
+  fill="#ef4444"
+  radius={[10, 10, 0, 0]}
+  animationDuration={1000}
+/>
 
       </BarChart>
 
@@ -479,13 +523,13 @@ useEffect(() => {
 
 
 
-      <div className="section chart-section">
+      <div className="sdChartCard">
 
         <div className="section-header">
           <h2>📈 Vendas dos últimos 7 dias</h2>
         </div>
 
-        <div className="chart-container">
+        <div className="sdChartBody">
 
           <ResponsiveContainer width="100%" height={300}>
 
@@ -499,19 +543,32 @@ useEffect(() => {
               }}
             >
 
-              <XAxis dataKey="data" />
+              <XAxis
+  dataKey="data"
+  tick={{
+    fill: "#94a3b8",
+    fontSize: 12
+  }}
+/>
 
-              <YAxis />
+              <YAxis
+  tick={{
+    fill: "#94a3b8",
+    fontSize: 12
+  }}
+/>
 
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
 
               <Line
-                type="monotone"
-                dataKey="total"
-                stroke="#4f46e5"
-                strokeWidth={3}
-                dot={{ r: 5 }}
-              />
+  type="monotone"
+  dataKey="total"
+  stroke="#6366f1"
+  strokeWidth={4}
+  dot={{ r: 6 }}
+  activeDot={{ r: 8 }}
+  animationDuration={1000}
+/>
 
             </LineChart>
 
@@ -523,13 +580,13 @@ useEffect(() => {
       </div>
 
       {/* GRÁFICO PEDIDOS */}
-      <div className="section chart-section">
+      <div className="sdChartCard">
 
         <div className="section-header">
           <h2>🛒 Pedidos por dia (tempo real)</h2>
         </div>
 
-        <div className="chart-container">
+        <div className="sdChartBody">
 
           <ResponsiveContainer width="100%" height={300}>
 
@@ -543,19 +600,32 @@ useEffect(() => {
               }}
             >
 
-              <XAxis dataKey="data" />
+             <XAxis
+  dataKey="data"
+  tick={{
+    fill: "#94a3b8",
+    fontSize: 12
+  }}
+/>
 
-              <YAxis />
+<YAxis
+  tick={{
+    fill: "#94a3b8",
+    fontSize: 12
+  }}
+/>
 
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
 
               <Line
-                type="monotone"
-                dataKey="total"
-                stroke="#10b981"
-                strokeWidth={3}
-                dot={{ r: 5 }}
-              />
+  type="monotone"
+  dataKey="total"
+  stroke="#10b981"
+  strokeWidth={4}
+  dot={{ r: 6 }}
+  activeDot={{ r: 8 }}
+  animationDuration={1000}
+/>
 
             </LineChart>
 
