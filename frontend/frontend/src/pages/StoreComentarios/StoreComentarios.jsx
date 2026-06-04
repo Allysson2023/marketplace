@@ -14,6 +14,15 @@ function StoreComentarios() {
     total: 0
 });
 
+const user = JSON.parse(
+    localStorage.getItem("user")
+);
+
+const tipoUsuario = user?.tipo;
+
+
+const [respostas, setRespostas] = useState({});
+
     useEffect(() => {
 
         fetch(`http://localhost:3000/api/stores/${id}/comentarios`)
@@ -49,6 +58,66 @@ function StoreComentarios() {
         });
 
     };
+
+const responderComentario = async (avaliacaoId) => {
+
+    const token =
+        localStorage.getItem("token");
+
+    try {
+
+        const resposta =
+            respostas[avaliacaoId];
+
+        if (!resposta?.trim()) {
+            return;
+        }
+
+        const res = await fetch(
+            `http://localhost:3000/api/avaliacoes/${avaliacaoId}/responder`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json",
+                    Authorization:
+                        `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    resposta
+                })
+            }
+        );
+
+        const data =
+            await res.json();
+
+        if (!res.ok) {
+            alert(data.message);
+            return;
+        }
+
+        alert("Resposta enviada!");
+
+        setAvaliacoesLoja(prev =>
+            prev.map(item =>
+                item.id === avaliacaoId
+                    ? {
+                          ...item,
+                          resposta_loja: resposta
+                      }
+                    : item
+            )
+        );
+
+    } catch (err) {
+        console.log(err);
+    }
+
+};
+
+
+
 
     return (
         <div className="storeReviewsPage">
@@ -146,6 +215,56 @@ function StoreComentarios() {
                                 {avaliacao.comentario || "Sem comentário"}
 
                             </div>
+
+                            {avaliacao.resposta_loja ? (
+
+    <div className="storeReplyBox">
+
+        <strong>
+            Resposta da loja
+        </strong>
+
+        <p>
+            {avaliacao.resposta_loja}
+        </p>
+
+    </div>
+
+) : (
+
+    tipoUsuario === "lojista" && (
+
+        <div className="storeReplyForm">
+
+            <textarea
+                placeholder="Responder cliente..."
+                value={
+                    respostas[avaliacao.id] || ""
+                }
+                onChange={(e) =>
+                    setRespostas({
+                        ...respostas,
+                        [avaliacao.id]:
+                            e.target.value
+                    })
+                }
+            />
+
+            <button
+                onClick={() =>
+                    responderComentario(
+                        avaliacao.id
+                    )
+                }
+            >
+                Responder
+            </button>
+
+        </div>
+
+    )
+
+)}
 
                         </div>
 

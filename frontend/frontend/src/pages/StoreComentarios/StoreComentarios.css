@@ -138,6 +138,131 @@
     font-size: 16px;
 }
 
+/* ==========================
+   RESPOSTA DA LOJA
+========================== */
+
+.storeReplyBox {
+    margin-top: 18px;
+    padding: 15px;
+    background: linear-gradient(
+        135deg,
+        #f8fff8,
+        #eefcf0
+    );
+    border-left: 4px solid #28a745;
+    border-radius: 12px;
+}
+
+.storeReplyBox strong {
+    display: block;
+    color: #198754;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.storeReplyBox p {
+    margin: 0;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* ==========================
+   FORMULÁRIO DE RESPOSTA
+========================== */
+
+.storeReplyForm {
+    margin-top: 18px;
+    padding: 15px;
+    background: #f8fafc;
+    border: 1px solid #e4e7ec;
+    border-radius: 14px;
+}
+
+.storeReplyForm textarea {
+    width: 100%;
+    min-height: 90px;
+    resize: vertical;
+
+    border: 1px solid #d0d5dd;
+    border-radius: 10px;
+
+    padding: 12px;
+    font-size: 14px;
+    font-family: inherit;
+
+    outline: none;
+
+    transition: all .25s ease;
+    box-sizing: border-box;
+}
+
+.storeReplyForm textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(
+        37,
+        99,
+        235,
+        0.12
+    );
+}
+
+.storeReplyForm textarea::placeholder {
+    color: #98a2b3;
+}
+
+.storeReplyForm button {
+    margin-top: 12px;
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color: white;
+    border: none;
+
+    padding: 12px 22px;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all .25s ease;
+}
+
+.storeReplyForm button:hover {
+    transform: translateY(-2px);
+
+    box-shadow: 0 8px 20px rgba(
+        37,
+        99,
+        235,
+        0.25
+    );
+}
+
+.storeReplyForm button:active {
+    transform: scale(0.98);
+}
+
+/* ==========================
+   RESPONSIVO
+========================== */
+
+@media (max-width: 768px) {
+
+    .storeReplyForm button {
+        width: 100%;
+    }
+
+}
+
 
 @media (max-width: 700px) {
 
