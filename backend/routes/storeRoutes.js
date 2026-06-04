@@ -1163,4 +1163,105 @@ router.get(
   }
 );
 
+router.post("/avaliacao", authMiddleware, (req, res) => {
+console.log(req.body);
+  const { pedido_id, loja_id, nota, comentario } = req.body;
+
+  const cliente_id = req.user.id;
+
+  const sqlVerifica = `
+    SELECT avaliado
+    FROM pedidos
+    WHERE id = ?
+  `;
+
+  db.query(sqlVerifica, [pedido_id], (err, pedido) => {
+
+    if (err) {
+      return res.status(500).json({ error: "Erro servidor" });
+    }
+
+    if (pedido.length === 0) {
+      return res.status(404).json({ error: "Pedido não encontrado" });
+    }
+
+    if (pedido[0].avaliado === 1) {
+      return res.status(400).json({
+        error: "Pedido já foi avaliado"
+      });
+    }
+
+    const sql = `
+      INSERT INTO avaliacoes
+      (pedido_id, cliente_id, loja_id, nota, comentario)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+
+    db.query(
+      sql,
+      [
+        pedido_id,
+        cliente_id,
+        loja_id,
+        nota,
+        comentario
+      ],
+      (err) => {
+
+        if (err) {
+          console.log(err);
+          return res.status(500).json({
+            error: "Erro ao salvar avaliação"
+          });
+        }
+
+        db.query(
+          `
+          UPDATE pedidos
+          SET avaliado = 1
+          WHERE id = ?
+          `,
+          [pedido_id]
+        );
+
+        res.json({
+          message: "Avaliação salva"
+        });
+
+      }
+    );
+
+  });
+
+});
+
+router.get(
+  "/avaliacao/verificar/:pedidoId",
+  authMiddleware,
+  (req, res) => {
+
+    const pedidoId = req.params.pedidoId;
+
+    const sql = `
+      SELECT id
+      FROM avaliacoes
+      WHERE pedido_id = ?
+      LIMIT 1
+    `;
+
+    db.query(sql, [pedidoId], (err, result) => {
+
+      if (err) {
+        return res.status(500).json(err);
+      }
+
+      res.json({
+        avaliado: result.length > 0
+      });
+
+    });
+
+});
+
+
 module.exports = router;

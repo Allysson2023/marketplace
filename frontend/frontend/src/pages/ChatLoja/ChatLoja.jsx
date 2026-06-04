@@ -20,6 +20,10 @@ function ChatLoja() {
     const [cliente, setCliente] = useState(null);
 
     const lojaId = user?.loja_id;
+
+    
+
+
     // ===============================
     // BUSCAR INFO DO CHAT (pedido + cliente_id)
     // ===============================
@@ -195,7 +199,6 @@ async function enviar() {
   }
 }
 
-
     return (
 
         <div className="chat-loja-container">
@@ -211,13 +214,10 @@ async function enviar() {
                 </button>
 
                 <h2>
-                    💬 Pedido : {chatInfo?.pedido_id}
-                    {" - "}
-                    {cliente
-                        ? cliente.nome
-                        : `Cliente : ${chatInfo?.cliente_id}`}
-                </h2>
-
+  💬 Conversando com: {chatInfo?.cliente?.nome || "Carregando..."}
+  {" - "}
+  Pedido #{chatInfo?.pedido_id}
+</h2>
             </div>
 
             {/* MENSAGENS */}

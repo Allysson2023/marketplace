@@ -10,6 +10,10 @@ function PedidoStatus() {
     const [pedido, setPedido] = useState(null);
     const [itens, setItens] = useState([]);
 
+    const [mostrarModal, setMostrarModal] = useState(false);
+const [nota, setNota] = useState(0);
+const [comentario, setComentario] = useState("");
+
     const token = localStorage.getItem("token");
 
     // ===============================
@@ -35,10 +39,7 @@ function PedidoStatus() {
 
 
 
-    if (!pedido) {
-        return <h2>Carregando...</h2>;
-    }
-
+    
 
 
     // ===============================
@@ -49,8 +50,9 @@ function PedidoStatus() {
         // apenas abre o chat
     //    navigate(`/chat/${pedido.id}`);
     //}
-
+    
     async function abrirChat() {
+        if (!pedido) return;
 
     try {
 
@@ -76,17 +78,66 @@ function PedidoStatus() {
         }
 
         navigate(`/chat/${data.chat_id}`);
-
+        
     } catch (err) {
         console.log(err);
     }
 }
 
-const podeAbrirChat =
-    pedido.status === "aceito" ||
-    pedido.status === "separação" ||
-    pedido.status === "em Rota";
+async function enviarAvaliacao() {
+    
+    await fetch("http://localhost:3000/api/avaliacao", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({
+    pedido_id: pedido.id,
+    cliente_id: pedido.usuario_id,
+    loja_id: pedido.loja_id,
+    nota,
+    comentario
+})
+});
+setPedido(prev => ({
+  ...prev,
+  avaliado: 1
+}));
 
+setMostrarModal(false);
+}
+
+useEffect(() => {
+
+  if (!pedido) return;
+
+  if (pedido.status !== "finalizado") return;
+
+  fetch(
+    `http://localhost:3000/api/avaliacao/verificar/${pedido.id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  )
+  .then(res => res.json())
+  .then(data => {
+
+    if (!data.avaliado) {
+      setMostrarModal(true);
+    }
+
+  });
+
+}, [pedido, token]);
+
+const podeAbrirChat = ["aceito", "separação", "em Rota"].includes(pedido?.status);
+    
+    if (!pedido) {
+        return <h2>Carregando...</h2>;
+    }
 
     return (
 
@@ -195,6 +246,39 @@ const podeAbrirChat =
                 <h2>Total: R$ {pedido.total}</h2>
 
             </div>
+
+            {mostrarModal && (
+  <div className="review-backdrop">
+    <div className="review-box">
+
+      <h2>Como foi seu pedido?</h2>
+      <p className="review-subtitle">Sua opinião ajuda a loja a melhorar</p>
+
+      <div className="review-stars">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <span
+            key={n}
+            onClick={() => setNota(n)}
+            className={`review-star ${n <= nota ? "on" : ""}`}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+
+      <textarea
+        className="review-input"
+        placeholder="Escreva um comentário (opcional)"
+        onChange={(e) => setComentario(e.target.value)}
+      />
+
+      <button className="review-button" onClick={enviarAvaliacao}>
+        Enviar avaliação
+      </button>
+
+    </div>
+  </div>
+)}
 
         </div>
 

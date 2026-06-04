@@ -201,8 +201,8 @@ const [produtos, setProdutos] = useState([]);
                             <div className={`store-status ${isLojaAberta() ? "open" : "closed"}`}>
                                 <span className="dot"></span>
                                 {isLojaAberta()
-                                    ? "LOJA ABERTA AGORA"
-                                    : "LOJA FECHADA"}
+                                    ? "ABERTA"
+                                    : "FECHADA"}
                             </div>
 
                             <span>
