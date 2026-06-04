@@ -1264,4 +1264,34 @@ router.get(
 });
 
 
+router.get("/stores/:id/avaliacoes", (req, res) => {
+
+  const lojaId = req.params.id;
+
+  const sql = `
+    SELECT
+      ROUND(AVG(nota), 1) AS media,
+      COUNT(*) AS total
+    FROM avaliacoes
+    WHERE loja_id = ?
+  `;
+
+  db.query(sql, [lojaId], (err, result) => {
+
+    if (err) {
+      return res.status(500).json({
+        error: "Erro ao buscar avaliações"
+      });
+    }
+
+    res.json({
+      media: result[0].media || 0,
+      total: result[0].total || 0
+    });
+
+  });
+
+});
+
+
 module.exports = router;

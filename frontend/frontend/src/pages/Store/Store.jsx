@@ -29,6 +29,11 @@ const [produtos, setProdutos] = useState([]);
     const [busca, setBusca] = useState("");
     const [menuConfig, setMenuConfig] = useState(false);
 
+    const [avaliacao, setAvaliacao] = useState({
+    media: 0,
+    total: 0
+});
+
     const menuRef = useRef(null);
 
     // =========================
@@ -78,6 +83,18 @@ const [produtos, setProdutos] = useState([]);
         .then(data => setStore(data))
         .catch(err => console.log(err));
 }, [id]);
+
+useEffect(() => {
+
+    fetch(`http://localhost:3000/api/stores/${id}/avaliacoes`)
+        .then(res => res.json())
+        .then(data => {
+            setAvaliacao(data);
+        })
+        .catch(err => console.log(err));
+
+}, [id]);
+
 
     // =========================
     // FILTRO PRODUTOS
@@ -190,6 +207,11 @@ const [produtos, setProdutos] = useState([]);
                     <div className="store-info">
 
                         <h1>{store?.nome}</h1>
+                        <div className="store-rating">
+    ⭐ {avaliacao.media} (
+    {avaliacao.total} {avaliacao.total === 1 ? "avaliação" : "avaliações"}
+    )
+</div>
 
                         <p>{store?.descricao}</p>
 
