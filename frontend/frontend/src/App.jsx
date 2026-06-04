@@ -41,46 +41,25 @@ import TopLojas from "./pages/TopLojas/TopLojas";
 function App() {
 
   useEffect(() => {
+  const user = JSON.parse(localStorage.getItem("user"));
 
-    const user = JSON.parse(localStorage.getItem("user"));
+  if (user?.id) {
+    socket.emit("join", user.id);
+  }
 
-    if (user?.id) {
-      socket.emit("join", user.id);
-    }
+  const notificationSound = new Audio(somNotificacao);
 
-    const notificationSound = new Audio(somNotificacao);
+  const handleNotificacao = () => {
+    notificationSound.currentTime = 0;
+    notificationSound.play().catch(() => {});
+  };
 
-    // ===============================
-    // 🔥 NOTIFICAÇÃO GLOBAL CHAT + SISTEMA
-    // ===============================
-    const handleNovaMensagem = (msg) => {
+  socket.on("nova_notificacao", handleNotificacao);
 
-      // evita erro se não tiver
-      if (!msg) return;
-
-      notificationSound.currentTime = 0;
-
-      notificationSound.play().catch(() => {
-        console.log("Som bloqueado pelo navegador");
-      });
-    };
-
-    const handleNotificacao = (data) => {
-
-      notificationSound.currentTime = 0;
-
-      notificationSound.play().catch(() => {});
-    };
-
-    socket.on("nova_mensagem", handleNovaMensagem);
-    socket.on("nova_notificacao", handleNotificacao);
-
-    return () => {
-      socket.off("nova_mensagem", handleNovaMensagem);
-      socket.off("nova_notificacao", handleNotificacao);
-    };
-
-  }, []);
+  return () => {
+    socket.off("nova_notificacao", handleNotificacao);
+  };
+}, []);
 
   return (
     <BrowserRouter>

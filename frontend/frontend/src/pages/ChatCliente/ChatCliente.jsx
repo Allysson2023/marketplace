@@ -76,40 +76,22 @@ const mensagemInicial = location.state?.mensagemInicial;
     // SOCKET MENSAGENS EM TEMPO REAL
     // ===============================
     useEffect(() => {
+  if (!chatId) return;
 
-    if (!chatId) return;
+  const handleMessage = (msg) => {
+    if (Number(msg.chat_id) !== Number(chatId)) return;
 
-    const handleMessage = (msg) => {
+    setMensagens(prev => {
+      const exists = prev.some(m => m.id === msg.id);
+      if (exists) return prev;
 
-        if (!msg?.chat_id) return;
-        if (Number(msg.chat_id) !== Number(chatId)) return;
+      return [...prev, msg];
+    });
+  };
 
-        setMensagens(prev => {
+  socket.on("nova_mensagem", handleMessage);
 
-            const exists = prev.some(m => {
-
-                // 🔥 fallback seguro (NUNCA depende só de id)
-                return (
-                    (m.id && msg.id && m.id === msg.id) ||
-                    (m.temp_id && msg.temp_id && m.temp_id === msg.temp_id) ||
-                    (m.mensagem === msg.mensagem &&
-                     m.remetente_tipo === msg.remetente_tipo &&
-                     Math.abs(
-                        new Date(m.criado_em) - new Date(msg.criado_em)
-                     ) < 2000)
-                );
-            });
-
-            if (exists) return prev;
-
-            return [...prev, msg];
-        });
-    };
-
-    socket.on("nova_mensagem", handleMessage);
-
-    return () => socket.off("nova_mensagem", handleMessage);
-
+  return () => socket.off("nova_mensagem", handleMessage);
 }, [chatId]);
 
     // ===============================
@@ -136,50 +118,28 @@ const mensagemInicial = location.state?.mensagemInicial;
     // ENVIAR MENSAGEM
     // ===============================
     async function enviarMensagem() {
-    if (!mensagem.trim()) return;
+  if (!mensagem.trim()) return;
 
-    const tempMsg = {
-        id: Date.now(),
+  try {
+    const res = await fetch("http://localhost:3000/api/chat/mensagem", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        chat_id: Number(chatId),
         mensagem,
-        remetente_tipo: "cliente",
-        criado_em: new Date().toISOString()
-    };
+        tipo: "texto",
+        remetente_tipo: "cliente"
+      })
+    });
 
-    // 🔥 MOSTRA INSTANTE (OTIMISTA)
-    setMensagens(prev => [...prev, tempMsg]);
+    setMensagem("");
 
-    try {
-        const res = await fetch("http://localhost:3000/api/chat/mensagem", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                chat_id: Number(chatId),
-                mensagem,
-                tipo: "texto",
-                remetente_tipo: "cliente"
-            })
-        });
-
-        const data = await res.json();
-
-        // 🔥 opcional: atualizar ID real
-        setMensagens(prev =>
-            prev.map(m =>
-                m.id === tempMsg.id
-                    ? { ...m, id: data.id }
-                    : m
-            )
-        );
-
-        setMensagem("");
-
-    } catch (err) {
-        console.log(err);
-        alert("Erro ao enviar mensagem");
-    }
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 useEffect(() => {

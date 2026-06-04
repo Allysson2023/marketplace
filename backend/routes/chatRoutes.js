@@ -310,38 +310,48 @@ router.post("/mensagem", authMiddleware, (req, res) => {
 
     const remetente_id = req.user.id;
 
-    // 1. se não tem chat → cria
+    // ==========================================
+    // CRIAR CHAT SE NÃO EXISTIR
+    // ==========================================
     if (!chat_id) {
-        
+
         const criarChat = `
-    INSERT INTO chats
-    (pedido_id, cliente_id, loja_id, atualizado_em, tem_nova_msg)
-    VALUES (?, ?, ?, NOW(), TRUE)
-`;
- 
-        db.query(criarChat,
+            INSERT INTO chats
+            (pedido_id, cliente_id, loja_id, atualizado_em, tem_nova_msg)
+            VALUES (?, ?, ?, NOW(), TRUE)
+        `;
+
+        db.query(
+            criarChat,
             [
                 null,
-                remetente_tipo === "cliente" ? remetente_id : cliente_id,
+                remetente_tipo === "cliente"
+                    ? remetente_id
+                    : cliente_id,
                 loja_id
             ],
             (err, result) => {
 
-                if (err) return res.status(500).json(err);
+                if (err) {
+                    return res.status(500).json(err);
+                }
 
                 const novoChatId = result.insertId;
 
-                salvarMensagem(novoChatId, loja_id);
+                salvarMensagem(novoChatId);
             }
         );
 
     } else {
 
-        // chat já existe
         salvarMensagem(chat_id);
+
     }
 
-    function salvarMensagem(chatId, lojaId) {
+    // ==========================================
+    // SALVAR MENSAGEM
+    // ==========================================
+    function salvarMensagem(chatId) {
 
         const sql = `
             INSERT INTO mensagens
@@ -349,40 +359,87 @@ router.post("/mensagem", authMiddleware, (req, res) => {
             VALUES (?, ?, ?, ?, ?)
         `;
 
-        db.query(sql,
-            [chatId, remetente_id, remetente_tipo, tipo, mensagem],
+        db.query(
+            sql,
+            [
+                chatId,
+                remetente_id,
+                remetente_tipo,
+                tipo,
+                mensagem
+            ],
             (err, result) => {
 
-                if (err) return res.status(500).json(err);
-                const novaMensagem = {
-    id: result.insertId,
-    chat_id: chatId,
-    loja_id,
-    mensagem,
-    remetente_tipo,
-    remetente_id,
-    criado_em: new Date().toISOString()
-};
+                if (err) {
+                    return res.status(500).json(err);
+                }
 
-            const io = getIo();
+                // ==========================================
+                // BUSCAR LOJA DO CHAT
+                // ==========================================
+                const buscarLoja = `
+                    SELECT loja_id
+                    FROM chats
+                    WHERE id = ?
+                    LIMIT 1
+                `;
 
-// mensagem dentro do chat
-io.to(`chat_${chatId}`).emit(
-    "nova_mensagem",
-    novaMensagem
-);
+                db.query(
+                    buscarLoja,
+                    [chatId],
+                    (err2, chatResult) => {
 
-// mensagem para atualizar lista da loja
-io.to(`loja_${loja_id}`).emit(
-    "nova_mensagem_loja",
-    novaMensagem
-);
+                        if (err2) {
+                            return res.status(500).json(err2);
+                        }
 
-                return res.json({
-                    message: "Mensagem enviada",
-                    chat_id: chatId,
-                    id: result.insertId
-                });
+                        if (chatResult.length === 0) {
+                            return res.status(404).json({
+                                message: "Chat não encontrado"
+                            });
+                        }
+
+                        const lojaIdReal =
+                            chatResult[0].loja_id;
+
+                        const novaMensagem = {
+                            id: result.insertId,
+                            chat_id: chatId,
+                            loja_id: lojaIdReal,
+                            mensagem,
+                            remetente_tipo,
+                            remetente_id,
+                            criado_em: new Date().toISOString()
+                        };
+
+                        const io = getIo();
+
+                        console.log("==============");
+                        console.log("CHAT:", chatId);
+                        console.log("LOJA_ID:", lojaIdReal);
+                        console.log("REMETENTE:", remetente_tipo);
+                        console.log("MSG:", mensagem);
+                        console.log("==============");
+
+                        // mensagem dentro do chat
+                        io.to(`chat_${chatId}`).emit(
+                            "nova_mensagem",
+                            novaMensagem
+                        );
+
+                        // atualizar inbox da loja
+                        io.to(`loja_${lojaIdReal}`).emit(
+                            "nova_mensagem_loja",
+                            novaMensagem
+                        );
+
+                        return res.json({
+                            message: "Mensagem enviada",
+                            chat_id: chatId,
+                            id: result.insertId
+                        });
+                    }
+                );
             }
         );
     }

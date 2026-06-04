@@ -50,6 +50,10 @@ socketUtil.setIo(io);
 io.on("connection", (socket) => {
 
     console.log("Cliente conectado:", socket.id);
+    console.log("USER SOCKET COUNT:", io.engine.clientsCount);
+    socket.on("disconnect", () => {
+    console.log("Cliente saiu:", socket.id);
+});
 
     // usuário geral
     socket.on("join", (userId) => {

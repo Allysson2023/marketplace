@@ -115,16 +115,14 @@ function ChatLoja() {
         if (isMyMessage) return; // ❌ bloqueia eco
 
         setMensagens(prev => {
-            const exists = prev.some(
-                m =>
-                    (msg.id && m.id === msg.id) ||
-                    (msg.temp_id && m.temp_id === msg.temp_id)
-            );
+  const exists = prev.some(
+    m => m.id === msg.id || m.temp_id === msg.temp_id
+  );
 
-            if (exists) return prev;
+  if (exists) return prev;
 
-            return [...prev, msg]; // ✅ CORRETO
-        });
+  return [...prev, msg];
+});
     };
 
     socket.on("nova_mensagem", handle);
@@ -156,49 +154,45 @@ function ChatLoja() {
     const [enviando, setEnviando] = useState(false);
 
 async function enviar() {
-    if (!texto.trim() || enviando) return;
+  if (!texto.trim() || enviando) return;
 
-    setEnviando(true);
+  const novaMsg = {
+    id: Date.now(), // temporário
+    chat_id: Number(chatId),
+    mensagem: texto,
+    remetente_tipo: "loja",
+    remetente_id: user?.id,
+    criado_em: new Date().toISOString(),
+    temp_id: Date.now()
+  };
 
-    const msg = texto.trim();
-    setTexto("");
+  // 🔥 atualiza na hora (UI instantânea)
+  setMensagens(prev => [...prev, novaMsg]);
 
-    try {
-        const res = await fetch("http://localhost:3000/api/chat/mensagem", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                chat_id: Number(chatId),
-                mensagem: msg,
-                tipo: "texto",
-                remetente_tipo: "loja",
-                loja_id: user?.loja_id
-            })
-        });
+  setTexto("");
+  setEnviando(true);
 
-        if (!res.ok) throw new Error("Erro ao enviar");
-
-        // 🔥 mostra imediatamente na tela
-setMensagens(prev => [
-    ...prev,
-    {
-        id: Date.now(),
-        temp_id: Date.now(),
+  try {
+    await fetch("http://localhost:3000/api/chat/mensagem", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
         chat_id: Number(chatId),
-        mensagem: msg,
+        mensagem: texto,
+        tipo: "texto",
         remetente_tipo: "loja",
-        criado_em: new Date().toISOString()
-    }
-]);
+        loja_id: user?.loja_id
+      })
+    });
 
-    } catch (err) {
-        console.log(err);
-    } finally {
-        setEnviando(false);
-    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+    setEnviando(false);
+  }
 }
 
 

@@ -14,6 +14,7 @@ function ChatListLoja() {
 const lojaId = Number(params.id);
 
     const token = localStorage.getItem("token");
+    const currentUser = JSON.parse(localStorage.getItem("user"));
 
     let user = null;
 try {
@@ -67,75 +68,49 @@ try {
     useEffect(() => {
   if (!token) return;
 
-  if (!lojaId) return; 
+  if (!lojaId) return;
+
+  if (!currentUser?.id) return;
 
   carregarChats();
-  socket.emit("join_loja", lojaId);
-}, [lojaId, token]);
+
+  socket.emit("join_loja", currentUser.id);
+
+}, [lojaId, token, currentUser?.id]);
 
     // ===============================
     // SOCKET TEMPO REAL
     // ===============================
-    const currentUser = JSON.parse(localStorage.getItem("user"));
 
 useEffect(() => {
+  if (!currentUser?.id) return;
 
-    const handleNovaMsg = (msg) => {
+  socket.emit("join_loja", currentUser.id);
 
-        const isMyMessage =
-            msg.remetente_tipo === "loja" &&
-            Number(msg.remetente_id) === Number(currentUser?.id);
+  const handleNovaMsg = (msg) => {
+    setChats(prev => {
+      const updated = [...prev];
 
-        const isChatOpen =
-            window.location.pathname.includes(`/chat/${msg.chat_id}/loja`);
+      const index = updated.findIndex(
+        c => Number(c.id) === Number(msg.chat_id)
+      );
 
-        if (isMyMessage || isChatOpen) return;
+      if (index !== -1) {
+        updated[index].ultima_mensagem = msg.mensagem;
+        updated[index].tem_nova_msg = true;
+        updated[index].atualizado_em = msg.criado_em;
+      }
 
-        try {
-            const audio = new Audio(somNotificacao);
-            audio.play();
-        } catch {}
+      return updated;
+    });
+  };
 
-        setChats(prev => {
-            let updated = [...prev];
+  socket.on("nova_mensagem_loja", handleNovaMsg);
 
-            const index = updated.findIndex(
-                c => Number(c.id) === Number(msg.chat_id)
-            );
-
-            if (index !== -1) {
-                updated[index] = {
-                    ...updated[index],
-                    ultima_mensagem: msg.mensagem,
-                    tem_nova_msg: true,
-                    atualizado_em: msg.criado_em
-                };
-            } else {
-                updated.unshift({
-                    id: msg.chat_id,
-                    pedido_id: msg.pedido_id,
-                    ultima_mensagem: msg.mensagem,
-                    tem_nova_msg: true,
-                    atualizado_em: msg.criado_em
-                });
-            }
-
-            updated.sort((a, b) =>
-                new Date(b.atualizado_em || 0) - new Date(a.atualizado_em || 0)
-            );
-
-            return updated;
-        });
-    };
-
-    socket.on("nova_mensagem_loja", handleNovaMsg);
-
-    return () => {
-        socket.off("nova_mensagem_loja", handleNovaMsg);
-    };
-
-}, [lojaId]);
-
+  return () => {
+    socket.off("nova_mensagem_loja", handleNovaMsg);
+  };
+}, [currentUser?.id]);
     // ===============================
     // ABRIR CHAT
     // ===============================
@@ -181,6 +156,7 @@ useEffect(() => {
     useEffect(() => {
     console.log("USER:", user);
     console.log("LOJA_ID:", lojaId);
+    console.log("USER ID:", currentUser?.id);
 }, []);
 
     return (
