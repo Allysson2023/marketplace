@@ -829,6 +829,20 @@ PAGINAÇÃO
     transform: translateY(-2px);
 }
 
+.loja-avaliacao {
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #f59e0b;
+}
+
+.loja-avaliacao span {
+    color: #666;
+    font-weight: 500;
+}
+
+
+
 /* =========================
 TABLETS
 ========================= */

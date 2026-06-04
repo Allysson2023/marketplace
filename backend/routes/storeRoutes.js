@@ -330,7 +330,24 @@ router.get('/stores', (req, res) => {
 
   const { busca } = req.query;
 
-  let sql = `SELECT * FROM stores`;
+  let sql = `
+SELECT
+  s.*,
+
+  COALESCE((
+    SELECT ROUND(AVG(a.nota), 1)
+    FROM avaliacoes a
+    WHERE a.loja_id = s.id
+  ), 0) AS media_avaliacao,
+
+  (
+    SELECT COUNT(*)
+    FROM avaliacoes a
+    WHERE a.loja_id = s.id
+  ) AS total_avaliacoes
+
+FROM stores s
+`;
   let values = [];
 
   if (busca) {

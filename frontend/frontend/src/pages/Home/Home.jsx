@@ -425,6 +425,17 @@ if (usuarioLogado?.tipo === "admin") {
               alt={loja.nome}
             />
             <p>{loja.nome}</p>
+
+<div className="loja-avaliacao">
+  ⭐ {loja.media_avaliacao}
+
+  <span>
+    ({loja.total_avaliacoes}
+    {loja.total_avaliacoes === 1
+      ? " avaliação"
+      : " avaliações"})
+  </span>
+</div>
           </div>
         ))}
       </div>
@@ -489,6 +500,7 @@ if (usuarioLogado?.tipo === "admin") {
 
             <h3 className="centraliza-titulo" >{produto.nome}</h3>
             <p className="centraliza-titulo" >{produto.nomeLoja}</p>
+            
            <div className="precos">
 
                     {produto.preco_antigo && (
