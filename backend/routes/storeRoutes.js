@@ -1311,4 +1311,43 @@ router.get("/stores/:id/avaliacoes", (req, res) => {
 });
 
 
+router.get("/stores/:id/comentarios", (req, res) => {
+
+  const lojaId = req.params.id;
+
+  const sql = `
+    SELECT
+      a.id,
+      a.nota,
+      a.comentario,
+      a.created_at,
+      u.username
+    FROM avaliacoes a
+
+    JOIN users u
+      ON u.id = a.cliente_id
+
+    WHERE a.loja_id = ?
+
+    ORDER BY a.created_at DESC
+  `;
+
+  db.query(sql, [lojaId], (err, result) => {
+
+    if (err) {
+      console.log(err);
+
+      return res.status(500).json({
+        error: "Erro ao buscar comentários"
+      });
+    }
+
+    res.json(result);
+
+  });
+
+});
+
+
+
 module.exports = router;

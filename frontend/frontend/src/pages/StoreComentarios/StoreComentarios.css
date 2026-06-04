@@ -1,0 +1,154 @@
+.storeReviewsPage {
+    min-height: 100vh;
+    background: #f5f7fb;
+    padding: 30px 15px;
+}
+
+.storeReviewsHeader {
+    max-width: 900px;
+    margin: 0 auto 25px auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.storeReviewsBackBtn {
+    border: none;
+    background: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.08);
+    transition: .2s;
+}
+
+.storeReviewsBackBtn:hover {
+    transform: translateY(-2px);
+}
+
+.storeReviewsTitle {
+    margin: 0;
+    font-size: 28px;
+    color: #1f2937;
+}
+
+.storeReviewsSubtitle {
+    margin-top: 4px;
+    color: #6b7280;
+}
+
+.storeReviewsList {
+    max-width: 900px;
+    margin: auto;
+}
+
+.storeReviewCard {
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.06);
+    transition: .2s;
+}
+
+.storeReviewCard:hover {
+    transform: translateY(-3px);
+}
+
+.storeReviewTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.storeReviewUser {
+    margin: 0;
+    color: #111827;
+    font-size: 17px;
+}
+
+.storeReviewDate {
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.storeReviewStars {
+    font-size: 18px;
+}
+
+.storeReviewComment {
+    color: #374151;
+    line-height: 1.7;
+    font-size: 15px;
+}
+
+.storeReviewsEmpty {
+    background: white;
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 50px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,.06);
+}
+
+.storeReviewsEmptyIcon {
+    font-size: 55px;
+    margin-bottom: 15px;
+}
+
+.storeReviewsEmpty h2 {
+    margin-bottom: 10px;
+    color: #111827;
+}
+
+.storeReviewsEmpty p {
+    color: #6b7280;
+}
+
+
+.storeReviewsSummary {
+    max-width: 900px;
+    margin: 0 auto 25px auto;
+
+    background: white;
+    border-radius: 18px;
+
+    padding: 25px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    box-shadow: 0 4px 16px rgba(0,0,0,.06);
+}
+
+.storeReviewsScore {
+    font-size: 42px;
+    font-weight: 700;
+    color: #f59e0b;
+}
+
+.storeReviewsTotal {
+    margin-top: 8px;
+    color: #6b7280;
+    font-size: 16px;
+}
+
+
+@media (max-width: 700px) {
+
+    .storeReviewTop {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .storeReviewsTitle {
+        font-size: 22px;
+    }
+
+}

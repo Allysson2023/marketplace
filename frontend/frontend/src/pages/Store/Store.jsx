@@ -277,7 +277,12 @@ useEffect(() => {
 ========================= */}
 <div className="store-stats">
     <span>{produtos.length} Produtos</span>
-    <span>Marketplace Premium</span>
+    <span
+    className="link-comentarios"
+    onClick={() => navigate(`/store/${id}/comentarios`)}
+>
+    Ver avaliações da loja
+</span>
 </div>
     </div>
 )}

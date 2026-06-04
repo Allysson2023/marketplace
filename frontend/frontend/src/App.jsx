@@ -36,7 +36,7 @@ import FuncionarioDashboard from "./pages/FuncionarioDashboard/FuncionarioDashbo
 import MinhasLojas from "./pages/MinhasLojas/MinhasLojas";
 import DashboardAnaliseLoja from "./pages/DashboardAnaliseLoja/DashboardAnaliseLoja";
 import TopLojas from "./pages/TopLojas/TopLojas";
-
+import StoreComentarios from "./pages/StoreComentarios/StoreComentarios";
 
 function App() {
 
@@ -113,6 +113,11 @@ function App() {
 <Route
   path="/top-lojas"
   element={<TopLojas />}
+/>
+
+<Route
+    path="/store/:id/comentarios"
+    element={<StoreComentarios />}
 />
       </Routes>
 
