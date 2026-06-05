@@ -22,6 +22,7 @@ function AdminPedido() {
         })
             .then(res => res.json())
             .then(data => {
+console.log(data);
 
     if (!data.pedido) {
         setErro(data.message || "Pedido não encontrado");
@@ -143,6 +144,7 @@ function AdminPedido() {
                             <p><strong>Endereço:</strong> {pedido.dadosEntrega.endereco}</p>
                             <p><strong>Número:</strong> {pedido.dadosEntrega.numero}</p>
                             <p><strong>Bairro:</strong> {pedido.dadosEntrega.bairro}</p>
+                            <p><strong>OBS:</strong> {pedido.dadosEntrega.observacao}</p>
                         </>
                     )}
 
