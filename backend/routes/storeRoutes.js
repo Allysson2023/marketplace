@@ -1428,4 +1428,137 @@ router.post(
     }
 );
 
+router.post("/stores/:id/favoritar", authMiddleware, async (req, res) => {
+
+    const lojaId = req.params.id;
+    const usuarioId = req.user.id;
+
+    try {
+
+        const [favorito] = await db.promise().query(
+            `
+            SELECT *
+            FROM lojas_favoritas
+            WHERE usuario_id = ? AND loja_id = ?
+            `,
+            [usuarioId, lojaId]
+        );
+
+        if (favorito.length > 0) {
+
+            await db.promise().query(
+                `
+                DELETE FROM lojas_favoritas
+                WHERE usuario_id = ? AND loja_id = ?
+                `,
+                [usuarioId, lojaId]
+            );
+
+            return res.json({
+                favorito: false
+            });
+        }
+
+        await db.promise().query(
+            `
+            INSERT INTO lojas_favoritas
+            (usuario_id, loja_id)
+            VALUES (?, ?)
+            `,
+            [usuarioId, lojaId]
+        );
+
+        res.json({
+            favorito: true
+        });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            erro: "Erro interno"
+        });
+    }
+});
+
+router.get("/stores/:id/favorito", authMiddleware, async (req, res) => {
+
+    const lojaId = req.params.id;
+    const usuarioId = req.user.id;
+
+    try {
+
+        const [resultado] = await db.promise().query(
+            `
+            SELECT id
+            FROM lojas_favoritas
+            WHERE usuario_id = ? AND loja_id = ?
+            `,
+            [usuarioId, lojaId]
+        );
+
+        res.json({
+            favorito: resultado.length > 0
+        });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            erro: "Erro interno"
+        });
+    }
+});
+
+router.get("/stores/:id/total-favoritos", async (req, res) => {
+
+    const lojaId = req.params.id;
+
+    try {
+
+        const [resultado] = await db.promise().query(
+            `
+            SELECT COUNT(*) AS total
+            FROM lojas_favoritas
+            WHERE loja_id = ?
+            `,
+            [lojaId]
+        );
+
+        res.json(resultado[0]);
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            erro: "Erro interno"
+        });
+    }
+});
+
+router.get("/stores/favoritos/minhas", authMiddleware, async (req, res) => {
+
+    const usuarioId = req.user.id;
+
+    try {
+
+        const [lojas] = await db.promise().query(
+            `
+            SELECT s.*
+            FROM stores s
+            INNER JOIN lojas_favoritas lf
+                ON lf.loja_id = s.id
+            WHERE lf.usuario_id = ?
+            ORDER BY lf.criado_em DESC
+            `,
+            [usuarioId]
+        );
+
+        res.json(lojas);
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            erro: "Erro interno"
+        });
+    }
+});
+
 module.exports = router;

@@ -29,6 +29,9 @@ const [produtos, setProdutos] = useState([]);
     const [busca, setBusca] = useState("");
     const [menuConfig, setMenuConfig] = useState(false);
 
+    const [favorito, setFavorito] = useState(false);
+const [totalFavoritos, setTotalFavoritos] = useState(0);
+
     const [avaliacao, setAvaliacao] = useState({
     media: 0,
     total: 0
@@ -70,8 +73,39 @@ const [produtos, setProdutos] = useState([]);
             });
     }, [id, pagina]);
 
-    
+    useEffect(() => {
 
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    fetch(
+        `http://localhost:3000/api/stores/${id}/favorito`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    )
+        .then(res => res.json())
+        .then(data => {
+            setFavorito(data.favorito);
+        });
+
+}, [id]);
+
+
+useEffect(() => {
+
+    fetch(
+        `http://localhost:3000/api/stores/${id}/total-favoritos`
+    )
+        .then(res => res.json())
+        .then(data => {
+            setTotalFavoritos(data.total);
+        });
+
+}, [id]);
 
 
     // =========================
@@ -145,6 +179,47 @@ useEffect(() => {
   navigate(`/store/${id}/dashboard`);
 };
 
+
+const handleFavoritar = async () => {
+
+    console.log("CLICOU NO FAVORITO");
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("Faça login primeiro");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `http://localhost:3000/api/stores/${id}/favoritar`,
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        setFavorito(data.favorito);
+
+        if (data.favorito) {
+            setTotalFavoritos(prev => prev + 1);
+        } else {
+            setTotalFavoritos(prev => prev - 1);
+        }
+
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+
+
     return (
         <div className="store-page">
 
@@ -207,6 +282,24 @@ useEffect(() => {
                     <div className="store-info">
 
                         <h1>{store?.nome}</h1>
+
+
+<div className="favorito-box">
+
+    <button
+        className={`btn-favorito ${favorito ? "ativo" : ""}`}
+        onClick={handleFavoritar}
+    >
+        {favorito ? "❤️ Favoritada" : "🤍 Favoritar"}
+    </button>
+
+    <span>
+        {totalFavoritos} favoritos
+    </span>
+
+</div>
+
+
                         <div className="store-rating">
     ⭐ {avaliacao.media} (
     {avaliacao.total} {avaliacao.total === 1 ? "avaliação" : "avaliações"}
@@ -270,7 +363,7 @@ useEffect(() => {
                 />
                 Instagram
             </a>
-        )}
+        )} 
 
 {/* =========================
     STATS (AGORA LIMPO)
