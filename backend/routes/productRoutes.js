@@ -380,5 +380,113 @@ router.put(
   }
 );
 
+// =========================
+// CURTIR PRODUTO
+// =========================
+router.post('/products/:id/like', authMiddleware, (req, res) => {
+
+    const userId = req.user.id;
+    const productId = req.params.id;
+
+    const sql = `
+        INSERT INTO product_likes (user_id, product_id)
+        VALUES (?, ?)
+    `;
+
+    db.query(sql, [userId, productId], (err) => {
+
+        if (err) {
+
+            // já curtiu (UNIQUE KEY)
+            if (err.code === "ER_DUP_ENTRY") {
+                return res.status(400).json({
+                    message: "Você já curtiu este produto"
+                });
+            }
+
+            return res.status(500).json(err);
+        }
+
+        res.json({
+            message: "Produto curtido!"
+        });
+
+    });
+
+});
+
+router.delete('/products/:id/like', authMiddleware, (req, res) => {
+
+    const userId = req.user.id;
+    const productId = req.params.id;
+
+    const sql = `
+        DELETE FROM product_likes
+        WHERE user_id = ? AND product_id = ?
+    `;
+
+    db.query(sql, [userId, productId], (err) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        res.json({
+            message: "Like removido!"
+        });
+
+    });
+
+});
+
+router.get('/products/:id/likes', (req, res) => {
+
+    const productId = req.params.id;
+
+    const sql = `
+        SELECT COUNT(*) AS total
+        FROM product_likes
+        WHERE product_id = ?
+    `;
+
+    db.query(sql, [productId], (err, result) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        res.json({
+            total: result[0].total
+        });
+
+    });
+
+});
+
+router.get('/products/:id/liked', authMiddleware, (req, res) => {
+
+    const userId = req.user.id;
+    const productId = req.params.id;
+
+    const sql = `
+        SELECT id
+        FROM product_likes
+        WHERE user_id = ? AND product_id = ?
+    `;
+
+    db.query(sql, [userId, productId], (err, result) => {
+
+        if (err) {
+            return res.status(500).json(err);
+        }
+
+        res.json({
+            liked: result.length > 0
+        });
+
+    });
+
+});
+
 
 module.exports = router;

@@ -18,6 +18,7 @@ const [comentarios, setComentarios] = useState([]);
 const [nota, setNota] = useState(5);
 const [comentario, setComentario] = useState("");
 
+const [curtido, setCurtido] = useState(false);
 
    const adicionarAoCarrinho = async () => {
 
@@ -89,37 +90,80 @@ const [comentario, setComentario] = useState("");
 
     useEffect(() => {
 
+    const token = localStorage.getItem("token");
+
+    // produto
     fetch(`http://localhost:3000/api/products/${id}`)
-    .then(res => res.json())
-    .then(data => {
+        .then(res => res.json())
+        .then(data => {
+            setProduto(data);
 
-        setProduto(data);
+            setImagemPrincipal(
+                `http://localhost:3000/uploads/produtos/${data.imagem}`
+            );
+        });
 
-        setImagemPrincipal(
-            `http://localhost:3000/uploads/produtos/${data.imagem}`
-        );
+    // total curtidas
+    fetch(`http://localhost:3000/api/products/${id}/likes`)
+        .then(res => res.json())
+        .then(data => {
+            setTotalCurtidas(data.total);
+        });
 
-    });
+    // se usuário curtiu
+    if (token) {
+        fetch(`http://localhost:3000/api/products/${id}/liked`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            setCurtido(data.liked);
+        });
+    }
 
 }, [id]);
 
+const toggleLike = async () => {
 
-const enviarComentario = () => {
+    const token = localStorage.getItem("token");
 
-    if (!comentario.trim()) {
-
-        alert("Digite um comentário");
-
+    if (!token) {
+        setModalLogin(true);
         return;
     }
 
-    console.log({
-        comentario
-    });
+    try {
 
-    alert("Comentário enviado!");
+        if (!curtido) {
 
-    setComentario("");
+            await fetch(`http://localhost:3000/api/products/${id}/like`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            setCurtido(true);
+            setTotalCurtidas(prev => prev + 1);
+
+        } else {
+
+            await fetch(`http://localhost:3000/api/products/${id}/like`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            setCurtido(false);
+            setTotalCurtidas(prev => prev - 1);
+        }
+
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 
@@ -144,18 +188,9 @@ const enviarComentario = () => {
 
         <div className="produto-detalhe">
 
-{totalCurtidas > 0 && (
-    <div className="pd-total-curtidas">
-        ❤️ {totalCurtidas} pessoas amaram este produto
-    </div>
-)}
+
     <div className="galeria">
-        <button
-    className="pd-heart-btn"
-    type="button"
->
-    ❤️
-</button>
+        
 
     <img
         className="imagem-principal"
@@ -226,6 +261,19 @@ const enviarComentario = () => {
             <div className="info-produto">
 
                 <h1>{produto.nome}</h1>
+                {totalCurtidas > 0 && (
+    <div className="pd-total-curtidas">
+        ❤️ {totalCurtidas} pessoas curtiram este produto
+    </div>
+)}
+
+               <button
+    className={`pd-heart-btn ${curtido ? "ativo" : ""}`}
+    type="button"
+    onClick={toggleLike}
+>
+    {curtido ? "❤️" : "🤍"}
+</button>
                 
                 <p className="loja">
                     Loja: {produto.nomeLoja}
@@ -279,74 +327,13 @@ const enviarComentario = () => {
 
             </div>
 
+
         </div>
 
-<div className="pd-comentarios-box">
-
-    <h2>
-        Avaliações dos Clientes
-    </h2>
-
-    {comentarios.length === 0 ? (
-
-        <p className="pd-sem-comentarios">
-            Nenhuma avaliação ainda.
-        </p>
-
-    ) : (
-
-        comentarios.map((c) => (
-
-            <div
-                key={c.id}
-                className="pd-comentario-card"
-            >
-
-                <div className="pd-comentario-topo">
-
-                    <strong>
-                        {c.username}
-                    </strong>
-
-                    <span>
-                        ⭐ {c.nota}
-                    </span>
-
-                </div>
-
-                <p>
-                    {c.comentario}
-                </p>
-
-            </div>
-
-        ))
-
-    )}
-
-</div>
 
 
-<div className="pd-form-comentario">
 
-    <h3>Comentários</h3>
 
-    <textarea
-        value={comentario}
-        onChange={(e) =>
-            setComentario(e.target.value)
-        }
-        placeholder="Escreva um comentário sobre este produto..."
-    />
-
-    <button
-        type="button"
-        onClick={enviarComentario}
-    >
-        Comentar
-    </button>
-
-</div>
 
 
 
