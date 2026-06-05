@@ -112,7 +112,7 @@ BOTÕES
 CARRINHO
 ========================= */
 
-.btn-carrinho{
+.btn-carrinhoo{
     position: relative;
 
     display: flex;
@@ -137,7 +137,7 @@ CARRINHO
     box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
 
-.btn-carrinho:hover{
+.btn-carrinhoo:hover{
     transform: translateY(-3px);
     box-shadow: 0 15px 30px rgba(37,99,235,0.35);
 }
@@ -626,7 +626,7 @@ PREÇOS
     color: white;
 }
 
-.btn-mais{
+.btn-maiss{
     width: 45px;
     height: 45px;
 
@@ -648,7 +648,7 @@ PREÇOS
     transition: 0.3s;
 }
 
-.btn-mais:hover{
+.btn-maiss:hover{
     transform: scale(1.08);
     background: #333;
 }
@@ -949,11 +949,11 @@ TABLETS
         min-width: 0;
     }
 
-    .btn-carrinho{
+    .btn-carrinhoo{
         flex-shrink: 0;
     }
 
-    .btn-mais{
+    .btn-maiss{
         flex-shrink: 0;
     }
 
@@ -1079,12 +1079,12 @@ CELULARES PEQUENOS
         padding: 10px;
     }
 
-    .btn-carrinho{
+    .btn-carrinhoo{
         padding: 10px 12px;
         font-size: 13px;
     }
 
-    .btn-mais{
+    .btn-maiss{
         width: 40px;
         height: 40px;
         font-size: 24px;

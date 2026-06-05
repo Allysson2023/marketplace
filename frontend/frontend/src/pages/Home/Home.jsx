@@ -301,8 +301,8 @@ if (usuarioLogado?.tipo === "admin") {
               setPagina(1);
             }}
           />
-
-         <button onClick={abrirCarrinho} className="btn-carrinho">
+ 
+         <button onClick={abrirCarrinho} className="btn-carrinhoo">
   🛒 Carrinho
 
   <span className="cart-badge">
@@ -314,7 +314,7 @@ if (usuarioLogado?.tipo === "admin") {
 
           <button
             onClick={() => setMenuAberto(!menuAberto)}
-            className="btn-mais"
+            className="btn-maiss"
           >
             +
           </button>
