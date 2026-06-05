@@ -4,6 +4,7 @@ const db = require('../config/db');
 const jwt = require('jsonwebtoken');
 const authMiddleware = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadLojas');
+const uploadPerfil = require('../middlewares/uploadPerfil');
 
 const SECRET = "segredo_super";
 const bcrypt = require("bcrypt");
@@ -194,99 +195,156 @@ router.get('/users/:id', authMiddleware, (req, res) => {
 // ===============================
 // ATUALIZAR USUÁRIO
 // ===============================
-router.put('/users/:id', authMiddleware, async (req, res) => {
+router.put(
+    '/users/:id',
+    authMiddleware,
+    uploadPerfil.single('imagem_perfil'),
+    async (req, res) => {
 
-    try {
+        try {
 
-        const userIdLogado = req.user.id;
-        const { id } = req.params;
+            const userIdLogado = req.user.id;
+            const { id } = req.params;
 
-        if (Number(id) !== Number(userIdLogado)) {
-            return res.status(403).json({
-                error: "Você não tem permissão para alterar este usuário"
-            });
-        }
-
-        const { username, password } = req.body;
-
-        if (!username || username.trim().length < 4) {
-            return res.status(400).json({
-                error: "O usuário deve ter pelo menos 4 caracteres"
-            });
-        }
-
-        let sql;
-        let valores;
-
-        if (password && password.trim()) {
-
-            if (password.length < 6) {
-                return res.status(400).json({
-                    error: "A senha deve ter pelo menos 6 caracteres"
+            // 🔒 segurança: só pode editar o próprio usuário
+            if (Number(id) !== Number(userIdLogado)) {
+                return res.status(403).json({
+                    error: "Você não tem permissão para alterar este usuário"
                 });
             }
 
-            const senhaForte =
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+            const { username, password } = req.body;
 
-            if (!senhaForte.test(password)) {
+            // 📸 imagem opcional
+            const imagem = req.file ? req.file.filename : null;
+
+            // 👤 valida username
+            if (!username || username.trim().length < 4) {
                 return res.status(400).json({
-                    error: "A senha deve conter letra maiúscula, minúscula e número"
+                    error: "O usuário deve ter pelo menos 4 caracteres"
                 });
             }
 
-            const senhaHash = await bcrypt.hash(password, 10);
+            let sql;
+            let valores;
 
-            sql = `
-                UPDATE users
-                SET username = ?, password = ?
-                WHERE id = ?
-            `;
+            // ===============================
+            // CASO TENHA SENHA NOVA
+            // ===============================
+            if (password && password.trim()) {
 
-            valores = [
-                username,
-                senhaHash,
-                id
-            ];
+                if (password.length < 6) {
+                    return res.status(400).json({
+                        error: "A senha deve ter pelo menos 6 caracteres"
+                    });
+                }
 
-        } else {
+                const senhaForte = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
 
-            sql = `
-                UPDATE users
-                SET username = ?
-                WHERE id = ?
-            `;
+                if (!senhaForte.test(password)) {
+                    return res.status(400).json({
+                        error: "A senha deve conter letra maiúscula, minúscula e número"
+                    });
+                }
 
-            valores = [
-                username,
-                id
-            ];
+                const senhaHash = await bcrypt.hash(password, 10);
 
-        }
+                // ===============================
+                // COM OU SEM IMAGEM (SENHA)
+                // ===============================
+                if (imagem) {
 
-        db.query(sql, valores, (err) => {
+                    sql = `
+                        UPDATE users
+                        SET username = ?, password = ?, imagem_perfil = ?
+                        WHERE id = ?
+                    `;
 
-            if (err) {
-                return res.status(500).json(err);
+                    valores = [
+                        username,
+                        senhaHash,
+                        imagem,
+                        id
+                    ];
+
+                } else {
+
+                    sql = `
+                        UPDATE users
+                        SET username = ?, password = ?
+                        WHERE id = ?
+                    `;
+
+                    valores = [
+                        username,
+                        senhaHash,
+                        id
+                    ];
+
+                }
+
+            } else {
+
+                // ===============================
+                // SEM ALTERAR SENHA
+                // ===============================
+                if (imagem) {
+
+                    sql = `
+                        UPDATE users
+                        SET username = ?, imagem_perfil = ?
+                        WHERE id = ?
+                    `;
+
+                    valores = [
+                        username,
+                        imagem,
+                        id
+                    ];
+
+                } else {
+
+                    sql = `
+                        UPDATE users
+                        SET username = ?
+                        WHERE id = ?
+                    `;
+
+                    valores = [
+                        username,
+                        id
+                    ];
+
+                }
             }
 
-            res.json({
-                message: "Usuário atualizado com sucesso"
+            // ===============================
+            // EXECUTA UPDATE
+            // ===============================
+            db.query(sql, valores, (err) => {
+
+                if (err) {
+                    return res.status(500).json(err);
+                }
+
+                res.json({
+                    message: "Usuário atualizado com sucesso"
+                });
+
             });
 
-        });
+        } catch (error) {
 
-    } catch (error) {
+            console.log(error);
 
-        console.log(error);
+            return res.status(500).json({
+                error: "Erro interno do servidor"
+            });
 
-        return res.status(500).json({
-            error: "Erro interno do servidor"
-        });
+        }
 
     }
-
-});
+);
 
 // ===============================
 // PERFIL DO CLIENTE

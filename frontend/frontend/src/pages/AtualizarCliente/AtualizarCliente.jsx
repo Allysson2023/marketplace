@@ -23,6 +23,8 @@ function AtualizarCliente() {
     const [senhaAlterada, setSenhaAlterada] = useState(false);
     const [mostrarModal, setMostrarModal] = useState(false);
 
+    const [imagem, setImagem] = useState(null);
+
     const abrirConfirmacao = (e) => {
     e.preventDefault();
 
@@ -95,27 +97,30 @@ const res = await fetch(
 
         setLoading(true);
 
-        const body = {
-            username
-        };
+        const formData = new FormData();
 
-        if (password.trim()) {
-            body.password = password;
-        }
+formData.append("username", username);
 
-        const token = localStorage.getItem("token");
+if (password.trim()) {
+    formData.append("password", password);
+}
 
-        const res = await fetch(
-            `http://localhost:3000/api/users/${id}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(body)
-            }
-        );
+if (imagem) {
+    formData.append("imagem_perfil", imagem);
+}
+
+const token = localStorage.getItem("token");
+
+const res = await fetch(
+    `http://localhost:3000/api/users/${id}`,
+    {
+        method: "PUT",
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: formData
+    }
+);
 
         const data = await res.json();
 
@@ -144,7 +149,8 @@ const res = await fetch(
 };
 const houveAlteracao =
     username !== usernameOriginal ||
-    senhaAlterada;
+    senhaAlterada ||
+    imagem;
     
     if (carregando) {
         return (
@@ -170,6 +176,23 @@ const houveAlteracao =
                 <p className="atualizar-subtitulo">
                     Atualize os dados da conta.
                 </p>
+
+                {imagem && (
+    <img
+        src={URL.createObjectURL(imagem)}
+        alt="Preview"
+        className="preview-foto"
+    />
+)}
+
+                <input
+    type="file"
+    accept="image/*"
+    capture="user"
+    onChange={(e) => {
+        setImagem(e.target.files[0]);
+    }}
+/>
 
                 <input
                     type="text"
