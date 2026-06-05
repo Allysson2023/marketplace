@@ -218,6 +218,40 @@ const handleFavoritar = async () => {
     }
 };
 
+const abrirChatLoja = async () => {
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("Faça login primeiro");
+        navigate("/login");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:3000/api/chat/abrir",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    loja_id: Number(id)
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        navigate(`/chat/${data.chat_id}`);
+
+    } catch (err) {
+        console.log(err);
+    }
+};
 
 
     return (
@@ -334,7 +368,12 @@ const handleFavoritar = async () => {
 ========================= */}
 {(store?.facebook || store?.instagram) && (
     <div className="store-social">
-
+<button
+    className="social-btn mensagem"
+    onClick={abrirChatLoja}
+>
+    💬 Mensagem
+</button>
         {store?.facebook && (
             <a
                 href={store.facebook}
@@ -368,6 +407,8 @@ const handleFavoritar = async () => {
 {/* =========================
     STATS (AGORA LIMPO)
 ========================= */}
+
+
 <div className="store-stats">
     <span>{produtos.length} Produtos</span>
     <span

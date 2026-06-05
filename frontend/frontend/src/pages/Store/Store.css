@@ -1095,6 +1095,18 @@ img{
     text-decoration: line-through;
     margin-left: 10px;
 }
+
+.social-btn.mensagem {
+    background: #25d366;
+    color: white;
+    border: none;
+}
+
+.social-btn.mensagem:hover {
+    transform: translateY(-2px);
+}
+
+
 /* =========================
    ANIMAÇÕES
 ========================= */
