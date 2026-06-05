@@ -200,31 +200,29 @@ router.get('/stores/:id/products', (req, res) => {
     const storeId = req.params.id;
 
     const pagina = parseInt(req.query.pagina) || 1;
-
-    const limite = 20;
-
+    const limite = 15;
     const offset = (pagina - 1) * limite;
 
     const sql = `
-        SELECT * FROM products
-        WHERE store_id = ?
-        ORDER BY id DESC
+        SELECT
+            products.*,
+            COUNT(product_likes.id) AS curtidas
+        FROM products
+        LEFT JOIN product_likes
+            ON product_likes.product_id = products.id
+        WHERE products.store_id = ?
+        GROUP BY products.id
+        ORDER BY products.id DESC
         LIMIT ? OFFSET ?
     `;
 
-    db.query(
-        sql,
-        [storeId, limite, offset],
-        (err, result) => {
-
-            if(err){
-                return res.status(500).json(err);
-            }
-
-            res.json(result);
-
+    db.query(sql, [storeId, limite, offset], (err, result) => {
+        if (err) {
+            return res.status(500).json(err);
         }
-    );
+
+        res.json(result);
+    });
 
 });
 

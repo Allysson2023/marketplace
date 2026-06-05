@@ -86,7 +86,9 @@ const produtosFiltrados = produtos.filter(produto =>
           />
 
           <div>
-            <h3>{produto.nome}</h3>
+            <h3>
+  {produto.nome} ❤️ {produto.curtidas || 0}
+</h3>
             <p>R$ {produto.preco}</p>
             <p>estoque: {produto.estoque}</p>
           </div>
