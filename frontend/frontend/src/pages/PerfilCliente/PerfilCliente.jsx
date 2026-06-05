@@ -16,9 +16,12 @@ function PerfilCliente() {
 
   const [modalSair, setModalSair] = useState(false);
 
+  const [totalFavoritos, setTotalFavoritos] = useState(0);
+
   useEffect(() => {
     carregarPerfil();
     carregarPedidos();
+  carregarFavoritos();
   }, []);
 
   const carregarPedidos = async () => {
@@ -41,6 +44,32 @@ function PerfilCliente() {
       console.log(erro);
     }
   };
+
+  const carregarFavoritos = async () => {
+
+  try {
+
+    const resposta = await fetch(
+      "http://localhost:3000/api/favoritos/quantidade",
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      }
+    );
+
+    const dados = await resposta.json();
+
+    setTotalFavoritos(dados.total);
+
+  } catch (erro) {
+
+    console.log(erro);
+
+  }
+
+};
+
 
   const carregarPerfil = async () => {
     try {
@@ -110,7 +139,7 @@ function PerfilCliente() {
 
           <div className="box-stat">
             <span className="icone-stat">⭐</span>
-            <h3>0</h3>
+            <h3>{totalFavoritos}</h3>
             <p>Favoritos</p>
           </div>
 
@@ -159,7 +188,7 @@ function PerfilCliente() {
 
       {modalSair && (
         <div className="perfil-modal-overlay">
-
+ 
           <div className="perfil-modal-sair">
 
             <h3>Sair da conta</h3>

@@ -1561,4 +1561,39 @@ router.get("/stores/favoritos/minhas", authMiddleware, async (req, res) => {
     }
 });
 
+router.get(
+  "/favoritos/quantidade",
+  authMiddleware,
+  async (req, res) => {
+
+    const usuarioId = req.user.id;
+
+    try {
+
+      const [resultado] = await db.promise().query(
+        `
+        SELECT COUNT(*) AS total
+        FROM lojas_favoritas
+        WHERE usuario_id = ?
+        `,
+        [usuarioId]
+      );
+
+      res.json({
+        total: resultado[0].total
+      });
+
+    } catch (err) {
+
+      console.log(err);
+
+      res.status(500).json({
+        erro: "Erro interno"
+      });
+
+    }
+
+  }
+);
+
 module.exports = router;
