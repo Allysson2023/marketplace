@@ -57,7 +57,7 @@ const [totalFavoritos, setTotalFavoritos] = useState(0);
     // CARREGAR PRODUTOS
     // =========================
     useEffect(() => {
-        fetch(`http://localhost:3000/api/stores/${id}/public/products?pagina=${pagina}`)
+        fetch(`http://localhost:3000/api/stores/${id}/products?pagina=${pagina}`)
             .then(res => res.json())
             .then(data => {
 
@@ -319,7 +319,7 @@ const handleFavoritar = async () => {
                                     ? "ABERTA"
                                     : "FECHADA"}
                             </div>
-
+ 
                             <span>
                                 🕒 {store?.horario_abertura} às {store?.horario_fechamento}
                             </span>
@@ -413,14 +413,39 @@ const handleFavoritar = async () => {
                                         : "https://dummyimage.com/300x300"
                                 }
                                 alt={produto.nome}
+
                             />
 
-                            <div className="product-info">
-                                <h3>{produto.nome}</h3>
-                                <p className="product-price">
-                                    R$ {produto.preco}
-                                </p>
-                            </div>
+
+
+                    <div className="product-info">
+
+    <h3>{produto.nome}</h3>
+
+    {/* likes */}
+    <div className="likes-row">
+        ❤️ {produto.curtidas ?? 0}
+    </div>
+
+    {/* preços */}
+    <div className="price-row">
+
+        <span className="product-price">
+            R$ {produto.preco}
+        </span>
+
+        {produto.preco_antigo && (
+            <span className="old-price">
+                R$ {produto.preco_antigo}
+            </span>
+        )}
+
+    </div>
+
+</div>
+
+
+
                         </div>
                     ))} 
 

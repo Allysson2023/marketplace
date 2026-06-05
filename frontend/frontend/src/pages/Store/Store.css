@@ -1080,7 +1080,21 @@ img{
     color:#333;
 }
 
-
+.likes-row{
+    font-size: 14px;
+    font-weight: 600;
+    color: #ef4444;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+.old-price{
+    font-size: 14px;
+    color: #9ca3af;
+    text-decoration: line-through;
+    margin-left: 10px;
+}
 /* =========================
    ANIMAÇÕES
 ========================= */
