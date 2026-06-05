@@ -12,6 +12,12 @@ function ProdutoDetalhe(){
 const [modalLogin, setModalLogin] =
 useState(false);
 
+const [totalCurtidas, setTotalCurtidas] = useState(0);
+const [comentarios, setComentarios] = useState([]);
+
+const [nota, setNota] = useState(5);
+const [comentario, setComentario] = useState("");
+
 
    const adicionarAoCarrinho = async () => {
 
@@ -98,15 +104,23 @@ useState(false);
 }, [id]);
 
 
-useEffect(() => {
+const enviarComentario = () => {
 
-  const interval = setInterval(() => {
-    window.location.reload();
-  }, 120000);
+    if (!comentario.trim()) {
 
-  return () => clearInterval(interval);
+        alert("Digite um comentário");
 
-}, []);
+        return;
+    }
+
+    console.log({
+        comentario
+    });
+
+    alert("Comentário enviado!");
+
+    setComentario("");
+};
 
 
     if(!produto){
@@ -124,19 +138,32 @@ useEffect(() => {
                 onClick={() => navigate(-1)}
             >
                 ← Voltar
-            </button>
+            </button> 
 
         </div>
 
         <div className="produto-detalhe">
 
+{totalCurtidas > 0 && (
+    <div className="pd-total-curtidas">
+        ❤️ {totalCurtidas} pessoas amaram este produto
+    </div>
+)}
     <div className="galeria">
+        <button
+    className="pd-heart-btn"
+    type="button"
+>
+    ❤️
+</button>
 
     <img
         className="imagem-principal"
         src={imagemPrincipal}
         alt={produto.nome}
     />
+
+    
 
     <div className="miniaturas">
 
@@ -199,7 +226,7 @@ useEffect(() => {
             <div className="info-produto">
 
                 <h1>{produto.nome}</h1>
-
+                
                 <p className="loja">
                     Loja: {produto.nomeLoja}
                 </p>
@@ -253,6 +280,78 @@ useEffect(() => {
             </div>
 
         </div>
+
+<div className="pd-comentarios-box">
+
+    <h2>
+        Avaliações dos Clientes
+    </h2>
+
+    {comentarios.length === 0 ? (
+
+        <p className="pd-sem-comentarios">
+            Nenhuma avaliação ainda.
+        </p>
+
+    ) : (
+
+        comentarios.map((c) => (
+
+            <div
+                key={c.id}
+                className="pd-comentario-card"
+            >
+
+                <div className="pd-comentario-topo">
+
+                    <strong>
+                        {c.username}
+                    </strong>
+
+                    <span>
+                        ⭐ {c.nota}
+                    </span>
+
+                </div>
+
+                <p>
+                    {c.comentario}
+                </p>
+
+            </div>
+
+        ))
+
+    )}
+
+</div>
+
+
+<div className="pd-form-comentario">
+
+    <h3>Comentários</h3>
+
+    <textarea
+        value={comentario}
+        onChange={(e) =>
+            setComentario(e.target.value)
+        }
+        placeholder="Escreva um comentário sobre este produto..."
+    />
+
+    <button
+        type="button"
+        onClick={enviarComentario}
+    >
+        Comentar
+    </button>
+
+</div>
+
+
+
+
+
 
         {modalSucesso && (
 
