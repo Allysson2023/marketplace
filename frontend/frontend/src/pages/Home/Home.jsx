@@ -496,24 +496,35 @@ if (usuarioLogado?.tipo === "admin") {
                   : "https://dummyimage.com/300x300"
               }
               alt={produto.nome}
-            />
+            /> 
 
-            <h3 className="centraliza-titulo" >{produto.nome}</h3>
-            <p className="centraliza-titulo" >{produto.nomeLoja}</p>
-            
-           <div className="precos">
 
-                    {produto.preco_antigo && (
-                        <span className="preco-antigo">
-                            R$ {produto.preco_antigo}
-                        </span>
-                    )}
 
-                    <span className="preco-atual">
-                        R$ {produto.preco}
-                    </span>
+                <h3 className="produto-title-safe">{produto.nome}</h3>
 
-                </div>
+<p className="produto-store-safe">{produto.nomeLoja}</p>
+
+<div className="produto-footer-safe">
+
+  <div className="produto-likes-safe">
+    ❤️ {produto.curtidas}
+  </div>
+
+  <div className="produto-price-safe">
+    <span className="price-current-safe">
+      R$ {Number(produto.preco).toFixed(2)}
+    </span>
+
+    {produto.preco_antigo && (
+      <span className="price-old-safe">
+        R$ {Number(produto.preco_antigo).toFixed(2)}
+      </span>
+    )}
+  </div>
+
+</div>
+
+
           </div>
         ))}
       </div>

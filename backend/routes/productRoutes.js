@@ -112,25 +112,24 @@ router.get('/products', (req, res) => {
     let sql = `
         SELECT
             products.*,
-            stores.nome AS nomeLoja
+            stores.nome AS nomeLoja,
+            COUNT(product_likes.id) AS curtidas
         FROM products
         JOIN stores
-        ON products.store_id = stores.id
+            ON products.store_id = stores.id
+        LEFT JOIN product_likes
+            ON product_likes.product_id = products.id
         WHERE 1=1
     `;
 
     let values = [];
 
-    if(categoria){
-
+    if (categoria) {
         sql += " AND products.categoria = ?";
-
         values.push(categoria);
-
     }
 
-    if(busca){
-
+    if (busca) {
         sql += `
             AND (
                 products.nome LIKE ?
@@ -138,33 +137,30 @@ router.get('/products', (req, res) => {
                 OR stores.nome LIKE ?
             )
         `;
-
         values.push(`%${busca}%`);
         values.push(`%${busca}%`);
         values.push(`%${busca}%`);
-
     }
 
+    sql += `
+        GROUP BY products.id
+        ORDER BY products.id DESC
+        LIMIT ? OFFSET ?
+    `;
+
     const pagina = parseInt(req.query.pagina) || 1;
-
     const limite = 30;
-
     const offset = (pagina - 1) * limite;
-
-    sql += " ORDER BY products.id DESC LIMIT ? OFFSET ?";
 
     values.push(limite, offset);
 
     db.query(sql, values, (err, result) => {
-
-        if(err){
+        if (err) {
             return res.status(500).json(err);
         }
 
         res.json(result);
-
     });
-
 });
 
 router.get('/products/:id', (req, res) => {
