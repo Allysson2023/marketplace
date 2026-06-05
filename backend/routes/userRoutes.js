@@ -357,6 +357,7 @@ router.get('/client-profile', authMiddleware, (req, res) => {
         SELECT
             u.id,
             u.username,
+    u.imagem_perfil,
             u.created_at,
             COUNT(p.id) AS total_compras
         FROM users u
@@ -381,6 +382,7 @@ router.get('/client-profile', authMiddleware, (req, res) => {
         res.json({
     id: result[0].id,
     username: result[0].username,
+    imagem_perfil: result[0].imagem_perfil,
     created_at: result[0].created_at,
     total_compras: result[0].total_compras
 });

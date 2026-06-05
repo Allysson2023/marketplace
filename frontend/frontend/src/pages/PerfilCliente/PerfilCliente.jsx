@@ -111,8 +111,22 @@ function PerfilCliente() {
       <div className="card-perfil">
 
         <div className="avatar">
-          {usuario.username?.charAt(0).toUpperCase()}
-        </div>
+
+  {usuario.imagem_perfil ? (
+
+    <img
+      src={`http://localhost:3000/uploads/perfil/${usuario.imagem_perfil}`}
+      alt="Foto de Perfil"
+      className="foto-perfil"
+    />
+
+  ) : (
+
+    usuario.username?.charAt(0).toUpperCase()
+
+  )}
+
+</div>
 
         <h2 className="titulo-perfil">
           Olá, {usuario.username} 👋
