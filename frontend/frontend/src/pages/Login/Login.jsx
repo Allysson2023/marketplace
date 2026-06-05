@@ -55,7 +55,7 @@ function Login() {
     <div className="container-geral">
 
     <div className="login-container">
-      <h2>Economica</h2>
+      <h2>Vandora - AC</h2>
 
 <p className="subtitulo">
   Entre na sua conta e encontre as melhores ofertas.

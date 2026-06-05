@@ -288,7 +288,7 @@ if (usuarioLogado?.tipo === "admin") {
 
       {/* TOPO */}
       <header className="topo">
-        <h2>Economica</h2>
+        <h2>Vandora - AC</h2>
 
         <div className="acoes-topo">
 
@@ -624,7 +624,7 @@ if (usuarioLogado?.tipo === "admin") {
       </div>
 
       <h2 className="welcome-title">
-        Bem-vindo ao Econômica
+        Bem-vindo ao Vandora - AC
       </h2>
 
       <p className="welcome-user">
