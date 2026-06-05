@@ -13,12 +13,9 @@ const [modalLogin, setModalLogin] =
 useState(false);
 
 const [totalCurtidas, setTotalCurtidas] = useState(0);
-const [comentarios, setComentarios] = useState([]);
-
-const [nota, setNota] = useState(5);
-const [comentario, setComentario] = useState("");
 
 const [curtido, setCurtido] = useState(false);
+    const [toast, setToast] = useState("");
 
    const adicionarAoCarrinho = async () => {
 
@@ -147,6 +144,7 @@ const toggleLike = async () => {
 
             setCurtido(true);
             setTotalCurtidas(prev => prev + 1);
+            mostrarToast("❤️ Curtida adicionada!");
 
         } else {
 
@@ -159,11 +157,20 @@ const toggleLike = async () => {
 
             setCurtido(false);
             setTotalCurtidas(prev => prev - 1);
+            mostrarToast("💔 Curtida removida!");
         }
 
     } catch (err) {
         console.log(err);
     }
+};
+
+const mostrarToast = (msg) => {
+    setToast(msg);
+
+    setTimeout(() => {
+        setToast("");
+    }, 2000);
 };
 
 
@@ -187,6 +194,12 @@ const toggleLike = async () => {
         </div>
 
         <div className="produto-detalhe">
+
+            {toast && (
+    <div className="toast-like">
+        {toast}
+    </div>
+)}
 
 
     <div className="galeria">
