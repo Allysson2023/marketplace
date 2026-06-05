@@ -134,6 +134,14 @@ console.log(data);
                             <p><strong>Pagamento:</strong> {pedido.dadosEntrega.pagamento}</p>
                         </>
                     )}
+                    <button
+        className="btn-ver-cliente"
+        onClick={() =>
+            navigate(`/perfil-cliente/${pedido.usuario_id}`)
+        }
+    >
+        Ver Perfil do Cliente
+    </button>
                 </div>
 
                 <div className="card-admin">
@@ -142,8 +150,11 @@ console.log(data);
                     {pedido.tipo_pedido === "entrega" && pedido.dadosEntrega && (
                         <>
                             <p><strong>Endereço:</strong> {pedido.dadosEntrega.endereco}</p>
+
                             <p><strong>Número:</strong> {pedido.dadosEntrega.numero}</p>
+
                             <p><strong>Bairro:</strong> {pedido.dadosEntrega.bairro}</p>
+                            
                             <p><strong>OBS:</strong> {pedido.dadosEntrega.observacao}</p>
                         </>
                     )}

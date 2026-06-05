@@ -37,6 +37,7 @@ import MinhasLojas from "./pages/MinhasLojas/MinhasLojas";
 import DashboardAnaliseLoja from "./pages/DashboardAnaliseLoja/DashboardAnaliseLoja";
 import TopLojas from "./pages/TopLojas/TopLojas";
 import StoreComentarios from "./pages/StoreComentarios/StoreComentarios";
+import MinhaConta from "./pages/MinhaConta/MinhaConta";
 
 function App() {
 
@@ -125,6 +126,14 @@ function App() {
   element={<StoreComentarios />}
 />
 
+<Route
+    path="/minha-conta"
+    element={<MinhaConta />}
+/>
+<Route
+    path="/perfil-cliente/:id"
+    element={<MinhaConta />}
+/>
 
       </Routes>
 

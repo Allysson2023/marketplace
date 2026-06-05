@@ -391,6 +391,61 @@ router.get('/client-profile', authMiddleware, (req, res) => {
 
 });
 
+router.get("/perfil-cliente/:id", (req, res) => {
+
+    const { id } = req.params;
+
+    const sql = `
+        SELECT
+            id,
+            username,
+            imagem_perfil,
+            created_at
+        FROM users
+        WHERE id = ?
+    `;
+
+    db.query(sql, [id], (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: "Usuário não encontrado"
+            });
+        }
+
+        res.json(result[0]);
+
+    });
+
+});
+
+router.get("/perfil-cliente/:id/pedidos", (req, res) => {
+
+    const { id } = req.params;
+
+    const sql = `
+        SELECT id
+        FROM pedidos
+        WHERE usuario_id = ?
+    `;
+
+    db.query(sql, [id], (err, result) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+
+        res.json(result);
+
+    });
+
+});
 
 // ===============================
 // PERFIL LOGADO

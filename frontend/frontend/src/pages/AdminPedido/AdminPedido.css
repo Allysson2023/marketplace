@@ -267,7 +267,69 @@ FOOTER
     color: white;
 }
 
+/* =========================
+BOTÃO VER PERFIL CLIENTE
+========================= */
 
+.btn-ver-cliente{
+    width: 100%;
+
+    margin-top: 18px;
+
+    border: none;
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    color: white;
+
+    padding: 14px 18px;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all .3s ease;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    box-shadow:
+        0 8px 20px rgba(37,99,235,.25);
+}
+
+.btn-ver-cliente::before{
+    content: "👤";
+}
+
+.btn-ver-cliente:hover{
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 12px 25px rgba(37,99,235,.35);
+
+    background:
+        linear-gradient(
+            135deg,
+            #1d4ed8,
+            #2563eb
+        );
+}
+
+.btn-ver-cliente:active{
+    transform: scale(.98);
+}
 
 /* =========================
 TABLET
