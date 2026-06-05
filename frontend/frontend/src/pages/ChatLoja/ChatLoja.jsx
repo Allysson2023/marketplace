@@ -16,6 +16,8 @@ function ChatLoja() {
 
     const mensagensRef = useRef(null);
 
+    const abriuChatRef = useRef(false);
+
     const [chatInfo, setChatInfo] = useState(null);
     const [cliente, setCliente] = useState(null);
 
@@ -100,6 +102,33 @@ function ChatLoja() {
         .catch(err => console.log("Erro mensagens:", err));
 
     }, [chatId, token]);
+
+    useEffect(() => {
+
+    if (!mensagens.length) return;
+
+    const el = mensagensRef.current;
+
+    if (!el) return;
+
+    // primeira abertura do chat
+    if (!abriuChatRef.current) {
+
+        abriuChatRef.current = true;
+
+        setTimeout(() => {
+            el.scrollTop = el.scrollHeight;
+        }, 100);
+
+        return;
+    }
+
+}, [mensagens, chatId]);
+
+useEffect(() => {
+    abriuChatRef.current = false;
+}, [chatId]);
+
 
     // ===============================
     // SOCKET REALTIME

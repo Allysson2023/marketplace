@@ -16,6 +16,7 @@ const jaEnviouInicial = useRef(false);
     const token = localStorage.getItem("token");
 
     const mensagensRef = useRef(null);
+    const abriuChatRef = useRef(false);
 
     const location = useLocation();
 const mensagemInicial = location.state?.mensagemInicial;
@@ -57,7 +58,30 @@ const mensagemInicial = location.state?.mensagemInicial;
 
 }, [chatId, token]);
 
-    
+    useEffect(() => {
+
+    if (!mensagens.length) return;
+
+    const el = mensagensRef.current;
+
+    if (!el) return;
+
+    if (!abriuChatRef.current) {
+
+        abriuChatRef.current = true;
+
+        setTimeout(() => {
+            el.scrollTop = el.scrollHeight;
+        }, 100);
+
+        return;
+    }
+
+}, [mensagens, chatId]);
+
+useEffect(() => {
+    abriuChatRef.current = false;
+}, [chatId]);
 
     // ===============================
     // SOCKET ENTRAR NO CHAT
@@ -111,7 +135,7 @@ const mensagemInicial = location.state?.mensagemInicial;
             behavior: "smooth"
         });
     }
-
+ 
 }, [mensagens]);
 
     // ===============================
